@@ -1,4 +1,4 @@
-## Build a web app that allows users to build their CV in a few minutes with Markdown
+## Build a web app that allows users to build their CV in a few minutes with Markdown (cvmd.vercel.app)
 
 ### Features
 
@@ -6,7 +6,6 @@
 - [ ] User can edit their CV with a template
 - [ ] User can preview their CV
 - [ ] User can download their CV as a PDF
-- [ ] User can export their CV to a file
 
 
 ### Must have
