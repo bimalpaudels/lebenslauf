@@ -53,7 +53,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Link
-              href="/builder"
+              href="/dashboard"
               className="group bg-[#3ECF8E] text-slate-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-[#4BE4B4] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
               Start Building Now
@@ -191,7 +191,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="/builder"
+              href="/dashboard"
               className="group inline-flex items-center bg-[#3ECF8E] text-slate-900 px-10 py-5 rounded-full font-bold text-xl hover:bg-[#4BE4B4] transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2"
             >
               Get Started Free
