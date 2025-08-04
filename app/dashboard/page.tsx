@@ -143,17 +143,6 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="relative z-10 px-6 py-12">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              My CVs
-            </h1>
-            <p className="text-xl text-slate-300 max-w-2xl">
-              Create, manage, and customize your professional CVs. All your work
-              is saved locally in your browser.
-            </p>
-          </div>
-
           {/* Saved CVs Grid */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6">Your CVs</h2>
@@ -186,10 +175,11 @@ export default function Dashboard() {
                 {Object.entries(savedCVs).map(([cvId, cvData]) => (
                   <div
                     key={cvId}
-                    className="group bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative"
+                    className="group bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative cursor-pointer"
                     title={`Edit ${cvData.name} - Last edited: ${formatDate(
                       cvData.updated_at
                     )}`}
+                    onClick={() => (window.location.href = `/builder/${cvId}`)}
                   >
                     <div className="flex-1 relative p-1 overflow-hidden">
                       <CVPreview
@@ -217,8 +207,11 @@ export default function Dashboard() {
                             </p>
                           </div>
                           <div className="flex space-x-1">
-                            <Link
-                              href={`/builder/${cvId}`}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.href = `/builder/${cvId}`;
+                              }}
                               className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/40 transition-colors"
                               title="Edit CV"
                             >
@@ -235,9 +228,18 @@ export default function Dashboard() {
                                   d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                                 />
                               </svg>
-                            </Link>
+                            </button>
                             <button
-                              onClick={() => handleDeleteCV(cvId)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (
+                                  confirm(
+                                    `Are you sure you want to delete "${cvData.name}"? This action cannot be undone.`
+                                  )
+                                ) {
+                                  handleDeleteCV(cvId);
+                                }
+                              }}
                               className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/40 transition-colors"
                               title="Delete CV"
                             >
