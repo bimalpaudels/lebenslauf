@@ -10,6 +10,7 @@ interface SimplePreviewProps {
   fontSize: number;
   pagePadding: number;
   lineHeight: number;
+  paragraphSpacing?: number;
 }
 
 const SimplePreview: React.FC<SimplePreviewProps> = ({
@@ -19,6 +20,7 @@ const SimplePreview: React.FC<SimplePreviewProps> = ({
   fontSize,
   pagePadding,
   lineHeight,
+  paragraphSpacing = 1,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
@@ -268,61 +270,74 @@ const SimplePreview: React.FC<SimplePreviewProps> = ({
       .page-content h1, .measuring-container h1 {
         color: #111827;
         margin-top: 0;
+        margin-bottom: ${paragraphSpacing}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content h2, .measuring-container h2 {
         color: #3b82f6;
-        margin-top: 1.5em;
-        margin-bottom: 0.5em;
+        margin-top: ${paragraphSpacing * 1.5}rem;
+        margin-bottom: ${paragraphSpacing * 0.5}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content h3, .measuring-container h3 {
         color: #111827;
-        margin-top: 1.2em;
-        margin-bottom: 0.4em;
+        margin-top: ${paragraphSpacing * 1.2}rem;
+        margin-bottom: ${paragraphSpacing * 0.4}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content p, .measuring-container p {
         color: #4b5563;
-        margin-bottom: 0.8em;
+        margin-bottom: ${paragraphSpacing * 0.8}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content li, .measuring-container li {
         color: #4b5563;
-        margin-bottom: 0.3em;
+        margin-bottom: ${paragraphSpacing * 0.3}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content ul, .measuring-container ul,
       .page-content ol, .measuring-container ol {
-        margin-bottom: 1em;
+        margin-bottom: ${paragraphSpacing}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content dl, .measuring-container dl {
-        margin-bottom: 1em;
+        margin-bottom: ${paragraphSpacing}rem;
+        line-height: ${lineHeight};
       }
       
       .page-content dt, .measuring-container dt {
         font-weight: 600;
         color: #111827;
+        line-height: ${lineHeight};
       }
       
       .page-content dd, .measuring-container dd {
         margin-left: 0;
-        margin-bottom: 0.5em;
+        margin-bottom: ${paragraphSpacing * 0.5}rem;
         color: #6b7280;
+        line-height: ${lineHeight};
       }
       
       .page-content strong, .measuring-container strong {
         color: #111827;
+        line-height: ${lineHeight};
       }
       
       .page-content em, .measuring-container em {
         color: #6b7280;
+        line-height: ${lineHeight};
       }
       
       .page-content a, .measuring-container a {
         color: #3b82f6;
         text-decoration: underline;
+        line-height: ${lineHeight};
       }
       
       /* Scale indicator */
@@ -423,6 +438,7 @@ const SimplePreview: React.FC<SimplePreviewProps> = ({
     lineHeight,
     pageDimensions,
     scale,
+    paragraphSpacing,
   ]);
 
   const renderContent = () => {

@@ -178,7 +178,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className={`w-full h-full bg-slate-800 text-slate-200 border-none p-4 font-mono text-sm resize-none focus:outline-none transition-colors overflow-y-auto ${
+          className={`w-full h-full bg-slate-800 text-slate-200 border-none p-4 font-mono text-sm resize-none focus:outline-none transition-colors overflow-y-auto editor-textarea ${
             isFocused ? "ring-1 ring-[#3ECF8E]" : ""
           }`}
           style={{
@@ -216,12 +216,31 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           @apply bg-slate-600 text-white;
         }
 
-        textarea {
+        .editor-textarea {
           font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas",
             monospace;
+          scrollbar-width: thin;
+          scrollbar-color: #3ecf8e #1e293b;
         }
 
-        textarea::placeholder {
+        .editor-textarea::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .editor-textarea::-webkit-scrollbar-track {
+          background: #1e293b;
+        }
+
+        .editor-textarea::-webkit-scrollbar-thumb {
+          background: #3ecf8e;
+          border-radius: 4px;
+        }
+
+        .editor-textarea::-webkit-scrollbar-thumb:hover {
+          background: #4be4b4;
+        }
+
+        .editor-textarea::placeholder {
           color: #64748b;
         }
       `}</style>

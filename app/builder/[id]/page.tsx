@@ -305,6 +305,7 @@ export default function BuilderPage({
                   fontSize={fontSize}
                   pagePadding={pagePadding}
                   lineHeight={lineHeight}
+                  paragraphSpacing={paragraphSpacing}
                 />
               </div>
             </div>
