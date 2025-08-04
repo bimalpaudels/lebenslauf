@@ -175,7 +175,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 20px;
       }
       
       .preview-container::-webkit-scrollbar {
@@ -345,19 +344,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         line-height: ${lineHeight};
       }
       
-      .scale-indicator {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        z-index: 1000;
-        backdrop-filter: blur(4px);
-      }
+
       
       .empty-state {
         display: flex;
@@ -382,17 +369,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         opacity: 0.5;
       }
       
-      .page-info {
-        text-align: center;
-        color: #6b7280;
-        font-size: 12px;
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        margin-top: 10px;
-        padding: 8px 16px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 6px;
-        backdrop-filter: blur(4px);
-      }
+
       
       @page {
         size: ${pageFormat === "A4" ? "A4" : "letter"};
@@ -400,8 +377,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       }
       
       @media print {
-        .scale-indicator,
-        .page-info,
         .page-number {
           display: none !important;
         }
@@ -594,18 +569,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         <div ref={measureRef} className="measuring-container" />
 
         <div className="preview-container" ref={containerRef}>
-          <div className="scale-indicator">
-            {Math.round(scale * 100)}% • {pageFormat}
-          </div>
-
           {renderContent()}
-
-          {pages.length > 0 && (
-            <div className="page-info">
-              {pages.length} page{pages.length !== 1 ? "s" : ""} • {pageFormat}{" "}
-              format • {fontSize}px font
-            </div>
-          )}
         </div>
       </div>
     );

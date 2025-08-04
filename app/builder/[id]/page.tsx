@@ -120,134 +120,131 @@ export default function BuilderPage({
               </div>
               <span className="text-white font-medium text-sm">BuildCV</span>
             </Link>
-            <h1 className="text-sm font-semibold text-white">{templateName}</h1>
-            <p className="text-xs text-slate-400">
-              ID: {cvId.substring(0, 8)}...
-            </p>
           </div>
 
           {/* Controls */}
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-            {/* Page Format */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
-                Page Format
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setPageFormat("A4")}
-                  className={`p-2 rounded text-xs transition-colors ${
-                    pageFormat === "A4"
-                      ? "bg-[#3ECF8E] text-slate-900 font-medium"
-                      : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                  }`}
-                >
-                  A4
-                </button>
-                <button
-                  onClick={() => setPageFormat("Letter")}
-                  className={`p-2 rounded text-xs transition-colors ${
-                    pageFormat === "Letter"
-                      ? "bg-[#3ECF8E] text-slate-900 font-medium"
-                      : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                  }`}
-                >
-                  Letter
-                </button>
+          <div className="flex-1 p-4 space-y-6 overflow-y-auto">
+            {/* Page Settings */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+                Page Settings
+              </h3>
+
+              {/* Page Format */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Page Format
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setPageFormat("A4")}
+                    className={`p-2 rounded text-xs transition-colors ${
+                      pageFormat === "A4"
+                        ? "bg-[#3ECF8E] text-slate-900 font-medium"
+                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    }`}
+                  >
+                    A4
+                  </button>
+                  <button
+                    onClick={() => setPageFormat("Letter")}
+                    className={`p-2 rounded text-xs transition-colors ${
+                      pageFormat === "Letter"
+                        ? "bg-[#3ECF8E] text-slate-900 font-medium"
+                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    }`}
+                  >
+                    Letter
+                  </button>
+                </div>
+              </div>
+
+              {/* Page Margin */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Page Margin: {pageMargin}px
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="40"
+                  value={pageMargin}
+                  onChange={(e) => setPageMargin(parseInt(e.target.value))}
+                  className="w-full accent-[#3ECF8E]"
+                />
+              </div>
+
+              {/* Page Padding */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Content Padding: {pagePadding}px
+                </label>
+                <input
+                  type="range"
+                  min="8"
+                  max="48"
+                  value={pagePadding}
+                  onChange={(e) => setPagePadding(parseInt(e.target.value))}
+                  className="w-full accent-[#3ECF8E]"
+                />
               </div>
             </div>
 
-            {/* Font Size */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
-                Font Size: {fontSize}px
-              </label>
-              <input
-                type="range"
-                min="8"
-                max="18"
-                value={fontSize}
-                onChange={(e) => setFontSize(parseInt(e.target.value))}
-                className="w-full accent-[#3ECF8E]"
-              />
-            </div>
+            {/* Typography Settings */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+                Typography
+              </h3>
 
-            {/* Page Margin */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
-                Page Margin: {pageMargin}px
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="40"
-                value={pageMargin}
-                onChange={(e) => setPageMargin(parseInt(e.target.value))}
-                className="w-full accent-[#3ECF8E]"
-              />
-            </div>
+              {/* Font Size */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Font Size: {fontSize}px
+                </label>
+                <input
+                  type="range"
+                  min="8"
+                  max="18"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(parseInt(e.target.value))}
+                  className="w-full accent-[#3ECF8E]"
+                />
+              </div>
 
-            {/* Page Padding */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
-                Content Padding: {pagePadding}px
-              </label>
-              <input
-                type="range"
-                min="8"
-                max="48"
-                value={pagePadding}
-                onChange={(e) => setPagePadding(parseInt(e.target.value))}
-                className="w-full accent-[#3ECF8E]"
-              />
-            </div>
+              {/* Line Height */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Line Height: {lineHeight}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="2"
+                  step="0.1"
+                  value={lineHeight}
+                  onChange={(e) => setLineHeight(parseFloat(e.target.value))}
+                  className="w-full accent-[#3ECF8E]"
+                />
+              </div>
 
-            {/* Line Height */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
-                Line Height: {lineHeight}
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="2"
-                step="0.1"
-                value={lineHeight}
-                onChange={(e) => setLineHeight(parseFloat(e.target.value))}
-                className="w-full accent-[#3ECF8E]"
-              />
+              {/* Paragraph Spacing */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Paragraph Spacing: {paragraphSpacing}rem
+                </label>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.1"
+                  value={paragraphSpacing}
+                  onChange={(e) =>
+                    setParagraphSpacing(parseFloat(e.target.value))
+                  }
+                  className="w-full accent-[#3ECF8E]"
+                />
+              </div>
             </div>
-
-            {/* Paragraph Spacing */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-2">
-                Paragraph Spacing: {paragraphSpacing}rem
-              </label>
-              <input
-                type="range"
-                min="0.5"
-                max="2"
-                step="0.1"
-                value={paragraphSpacing}
-                onChange={(e) =>
-                  setParagraphSpacing(parseFloat(e.target.value))
-                }
-                className="w-full accent-[#3ECF8E]"
-              />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="p-4 space-y-2 border-t border-slate-700">
-            <button
-              onClick={() => previewRef.current?.exportToPDF()}
-              className="w-full bg-[#3ECF8E] text-slate-900 py-2 px-3 rounded-lg text-sm font-semibold hover:bg-[#4BE4B4] transition-colors"
-            >
-              Export PDF
-            </button>
-            <button className="w-full bg-slate-700 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
-              Save CV
-            </button>
           </div>
         </div>
 
@@ -278,9 +275,6 @@ export default function BuilderPage({
                       <h3 className="text-sm font-medium text-white">
                         Edit CV
                       </h3>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Use markdown formatting for rich text
-                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -288,9 +282,6 @@ export default function BuilderPage({
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-xs text-slate-400">Auto-save</span>
                     </div>
-                    <button className="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 transition-colors">
-                      Save
-                    </button>
                   </div>
                 </div>
 
@@ -326,26 +317,18 @@ export default function BuilderPage({
                       <h3 className="text-sm font-medium text-white">
                         Live Preview
                       </h3>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Real-time preview of your CV
-                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-1">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-xs text-slate-400">Live</span>
                     </div>
-                    <div className="flex items-center space-x-1 px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
-                      <span>{pageFormat}</span>
-                      <span className="text-slate-500">•</span>
-                      <span>{fontSize}px</span>
-                    </div>
                     <button
-                      className="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 transition-colors"
                       onClick={() => previewRef.current?.exportToPDF()}
+                      className="px-3 py-1 text-xs bg-[#3ECF8E] text-slate-900 rounded font-medium hover:bg-[#4BE4B4] transition-colors"
                     >
-                      Export
+                      Export PDF
                     </button>
                   </div>
                 </div>
