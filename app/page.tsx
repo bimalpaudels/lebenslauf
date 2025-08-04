@@ -20,7 +20,7 @@ export default function Home() {
               Features
             </a>
             <a
-              href="https://github.com/buildcv/buildcv"
+              href="https://github.com/bimalpaudels/lebenslauf"
               className="text-slate-300 hover:text-[#3ECF8E] transition-colors"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ export default function Home() {
               </span>
             </Link>
             <Link
-              href="https://github.com/buildcv/buildcv"
+              href="https://github.com/bimalpaudels/lebenslauf"
               className="group inline-flex items-center border-2 border-[#3ECF8E] text-[#3ECF8E] px-10 py-5 rounded-full font-bold text-xl hover:bg-[#3ECF8E] hover:text-slate-900 transition-all duration-300"
             >
               <svg

@@ -121,7 +121,7 @@ export default function Dashboard() {
           </Link>
           <div className="hidden md:flex items-center space-x-8">
             <a
-              href="https://github.com/buildcv/buildcv"
+              href="https://github.com/bimalpaudels/lebenslauf"
               className="text-slate-300 hover:text-[#3ECF8E] transition-colors"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
