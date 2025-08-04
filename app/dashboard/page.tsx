@@ -206,20 +206,20 @@ export default function Dashboard() {
                       />
 
                       {/* Overlay with CV info */}
-                      <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-3">
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-3">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h4 className="text-white font-medium text-sm drop-shadow-sm">
+                            <h4 className="text-white font-semibold text-sm drop-shadow-lg">
                               {cvData.name}
                             </h4>
-                            <p className="text-white/80 text-xs drop-shadow-sm">
+                            <p className="text-white/90 text-xs drop-shadow-lg font-medium">
                               Last edited: {formatDate(cvData.updated_at)}
                             </p>
                           </div>
                           <div className="flex space-x-1">
                             <Link
                               href={`/builder/${cvId}`}
-                              className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/30 transition-colors"
+                              className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/40 transition-colors"
                               title="Edit CV"
                             >
                               <svg
@@ -238,7 +238,7 @@ export default function Dashboard() {
                             </Link>
                             <button
                               onClick={() => handleDeleteCV(cvId)}
-                              className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/30 transition-colors"
+                              className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/40 transition-colors"
                               title="Delete CV"
                             >
                               <svg
@@ -270,41 +270,16 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold text-white mb-6">
               Choose a Template
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {fileBasedTemplates.map((template) => {
                 const preview = templatePreviews[template.id];
                 return (
-                  <button
+                  <div
                     key={template.id}
-                    onClick={() => handleCreateNewCV(template.id)}
-                    className="group bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 hover:bg-slate-700/60 transition-all duration-300 border border-slate-700/50 hover:border-[#3ECF8E] flex flex-col aspect-[3/4] min-h-[300px] text-left relative overflow-hidden"
+                    className="group bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative"
                     title={`Use ${template.name} template - ${template.description}`}
                   >
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-[#3ECF8E] rounded-lg flex items-center justify-center mx-auto mb-3">
-                          <svg
-                            className="w-6 h-6 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-white font-semibold text-lg">
-                          Use Template
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 mb-4 overflow-hidden rounded-lg">
+                    <div className="flex-1 relative p-1 overflow-hidden">
                       {preview ? (
                         <CVPreview
                           markdown={preview.markdown}
@@ -313,7 +288,7 @@ export default function Dashboard() {
                           standalone={true}
                         />
                       ) : (
-                        <div className="h-full bg-slate-700/50 rounded-lg flex items-center justify-center relative overflow-hidden">
+                        <div className="h-full bg-slate-100 rounded-lg flex items-center justify-center relative overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-br from-[#3ECF8E]/10 to-blue-500/10"></div>
                           <div className="relative text-center p-4">
                             <div className="w-12 h-12 bg-[#3ECF8E]/20 rounded-lg flex items-center justify-center mx-auto mb-3">
@@ -331,22 +306,49 @@ export default function Dashboard() {
                                 />
                               </svg>
                             </div>
-                            <div className="text-xs text-slate-400">
+                            <div className="text-xs text-slate-500">
                               Loading Preview...
                             </div>
                           </div>
                         </div>
                       )}
+
+                      {/* Overlay with template info */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-white font-semibold text-sm drop-shadow-lg">
+                              {template.name}
+                            </h4>
+                            <p className="text-white/90 text-xs drop-shadow-lg font-medium">
+                              {template.description}
+                            </p>
+                          </div>
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={() => handleCreateNewCV(template.id)}
+                              className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/40 transition-colors"
+                              title="Use Template"
+                            >
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <h4 className="text-white font-semibold text-lg group-hover:text-[#3ECF8E] transition-colors duration-300">
-                        {template.name}
-                      </h4>
-                      <p className="text-slate-400 text-sm">
-                        {template.description}
-                      </p>
-                    </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
