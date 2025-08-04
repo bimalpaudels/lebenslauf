@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fileBasedTemplates } from "@/lib/template-loader";
 import { getAllCVs, createNewCV, deleteCV, type CVData } from "@/lib/storage";
+import CVPreview from "@/components/CVPreview";
 
 // Generate a simple unique ID
 const generateId = () => {
@@ -16,6 +17,9 @@ const generateId = () => {
 export default function Dashboard() {
   const [savedCVs, setSavedCVs] = useState<{ [key: string]: CVData }>({});
   const [loading, setLoading] = useState(true);
+  const [templatePreviews, setTemplatePreviews] = useState<{
+    [key: string]: { markdown: string; css: string };
+  }>({});
 
   useEffect(() => {
     // Load saved CVs from localForage
@@ -31,6 +35,37 @@ export default function Dashboard() {
     };
 
     loadSavedCVs();
+  }, []);
+
+  // Load template previews
+  useEffect(() => {
+    const loadTemplatePreviews = async () => {
+      const previews: { [key: string]: { markdown: string; css: string } } = {};
+
+      for (const template of fileBasedTemplates) {
+        try {
+          const [markdownResponse, cssResponse] = await Promise.all([
+            fetch(template.markdownPath),
+            fetch(template.cssPath),
+          ]);
+
+          if (markdownResponse.ok && cssResponse.ok) {
+            const [markdown, css] = await Promise.all([
+              markdownResponse.text(),
+              cssResponse.text(),
+            ]);
+
+            previews[template.id] = { markdown, css };
+          }
+        } catch (error) {
+          console.error(`Error loading template ${template.id}:`, error);
+        }
+      }
+
+      setTemplatePreviews(previews);
+    };
+
+    loadTemplatePreviews();
   }, []);
 
   const handleCreateNewCV = async (templateId: string) => {
@@ -151,57 +186,76 @@ export default function Dashboard() {
                 {Object.entries(savedCVs).map(([cvId, cvData]) => (
                   <div
                     key={cvId}
-                    className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 aspect-[3/4] min-h-[300px] flex flex-col"
+                    className="group bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative"
+                    title={`Edit ${cvData.name} - Last edited: ${formatDate(
+                      cvData.updated_at
+                    )}`}
                   >
-                    <div className="flex-1 bg-slate-700/50 rounded-lg mb-4 flex items-center justify-center">
-                      <span className="text-slate-500 text-sm">CV Preview</span>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-white font-medium text-sm">
-                        {cvData.name}
-                      </h4>
-                      <p className="text-slate-400 text-xs">
-                        Last edited: {formatDate(cvData.updated_at)}
-                      </p>
-                      <div className="flex items-center justify-between pt-2">
-                        <span className="text-xs text-slate-500">Draft</span>
-                        <div className="flex space-x-1">
-                          <Link
-                            href={`/builder/${cvId}`}
-                            className="w-6 h-6 bg-slate-700 rounded flex items-center justify-center hover:bg-slate-600 transition-colors"
-                          >
-                            <svg
-                              className="w-3 h-3 text-slate-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                    <div className="flex-1 relative p-1 overflow-hidden">
+                      <CVPreview
+                        markdown={cvData.content}
+                        css={cvData.design}
+                        pageFormat={cvData.style.pageSize as "A4" | "Letter"}
+                        fontSize={cvData.style.fontSize}
+                        pagePadding={cvData.style.marginV}
+                        lineHeight={cvData.style.lineHeight}
+                        paragraphSpacing={cvData.style.paragraphSpace}
+                        themeColor={cvData.style.theme}
+                        className="h-full"
+                        standalone={true}
+                      />
+
+                      {/* Overlay with CV info */}
+                      <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-white font-medium text-sm drop-shadow-sm">
+                              {cvData.name}
+                            </h4>
+                            <p className="text-white/80 text-xs drop-shadow-sm">
+                              Last edited: {formatDate(cvData.updated_at)}
+                            </p>
+                          </div>
+                          <div className="flex space-x-1">
+                            <Link
+                              href={`/builder/${cvId}`}
+                              className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/30 transition-colors"
+                              title="Edit CV"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                              />
-                            </svg>
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteCV(cvId)}
-                            className="w-6 h-6 bg-slate-700 rounded flex items-center justify-center hover:bg-slate-600 transition-colors"
-                          >
-                            <svg
-                              className="w-3 h-3 text-slate-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                                />
+                              </svg>
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteCV(cvId)}
+                              className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded flex items-center justify-center hover:bg-white/30 transition-colors"
+                              title="Delete CV"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -217,50 +271,84 @@ export default function Dashboard() {
               Choose a Template
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {fileBasedTemplates.map((template) => (
-                <button
-                  key={template.id}
-                  onClick={() => handleCreateNewCV(template.id)}
-                  className="group bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 hover:bg-slate-700/60 transition-all duration-300 border border-slate-700/50 hover:border-[#3ECF8E] flex flex-col aspect-[3/4] min-h-[300px] text-left"
-                >
-                  <div className="flex-1 bg-slate-700/50 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#3ECF8E]/10 to-blue-500/10"></div>
-                    <div className="relative text-center p-4">
-                      <div className="w-12 h-12 bg-[#3ECF8E]/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <svg
-                          className="w-6 h-6 text-[#3ECF8E]"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="text-xs text-slate-400">
-                        Template Preview
+              {fileBasedTemplates.map((template) => {
+                const preview = templatePreviews[template.id];
+                return (
+                  <button
+                    key={template.id}
+                    onClick={() => handleCreateNewCV(template.id)}
+                    className="group bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 hover:bg-slate-700/60 transition-all duration-300 border border-slate-700/50 hover:border-[#3ECF8E] flex flex-col aspect-[3/4] min-h-[300px] text-left relative overflow-hidden"
+                    title={`Use ${template.name} template - ${template.description}`}
+                  >
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-[#3ECF8E] rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <svg
+                            className="w-6 h-6 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-white font-semibold text-lg">
+                          Use Template
+                        </p>
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-white font-semibold text-lg group-hover:text-[#3ECF8E] transition-colors duration-300">
-                      {template.name}
-                    </h4>
-                    <p className="text-slate-400 text-sm">
-                      {template.description}
-                    </p>
-                    <div className="pt-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#3ECF8E]/10 text-[#3ECF8E] border border-[#3ECF8E]/20">
-                        Create New CV
-                      </span>
+
+                    <div className="flex-1 mb-4 overflow-hidden rounded-lg">
+                      {preview ? (
+                        <CVPreview
+                          markdown={preview.markdown}
+                          css={preview.css}
+                          className="h-full"
+                          standalone={true}
+                        />
+                      ) : (
+                        <div className="h-full bg-slate-700/50 rounded-lg flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-[#3ECF8E]/10 to-blue-500/10"></div>
+                          <div className="relative text-center p-4">
+                            <div className="w-12 h-12 bg-[#3ECF8E]/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                              <svg
+                                className="w-6 h-6 text-[#3ECF8E]"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              Loading Preview...
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </button>
-              ))}
+                    <div className="space-y-2">
+                      <h4 className="text-white font-semibold text-lg group-hover:text-[#3ECF8E] transition-colors duration-300">
+                        {template.name}
+                      </h4>
+                      <p className="text-slate-400 text-sm">
+                        {template.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
