@@ -18,6 +18,7 @@ interface SimplePreviewProps {
   pagePadding: number;
   lineHeight: number;
   paragraphSpacing?: number;
+  themeColor?: string;
 }
 
 export interface SimplePreviewRef {
@@ -34,6 +35,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       pagePadding,
       lineHeight,
       paragraphSpacing = 1,
+      themeColor = "#3ECF8E",
     },
     ref
   ) => {
@@ -272,14 +274,14 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       }
       
       .page-content h1, .measuring-container h1 {
-        color: #111827;
+        color: ${themeColor};
         margin-top: 0;
         margin-bottom: ${paragraphSpacing}rem;
         line-height: ${lineHeight};
       }
       
       .page-content h2, .measuring-container h2 {
-        color: #3b82f6;
+        color: ${themeColor};
         margin-top: ${paragraphSpacing * 1.5}rem;
         margin-bottom: ${paragraphSpacing * 0.5}rem;
         line-height: ${lineHeight};
@@ -339,7 +341,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       }
       
       .page-content a, .measuring-container a {
-        color: #3b82f6;
+        color: ${themeColor};
         text-decoration: underline;
         line-height: ${lineHeight};
       }
@@ -437,14 +439,14 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
           .join("\n")}
         
         .page-content h1 {
-          color: #111827 !important;
+          color: ${themeColor} !important;
           margin-top: 0 !important;
           margin-bottom: ${paragraphSpacing}rem !important;
           line-height: ${lineHeight} !important;
         }
         
         .page-content h2 {
-          color: #3b82f6 !important;
+          color: ${themeColor} !important;
           margin-top: ${paragraphSpacing * 1.5}rem !important;
           margin-bottom: ${paragraphSpacing * 0.5}rem !important;
           line-height: ${lineHeight} !important;
@@ -504,7 +506,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         }
         
         .page-content a {
-          color: #3b82f6 !important;
+          color: ${themeColor} !important;
           text-decoration: underline !important;
           line-height: ${lineHeight} !important;
         }
@@ -519,6 +521,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       pageDimensions,
       scale,
       paragraphSpacing,
+      themeColor,
     ]);
 
     const renderContent = () => {

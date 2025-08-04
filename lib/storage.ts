@@ -6,10 +6,8 @@ export interface CVData {
   content: string;
   name: string;
   style: {
-    font: { name: string; fontFamily: string };
     fontSize: number;
     lineHeight: number;
-    marginH: number;
     marginV: number;
     pageSize: string;
     paragraphSpace: number;
@@ -97,14 +95,12 @@ export async function createNewCV(
     content: templateMarkdown,
     name: "New Resume",
     style: {
-      font: { name: "Times New Roman", fontFamily: "Times New Roman" },
       fontSize: 12,
       lineHeight: 1.4,
-      marginH: 20,
       marginV: 20,
       pageSize: "A4",
       paragraphSpace: 1,
-      theme: "#377BB5",
+      theme: "#3ECF8E",
     },
     updated_at: now,
   };

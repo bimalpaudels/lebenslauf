@@ -13,6 +13,15 @@ interface BuilderPageProps {
   }>;
 }
 
+// Theme color options
+const themeColors = [
+  { name: "Site Theme", value: "#3ECF8E" },
+  { name: "Blue", value: "#377BB5" },
+  { name: "Purple", value: "#8B5CF6" },
+  { name: "Red", value: "#EF4444" },
+  { name: "Orange", value: "#F97316" },
+];
+
 export default function BuilderPage({ params }: BuilderPageProps) {
   const [pageFormat, setPageFormat] = useState<"A4" | "Letter">("A4");
   const [fontSize, setFontSize] = useState(12);
@@ -24,10 +33,11 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const [templateMarkdown, setTemplateMarkdown] = useState<string>("");
   const [templateCss, setTemplateCss] = useState<string>("");
   const [templateName, setTemplateName] = useState<string>("");
-  const [pageMargin, setPageMargin] = useState(20);
   const [pagePadding, setPagePadding] = useState(16);
   const [paragraphSpacing, setParagraphSpacing] = useState(1);
   const [lineHeight, setLineHeight] = useState(1.4);
+  const [themeColor, setThemeColor] = useState("#3ECF8E");
+  const [customColor, setCustomColor] = useState("");
 
   // Auto-save timer ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,10 +64,10 @@ export default function BuilderPage({ params }: BuilderPageProps) {
           if (savedCV.style) {
             setFontSize(savedCV.style.fontSize);
             setLineHeight(savedCV.style.lineHeight);
-            setPageMargin(savedCV.style.marginH);
             setPagePadding(savedCV.style.marginV);
             setParagraphSpacing(savedCV.style.paragraphSpace);
             setPageFormat(savedCV.style.pageSize as "A4" | "Letter");
+            setThemeColor(savedCV.style.theme);
           }
         } else {
           // CV not found, redirect to dashboard
@@ -108,6 +118,40 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handleMarkdownChange = (newMarkdown: string) => {
     setTemplateMarkdown(newMarkdown);
     autoSave(newMarkdown);
+  };
+
+  // Handle font size change
+  const handleFontSizeChange = (value: number) => {
+    setFontSize(value);
+    if (cvId && cvData) {
+      updateCV(cvId, {
+        style: {
+          ...cvData.style,
+          fontSize: value,
+        },
+      });
+    }
+  };
+
+  // Handle theme color change
+  const handleThemeColorChange = (color: string) => {
+    setThemeColor(color);
+    if (cvId && cvData) {
+      updateCV(cvId, {
+        style: {
+          ...cvData.style,
+          theme: color,
+        },
+      });
+    }
+  };
+
+  // Handle custom color input
+  const handleCustomColorChange = (color: string) => {
+    setCustomColor(color);
+    if (color.match(/^#[0-9A-F]{6}$/i)) {
+      handleThemeColorChange(color);
+    }
   };
 
   // Cleanup timer on unmount
@@ -196,7 +240,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
           </div>
 
           {/* Controls */}
-          <div className="flex-1 p-4 space-y-6 overflow-y-auto">
+          <div className="flex-1 p-4 space-y-8 overflow-y-auto">
             {/* Page Settings */}
             <div className="space-y-4">
               <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
@@ -232,21 +276,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                 </div>
               </div>
 
-              {/* Page Margin */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Page Margin: {pageMargin}px
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="40"
-                  value={pageMargin}
-                  onChange={(e) => setPageMargin(parseInt(e.target.value))}
-                  className="w-full accent-[#3ECF8E]"
-                />
-              </div>
-
               {/* Page Padding */}
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-2">
@@ -262,6 +291,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                 />
               </div>
             </div>
+
+            {/* Separator */}
+            <div className="border-t border-slate-700/50"></div>
 
             {/* Typography Settings */}
             <div className="space-y-4">
@@ -279,7 +311,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   min="10"
                   max="16"
                   value={fontSize}
-                  onChange={(e) => setFontSize(parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleFontSizeChange(parseInt(e.target.value))
+                  }
                   className="w-full accent-[#3ECF8E]"
                 />
               </div>
@@ -316,6 +350,60 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   }
                   className="w-full accent-[#3ECF8E]"
                 />
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div className="border-t border-slate-700/50"></div>
+
+            {/* Theme Settings */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+                Theme
+              </h3>
+
+              {/* Theme Color Options */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Theme Color
+                </label>
+                <div className="grid grid-cols-5 gap-2 mb-3">
+                  {themeColors.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => handleThemeColorChange(color.value)}
+                      className={`w-8 h-8 rounded border-2 transition-all ${
+                        themeColor === color.value
+                          ? "border-white scale-110"
+                          : "border-slate-600 hover:border-slate-400"
+                      }`}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Color Input */}
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-2">
+                  Custom Color
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="color"
+                    value={themeColor}
+                    onChange={(e) => handleThemeColorChange(e.target.value)}
+                    className="w-8 h-8 rounded border border-slate-600 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    placeholder="#3ECF8E"
+                    value={customColor}
+                    onChange={(e) => handleCustomColorChange(e.target.value)}
+                    className="flex-1 bg-slate-700 text-slate-300 text-xs rounded p-2 border border-slate-600 focus:border-[#3ECF8E] focus:outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -423,6 +511,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                     pagePadding={pagePadding}
                     lineHeight={lineHeight}
                     paragraphSpacing={paragraphSpacing}
+                    themeColor={themeColor}
                   />
                 </div>
               </div>
