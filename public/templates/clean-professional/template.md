@@ -2,7 +2,7 @@
 name: Haha Ha
 header:
   - text: |
-      <span style="font-size: 1.2em; font-weight: bold;">Applying for: Cooking Engineer</span>
+      <span style="font-size: 1.1em; font-weight: bold;">Applying for: Cooking Engineer</span>
   - text: <span class="iconify" data-icon="tabler:phone"></span> (+1) 123-456-7890
     newLine: true
   - text: <span class="iconify" data-icon="tabler:mail"></span> icancook@email.com
@@ -36,30 +36,29 @@ _Culinary Visualization and Potato Roasting Conference (CVPR), 2077 (Best Paper 
 **Cooking Engineer Intern** <span class="date-location">Microwavesoft</span>  
 <span class="date-right">07/2021 - Present</span>
 
-• Developed an innovative, versatile cooking methodology applicable across diverse ingredients, incorporating and improving upon recent advances in cooking techniques
-• Created a streamlined cream of mushroom soup recipe, achieving results comparable to complex state-of-the-art techniques through a multi-scale cutting approach; published in NIPS (see P1)
-• Designed a specialized cooking pan that enhanced research efficiency for team members
+• Developed innovative cooking methodology applicable across diverse ingredients
+• Created streamlined cream of mushroom soup recipe achieving state-of-the-art results
+• Designed specialized cooking pan enhancing research efficiency for team members
 
 **Engineering Chef Intern** <span class="date-location">University of California, Berkeley</span>  
 <span class="date-right">08/2020 - Present</span>
 
-• Developed a precise mapo tofu quality assessment technique using thermometer-based measurements
-• Invented a rapid stir-frying algorithm for tofu cooking, replacing vague instructions like "add as much as you can" with specific measurements; published in CVPR 2077 (see P2)
-• Outperformed SOTA cooking methods in both efficiency and quality across experiments with popular tofu types
+• Developed precise mapo tofu quality assessment technique using thermometer-based measurements
+• Invented rapid stir-frying algorithm for tofu cooking with specific measurements
+• Outperformed SOTA cooking methods in efficiency and quality across popular tofu types
 
 **Student Chef Intern** <span class="date-location">Cabbage Melon University</span>  
 <span class="date-right">03/2020 - 06/2020</span>
 
-• Developed an innovative mapo tofu consumption framework utilizing a spoon-chopstick combination
-• Engineered a filtering method for tofu dataset creation, inspired by bean grinding techniques
+• Developed innovative mapo tofu consumption framework utilizing spoon-chopstick combination
+• Engineered filtering method for tofu dataset creation inspired by bean grinding techniques
 • Established two new cooking quality baselines for eating plan novelty and diversity
-• Significantly surpassed existing methods and baselines in diversity, novelty, and coherence
 
 **Research Chef Intern** <span class="date-location">Soupchopstick</span>  
 <span class="date-right">07/2018 - 08/2018</span>
 
-• Designed two novel sandwiches by repurposing breads and meat from traditional bacon cheeseburgers, maximizing resource efficiency
-• Leveraged structure duality to boost cooking speed for two complementary tasks based on shared ingredients
+• Designed two novel sandwiches by repurposing breads and meat from traditional bacon cheeseburgers
+• Leveraged structure duality to boost cooking speed for complementary tasks
 • Surpassed strong baselines on QWE15 and ASDF14 dataset
 
 ## Awards and Honors
