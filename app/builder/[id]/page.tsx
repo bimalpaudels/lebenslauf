@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import {
-  getFileBasedTemplateById,
-  loadTemplateContent,
-} from "@/lib/template-loader";
+import { loadCV, updateCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
 import SimplePreview, { SimplePreviewRef } from "@/components/SimplePreview";
 import SimpleSplitPane from "@/components/SimpleSplitPane";
@@ -14,18 +11,15 @@ interface BuilderPageProps {
   params: Promise<{
     id: string;
   }>;
-  searchParams: Promise<{
-    template?: string;
-  }>;
 }
 
-export default function BuilderPage({
-  params,
-  searchParams,
-}: BuilderPageProps) {
+export default function BuilderPage({ params }: BuilderPageProps) {
   const [pageFormat, setPageFormat] = useState<"A4" | "Letter">("A4");
   const [fontSize, setFontSize] = useState(12);
   const [cvId, setCvId] = useState<string>("");
+  const [cvData, setCvData] = useState<CVData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [templateMarkdown, setTemplateMarkdown] = useState<string>("");
   const [templateCss, setTemplateCss] = useState<string>("");
@@ -35,32 +29,111 @@ export default function BuilderPage({
   const [paragraphSpacing, setParagraphSpacing] = useState(1);
   const [lineHeight, setLineHeight] = useState(1.4);
 
+  // Auto-save timer ref
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Ref to access the SimplePreview export functionality
   const previewRef = useRef<SimplePreviewRef>(null);
 
   useEffect(() => {
     const initializeBuilder = async () => {
-      const [resolvedParams, resolvedSearchParams] = await Promise.all([
-        params,
-        searchParams,
-      ]);
+      try {
+        const resolvedParams = await params;
+        const id = resolvedParams.id;
+        setCvId(id);
 
-      setCvId(resolvedParams.id);
+        // Load CV data from localForage
+        const savedCV = await loadCV(id);
+        if (savedCV) {
+          setCvData(savedCV);
+          setTemplateMarkdown(savedCV.content);
+          setTemplateCss(savedCV.design);
+          setTemplateName(savedCV.name);
 
-      const templateIdFromUrl =
-        resolvedSearchParams.template || "modern-professional";
-
-      const fileTemplate = getFileBasedTemplateById(templateIdFromUrl);
-      if (fileTemplate) {
-        setTemplateName(fileTemplate.name);
-        const content = await loadTemplateContent(fileTemplate);
-        setTemplateMarkdown(content.markdown);
-        setTemplateCss(content.css);
+          // Load styles from saved data
+          if (savedCV.style) {
+            setFontSize(savedCV.style.fontSize);
+            setLineHeight(savedCV.style.lineHeight);
+            setPageMargin(savedCV.style.marginH);
+            setPagePadding(savedCV.style.marginV);
+            setParagraphSpacing(savedCV.style.paragraphSpace);
+            setPageFormat(savedCV.style.pageSize as "A4" | "Letter");
+          }
+        } else {
+          // CV not found, redirect to dashboard
+          window.location.href = "/dashboard";
+          return;
+        }
+      } catch (error) {
+        console.error("Error loading CV:", error);
+        window.location.href = "/dashboard";
+        return;
+      } finally {
+        setLoading(false);
       }
     };
 
     initializeBuilder();
-  }, [params, searchParams]);
+  }, [params]);
+
+  // Auto-save function with 3-second delay
+  const autoSave = useCallback(
+    async (markdown: string) => {
+      if (!cvId || !cvData) return;
+
+      // Clear existing timer
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      // Set new timer
+      autoSaveTimerRef.current = setTimeout(async () => {
+        try {
+          setIsSaving(true);
+          await updateCV(cvId, {
+            content: markdown,
+            updated_at: Date.now().toString(),
+          });
+        } catch (error) {
+          console.error("Error auto-saving CV:", error);
+        } finally {
+          setIsSaving(false);
+        }
+      }, 3000);
+    },
+    [cvId, cvData]
+  );
+
+  // Handle markdown changes with auto-save
+  const handleMarkdownChange = (newMarkdown: string) => {
+    setTemplateMarkdown(newMarkdown);
+    autoSave(newMarkdown);
+  };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!cvData) {
+    return (
+      <div className="h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-white">CV not found</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -203,8 +276,8 @@ export default function BuilderPage({
                 </label>
                 <input
                   type="range"
-                  min="8"
-                  max="18"
+                  min="10"
+                  max="16"
                   value={fontSize}
                   onChange={(e) => setFontSize(parseInt(e.target.value))}
                   className="w-full accent-[#3ECF8E]"
@@ -218,8 +291,8 @@ export default function BuilderPage({
                 </label>
                 <input
                   type="range"
-                  min="1"
-                  max="2"
+                  min="1.2"
+                  max="1.6"
                   step="0.1"
                   value={lineHeight}
                   onChange={(e) => setLineHeight(parseFloat(e.target.value))}
@@ -235,7 +308,7 @@ export default function BuilderPage({
                 <input
                   type="range"
                   min="0.5"
-                  max="2"
+                  max="1.5"
                   step="0.1"
                   value={paragraphSpacing}
                   onChange={(e) =>
@@ -279,8 +352,14 @@ export default function BuilderPage({
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-400">Auto-save</span>
+                      <div
+                        className={`w-2 h-2 rounded-full animate-pulse ${
+                          isSaving ? "bg-amber-400" : "bg-green-400"
+                        }`}
+                      ></div>
+                      <span className="text-xs text-slate-400">
+                        {isSaving ? "Saving..." : "Auto-save"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -289,7 +368,7 @@ export default function BuilderPage({
                 <div className="flex-1 overflow-hidden">
                   <RichTextEditor
                     value={templateMarkdown}
-                    onChange={setTemplateMarkdown}
+                    onChange={handleMarkdownChange}
                     placeholder="Start writing your CV in markdown..."
                   />
                 </div>
