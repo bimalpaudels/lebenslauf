@@ -47,3 +47,71 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* React Split Pane Styles */
+.split-resizer {
+  background: #334155 !important;
+  border-left: 1px solid #475569 !important;
+  border-right: 1px solid #475569 !important;
+  cursor: col-resize !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+  width: 6px !important;
+}
+
+.split-resizer:hover {
+  background: #3ecf8e !important;
+  border-color: #4be4b4 !important;
+}
+
+.split-resizer:active {
+  background: #4be4b4 !important;
+}
+
+.split-resizer::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
+}
+
+.split-resizer:hover::before {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .split-resizer {
+    width: 8px !important;
+  }
+}
+
+/* Ensure proper height constraints */
+.simple-split-pane {
+  height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+.split-pane-left,
+.split-pane-right {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Rich Text Editor height fix */
+.rich-text-editor {
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Simple Preview container height fix */
+.simple-preview-container {
+  height: 100% !important;
+  max-height: 100% !important;
+}

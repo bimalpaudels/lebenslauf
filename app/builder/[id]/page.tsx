@@ -1,0 +1,319 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  getFileBasedTemplateById,
+  loadTemplateContent,
+} from "@/lib/template-loader";
+import RichTextEditor from "@/components/RichTextEditor";
+import SimplePreview from "@/components/SimplePreview";
+import SimpleSplitPane from "@/components/SimpleSplitPane";
+
+interface BuilderPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+  searchParams: Promise<{
+    template?: string;
+  }>;
+}
+
+export default function BuilderPage({
+  params,
+  searchParams,
+}: BuilderPageProps) {
+  const [pageFormat, setPageFormat] = useState<"A4" | "Letter">("A4");
+  const [fontSize, setFontSize] = useState(12);
+  const [cvId, setCvId] = useState<string>("");
+
+  const [templateMarkdown, setTemplateMarkdown] = useState<string>("");
+  const [templateCss, setTemplateCss] = useState<string>("");
+  const [templateName, setTemplateName] = useState<string>("");
+  const [pageMargin, setPageMargin] = useState(20);
+  const [pagePadding, setPagePadding] = useState(16);
+  const [paragraphSpacing, setParagraphSpacing] = useState(1);
+  const [lineHeight, setLineHeight] = useState(1.4);
+
+  useEffect(() => {
+    const initializeBuilder = async () => {
+      const [resolvedParams, resolvedSearchParams] = await Promise.all([
+        params,
+        searchParams,
+      ]);
+
+      setCvId(resolvedParams.id);
+
+      const templateIdFromUrl =
+        resolvedSearchParams.template || "modern-professional";
+
+      const fileTemplate = getFileBasedTemplateById(templateIdFromUrl);
+      if (fileTemplate) {
+        setTemplateName(fileTemplate.name);
+        const content = await loadTemplateContent(fileTemplate);
+        setTemplateMarkdown(content.markdown);
+        setTemplateCss(content.css);
+      }
+    };
+
+    initializeBuilder();
+  }, [params, searchParams]);
+
+  return (
+    <div className="h-screen bg-slate-900 flex overflow-hidden">
+      {/* Left Sidebar - Controls */}
+      <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0">
+        {/* Header */}
+        <div className="p-4 border-b border-slate-700">
+          <Link href="/dashboard" className="flex items-center space-x-2 mb-3">
+            <div className="w-5 h-5 bg-[#3ECF8E] rounded flex items-center justify-center">
+              <span className="text-slate-900 font-bold text-xs">CV</span>
+            </div>
+            <span className="text-white font-medium text-sm">BuildCV</span>
+          </Link>
+          <h1 className="text-sm font-semibold text-white">{templateName}</h1>
+          <p className="text-xs text-slate-400">
+            ID: {cvId.substring(0, 8)}...
+          </p>
+        </div>
+
+        {/* Controls */}
+        <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+          {/* Page Format */}
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-2">
+              Page Format
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setPageFormat("A4")}
+                className={`p-2 rounded text-xs transition-colors ${
+                  pageFormat === "A4"
+                    ? "bg-[#3ECF8E] text-slate-900 font-medium"
+                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                }`}
+              >
+                A4
+              </button>
+              <button
+                onClick={() => setPageFormat("Letter")}
+                className={`p-2 rounded text-xs transition-colors ${
+                  pageFormat === "Letter"
+                    ? "bg-[#3ECF8E] text-slate-900 font-medium"
+                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                }`}
+              >
+                Letter
+              </button>
+            </div>
+          </div>
+
+          {/* Font Size */}
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-2">
+              Font Size: {fontSize}px
+            </label>
+            <input
+              type="range"
+              min="8"
+              max="18"
+              value={fontSize}
+              onChange={(e) => setFontSize(parseInt(e.target.value))}
+              className="w-full accent-[#3ECF8E]"
+            />
+          </div>
+
+          {/* Page Margin */}
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-2">
+              Page Margin: {pageMargin}px
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="40"
+              value={pageMargin}
+              onChange={(e) => setPageMargin(parseInt(e.target.value))}
+              className="w-full accent-[#3ECF8E]"
+            />
+          </div>
+
+          {/* Page Padding */}
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-2">
+              Content Padding: {pagePadding}px
+            </label>
+            <input
+              type="range"
+              min="8"
+              max="48"
+              value={pagePadding}
+              onChange={(e) => setPagePadding(parseInt(e.target.value))}
+              className="w-full accent-[#3ECF8E]"
+            />
+          </div>
+
+          {/* Line Height */}
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-2">
+              Line Height: {lineHeight}
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="2"
+              step="0.1"
+              value={lineHeight}
+              onChange={(e) => setLineHeight(parseFloat(e.target.value))}
+              className="w-full accent-[#3ECF8E]"
+            />
+          </div>
+
+          {/* Paragraph Spacing */}
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-2">
+              Paragraph Spacing: {paragraphSpacing}rem
+            </label>
+            <input
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={paragraphSpacing}
+              onChange={(e) => setParagraphSpacing(parseFloat(e.target.value))}
+              className="w-full accent-[#3ECF8E]"
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="p-4 space-y-2 border-t border-slate-700">
+          <button className="w-full bg-[#3ECF8E] text-slate-900 py-2 px-3 rounded-lg text-sm font-semibold hover:bg-[#4BE4B4] transition-colors">
+            Export PDF
+          </button>
+          <button className="w-full bg-slate-700 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
+            Save CV
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content - Simple Split View */}
+      {/* Main Content - Improved Split View */}
+      <div className="flex-1 flex overflow-hidden">
+        <SimpleSplitPane
+          leftPanel={
+            <div className="h-full flex flex-col bg-slate-900">
+              {/* Editor Header */}
+              <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center space-x-3">
+                  <div className="text-[#3ECF8E] text-lg">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14,2 14,8 20,8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10,9 9,9 8,9" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-white">Edit CV</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Use markdown formatting for rich text
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-slate-400">Auto-save</span>
+                  </div>
+                  <button className="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 transition-colors">
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {/* Rich Text Editor */}
+              <div className="flex-1 overflow-hidden">
+                <RichTextEditor
+                  value={templateMarkdown}
+                  onChange={setTemplateMarkdown}
+                  placeholder="Start writing your CV in markdown..."
+                />
+              </div>
+            </div>
+          }
+          rightPanel={
+            <div className="h-full flex flex-col bg-slate-900">
+              {/* Preview Header */}
+              <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center space-x-3">
+                  <div className="text-[#3ECF8E] text-lg">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-white">
+                      Live Preview
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Real-time preview of your CV
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-slate-400">Live</span>
+                  </div>
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
+                    <span>{pageFormat}</span>
+                    <span className="text-slate-500">•</span>
+                    <span>{fontSize}px</span>
+                  </div>
+                  <button
+                    className="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 transition-colors"
+                    onClick={() => window.print()}
+                  >
+                    Export
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview Container */}
+              <div className="flex-1 overflow-hidden">
+                <SimplePreview
+                  markdown={templateMarkdown}
+                  templateCss={templateCss}
+                  pageFormat={pageFormat}
+                  fontSize={fontSize}
+                  pagePadding={pagePadding}
+                  lineHeight={lineHeight}
+                />
+              </div>
+            </div>
+          }
+          defaultSize={50}
+          minSize={30}
+          maxSize={70}
+        />
+      </div>
+    </div>
+  );
+}

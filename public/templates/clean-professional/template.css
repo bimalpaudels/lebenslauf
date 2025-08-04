@@ -1,0 +1,282 @@
+.cv-container {
+  font-family: 'Times New Roman', serif;
+  line-height: 1.4;
+  color: #000;
+  background: white;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Header styling with YAML support */
+.cv-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #000;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.cv-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #2563eb;
+  border: none;
+  padding: 0;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.cv-header .header-item {
+  display: block;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.cv-header .header-item.new-line {
+  margin-top: 0.5rem;
+}
+
+.cv-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cv-header .iconify {
+  margin-right: 0.25rem;
+}
+
+/* Regular header styling for markdown */
+.cv-container h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  color: #2563eb;
+  text-align: center;
+  border: none;
+  padding: 0;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* Job title styling */
+.cv-container h1 + p {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* Contact info styling */
+.cv-container h1 + p + p {
+  font-size: 0.9rem;
+  color: #000;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #000;
+  padding-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Section headers */
+.cv-container h2 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2563eb;
+  border: none;
+  margin: 1.5rem 0 0.75rem 0;
+  padding: 0;
+  text-transform: none;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* Experience/Education entries with right-aligned dates and locations */
+.cv-container h3, 
+.cv-container p:has(strong) {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 1rem 0 0.25rem 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-container .date-location {
+  font-style: italic;
+  font-weight: normal;
+  color: #000;
+  margin-left: auto;
+}
+
+.cv-container .date-right {
+  font-style: italic;
+  font-weight: normal;
+  color: #000;
+  margin-left: auto;
+  display: block;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+/* Position entries */
+.cv-container p {
+  margin-bottom: 0.5rem;
+  color: #000;
+  font-size: 0.9rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Strong elements for job titles and company names */
+.cv-container strong {
+  color: #000;
+  font-weight: bold;
+}
+
+/* Italic text for positions and dates */
+.cv-container em {
+  color: #000;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* List styling */
+.cv-container ul {
+  margin: 0.5rem 0 1rem 1rem;
+  padding: 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-container ol {
+  margin: 0.5rem 0 1rem 1rem;
+  padding: 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-container li {
+  margin-bottom: 0.4rem;
+  color: #000;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Publication styling */
+.cv-container h2:nth-of-type(2) + p {
+  margin-bottom: 0.75rem;
+}
+
+/* Publication entries with bold P1, P2, etc. */
+.cv-container h2:nth-of-type(2) + p strong:first-child {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+/* Awards section with right alignment */
+.cv-container h2:last-of-type + p {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+/* Specific adjustments for better alignment */
+.cv-container p:has(.date-right) {
+  position: relative;
+}
+
+.cv-container .date-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+/* Education section styling */
+.cv-container h2:first-of-type + p {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+/* Experience entries proper spacing */
+.cv-container h2 + p + strong,
+.cv-container ul + p {
+  margin-top: 1.25rem;
+}
+
+/* Better spacing for nested content */
+.cv-container h3 + p {
+  margin-top: 0.25rem;
+}
+
+.cv-container h3 + ul {
+  margin-top: 0.5rem;
+}
+
+/* Section spacing */
+.cv-container h2 + p {
+  margin-top: 0.5rem;
+}
+
+/* Print optimizations */
+@media print {
+  .cv-container {
+    padding: 0;
+    margin: 0;
+    font-size: 11pt;
+  }
+  
+  .cv-container h1 {
+    font-size: 18pt;
+    margin-top: 0;
+  }
+  
+  .cv-container h2 {
+    font-size: 12pt;
+  }
+  
+  .cv-container h3 {
+    font-size: 11pt;
+  }
+  
+  .cv-container p {
+    margin-bottom: 0.25rem;
+  }
+  
+  .cv-container ul, .cv-container ol {
+    margin-bottom: 0.5rem;
+  }
+  
+  .cv-container li {
+    margin-bottom: 0.2rem;
+  }
+}
+
+/* Responsive design for different screen sizes */
+@media screen and (max-width: 768px) {
+  .cv-container {
+    font-size: 0.85rem;
+  }
+  
+  .cv-container h1 {
+    font-size: 1.6rem;
+  }
+  
+  .cv-container h2 {
+    font-size: 0.95rem;
+  }
+  
+  .cv-container h3 {
+    font-size: 0.9rem;
+  }
+}
