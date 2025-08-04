@@ -105,20 +105,20 @@ export function parseMarkdownToHtml(markdown: string): string {
 // Available file-based templates
 export const fileBasedTemplates: FileBasedTemplate[] = [
   {
-    id: "academic-modern",
-    name: "Academic Modern",
+    id: "modern-minimal",
+    name: "Modern Minimal",
     description:
-      "Clean, modern academic design with blue accents and professional layout",
-    markdownPath: "/templates/academic-modern/template.md",
-    cssPath: "/templates/academic-modern/template.css",
+      "Clean, contemporary design with subtle colors and modern typography for 2025",
+    markdownPath: "/templates/modern-minimal/template.md",
+    cssPath: "/templates/modern-minimal/template.css",
   },
   {
-    id: "clean-professional",
-    name: "Clean Professional",
+    id: "professional-tech",
+    name: "Professional Tech",
     description:
-      "Traditional academic/professional layout with Times New Roman and blue accents",
-    markdownPath: "/templates/clean-professional/template.md",
-    cssPath: "/templates/clean-professional/template.css",
+      "Tech-focused template with accent colors and structured layout for software engineers",
+    markdownPath: "/templates/professional-tech/template.md",
+    cssPath: "/templates/professional-tech/template.css",
   },
 ];
 

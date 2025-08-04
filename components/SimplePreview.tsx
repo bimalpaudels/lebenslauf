@@ -215,7 +215,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       }
       
       .page-content {
-        padding: ${pagePadding}px;
+        padding: ${pagePadding}px !important;
         font-size: ${fontSize}px;
         line-height: ${lineHeight};
         height: 100%;
@@ -242,8 +242,8 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         top: -9999px;
         left: -9999px;
         width: ${pageDimensions.width - pagePadding * 2}px;
-        padding: ${pagePadding}px;
-        font-size: ${fontSize}px;
+        padding: ${pagePadding}px !important;
+        font-size: ${fontSize}px !important;
         line-height: ${lineHeight};
         visibility: hidden;
         overflow: visible;
@@ -269,6 +269,17 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         })
         .join("\n")}
       
+      /* Override template padding and font-size to ensure dynamic controls work */
+      .page-content {
+        padding: ${pagePadding}px !important;
+        font-size: ${fontSize}px !important;
+      }
+      
+      .measuring-container {
+        padding: ${pagePadding}px !important;
+        font-size: ${fontSize}px !important;
+      }
+      
       .page-content, .measuring-container {
         color: #1f2937;
       }
@@ -278,6 +289,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         margin-top: 0;
         margin-bottom: ${paragraphSpacing}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize * 1.8}px !important;
       }
       
       .page-content h2, .measuring-container h2 {
@@ -285,6 +297,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         margin-top: ${paragraphSpacing * 1.5}rem;
         margin-bottom: ${paragraphSpacing * 0.5}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize * 1.4}px !important;
       }
       
       .page-content h3, .measuring-container h3 {
@@ -292,35 +305,41 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         margin-top: ${paragraphSpacing * 1.2}rem;
         margin-bottom: ${paragraphSpacing * 0.4}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize * 1.2}px !important;
       }
       
       .page-content p, .measuring-container p {
         color: #4b5563;
         margin-bottom: ${paragraphSpacing * 0.8}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content li, .measuring-container li {
         color: #4b5563;
         margin-bottom: ${paragraphSpacing * 0.3}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content ul, .measuring-container ul,
       .page-content ol, .measuring-container ol {
         margin-bottom: ${paragraphSpacing}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content dl, .measuring-container dl {
         margin-bottom: ${paragraphSpacing}rem;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content dt, .measuring-container dt {
         font-weight: 600;
         color: #111827;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content dd, .measuring-container dd {
@@ -328,22 +347,26 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         margin-bottom: ${paragraphSpacing * 0.5}rem;
         color: #6b7280;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content strong, .measuring-container strong {
         color: #111827;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content em, .measuring-container em {
         color: #6b7280;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
       .page-content a, .measuring-container a {
         color: ${themeColor};
         text-decoration: underline;
         line-height: ${lineHeight};
+        font-size: ${fontSize}px !important;
       }
       
 

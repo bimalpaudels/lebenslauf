@@ -1,0 +1,316 @@
+.cv-container {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background: white;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  font-size: 11pt;
+  padding: 0;
+  margin: 0;
+}
+
+/* Header styling with YAML support */
+.cv-header {
+  text-align: center;
+  margin-bottom: 28px;
+  page-break-after: avoid;
+  break-after: avoid;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #1e40af;
+}
+
+.cv-header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+  border: none;
+  padding: 0;
+  page-break-after: avoid;
+  break-after: avoid;
+  letter-spacing: -0.02em;
+}
+
+.cv-header .header-item {
+  display: block;
+  margin: 0.4rem 0;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.cv-header .header-item:first-child {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1e40af;
+}
+
+.cv-header a {
+  color: #1e40af;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cv-header a:hover {
+  color: #1d4ed8;
+}
+
+/* Regular header styling for markdown */
+.cv-container h1 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #111827;
+  text-align: center;
+  border: none;
+  padding: 0;
+  page-break-after: avoid;
+  break-after: avoid;
+  letter-spacing: -0.02em;
+}
+
+/* Section headers */
+.cv-container h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 28px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 6px;
+  text-transform: none;
+  page-break-after: avoid;
+  break-after: avoid;
+  letter-spacing: -0.01em;
+}
+
+/* Professional Summary */
+.cv-container h2:first-of-type + p {
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+  text-align: justify;
+}
+
+/* Experience items */
+.cv-container h2:nth-of-type(2) + p {
+  margin-bottom: 20px;
+}
+
+.cv-container .company {
+  font-weight: 600;
+  color: #111827;
+  font-size: 13px;
+}
+
+.cv-container .job-date {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Job header layout */
+.cv-container p:has(.company),
+.cv-container p strong:first-child + .company {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Ensure job titles and companies are properly aligned */
+.cv-container strong:first-child {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.cv-container .company {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* Job description lists */
+.cv-container p:has(.company) + ul {
+  margin: 10px 0 20px 0;
+  padding-left: 18px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-container p:has(.company) + ul li {
+  margin-bottom: 6px;
+  text-align: justify;
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Education items */
+.cv-container .location-date {
+  text-align: right;
+  font-size: 12px;
+  margin-top: -35px;
+  margin-bottom: 8px;
+  font-style: normal;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Technical Skills section */
+.cv-container h2:contains("Technical Skills") + p {
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.cv-container .highlight {
+  background-color: #dbeafe;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+/* Projects section */
+.cv-container h2:contains("Projects") + p {
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.cv-container .project-year {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Awards section */
+.cv-container h2:last-of-type + p {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cv-container .award-year {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Position entries */
+.cv-container p {
+  margin-bottom: 0.4rem;
+  color: #4b5563;
+  font-size: 12px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  line-height: 1.4;
+}
+
+/* Strong elements for job titles and company names */
+.cv-container strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Italic text for positions and dates */
+.cv-container em {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* List styling */
+.cv-container ul {
+  margin: 0.4rem 0 0.8rem 1rem;
+  padding: 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-container ol {
+  margin: 0.4rem 0 0.8rem 1rem;
+  padding: 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-container li {
+  margin-bottom: 0.3rem;
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1.4;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Print optimizations */
+@media print {
+  .cv-container {
+    padding: 0;
+    margin: 0;
+    font-size: 10pt;
+    line-height: 1.3;
+  }
+  
+  .cv-container h1 {
+    font-size: 16pt;
+    margin-top: 0;
+  }
+  
+  .cv-container h2 {
+    font-size: 11pt;
+  }
+  
+  .cv-container h3 {
+    font-size: 9pt;
+  }
+  
+  .cv-container p {
+    margin-bottom: 0.15rem;
+  }
+  
+  .cv-container ul, .cv-container ol {
+    margin-bottom: 0.25rem;
+  }
+  
+  .cv-container li {
+    margin-bottom: 0.1rem;
+  }
+  
+  .cv-container .location-date,
+  .cv-container .job-date,
+  .cv-container .award-year,
+  .cv-container .project-year {
+    font-size: 8pt;
+  }
+}
+
+/* Responsive design for different screen sizes */
+@media screen and (max-width: 768px) {
+  .cv-container {
+    font-size: 0.85rem;
+  }
+  
+  .cv-container h1 {
+    font-size: 1.6rem;
+  }
+  
+  .cv-container h2 {
+    font-size: 1.1rem;
+  }
+  
+  .cv-container h3 {
+    font-size: 0.9rem;
+  }
+} 

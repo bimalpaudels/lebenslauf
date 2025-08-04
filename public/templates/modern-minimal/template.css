@@ -1,167 +1,146 @@
 .cv-container {
-  font-family: 'Times New Roman', serif;
-  line-height: 1.4;
-  color: #000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #1f2937;
   background: white;
   max-width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
   word-wrap: break-word;
-  font-size: 10pt;
+  font-size: 11pt;
+  padding: 0;
+  margin: 0;
 }
 
 /* Header styling with YAML support */
 .cv-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
   page-break-after: avoid;
   break-after: avoid;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #f3f4f6;
 }
 
 .cv-header h1 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #2563eb;
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
   margin-bottom: 8px;
   border: none;
   padding: 0;
   page-break-after: avoid;
   break-after: avoid;
+  letter-spacing: -0.025em;
 }
 
 .cv-header .header-item {
   display: block;
-  margin: 0.25rem 0;
+  margin: 0.5rem 0;
   font-size: 14px;
-  color: #000;
+  color: #6b7280;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .cv-header .header-item:first-child {
   font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #374151;
 }
 
 .cv-header a {
-  color: inherit;
+  color: #3b82f6;
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cv-header a:hover {
+  color: #2563eb;
 }
 
 /* Regular header styling for markdown */
 .cv-container h1 {
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 32px;
+  font-weight: 700;
   margin-bottom: 8px;
-  color: #2563eb;
+  color: #111827;
   text-align: center;
   border: none;
   padding: 0;
   page-break-after: avoid;
   break-after: avoid;
-}
-
-/* Job title styling */
-.cv-container h1 + p {
-  font-size: 16px;
-  font-weight: bold;
-  color: #000;
-  text-align: center;
-  margin-bottom: 8px;
-  page-break-after: avoid;
-  break-after: avoid;
-}
-
-/* Contact info styling */
-.cv-container h1 + p + p {
-  font-size: 14px;
-  color: #000;
-  text-align: center;
-  margin-bottom: 20px;
-  line-height: 1.4;
+  letter-spacing: -0.025em;
 }
 
 /* Section headers */
 .cv-container h2 {
-  font-size: 18px;
-  font-weight: bold;
-  color: #2563eb;
-  margin-top: 25px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 2px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
   text-transform: none;
   page-break-after: avoid;
   break-after: avoid;
+  letter-spacing: -0.025em;
 }
 
-/* Education items */
+/* Professional Summary */
 .cv-container h2:first-of-type + p {
-  margin-bottom: 15px;
-}
-
-.cv-container .location-date {
-  text-align: right;
+  margin-bottom: 24px;
   font-size: 14px;
-  margin-top: -40px;
-  margin-bottom: 10px;
-  font-style: normal;
-  font-weight: normal;
-  color: #000;
-}
-
-/* Publication styling */
-.cv-container h2:nth-of-type(2) + p {
-  margin-bottom: 15px;
-}
-
-.cv-container h2:nth-of-type(2) + p strong:first-child {
-  color: #2563eb;
-  font-weight: bold;
-  display: inline;
-}
-
-.cv-container h2:nth-of-type(2) + p em {
-  font-style: italic;
-  margin-top: 5px;
-  display: block;
-}
-
-.cv-container h2:nth-of-type(2) + p em + em {
-  font-style: italic;
-  margin-top: 2px;
-  display: block;
+  line-height: 1.6;
+  color: #4b5563;
+  text-align: justify;
 }
 
 /* Experience items */
-.cv-container h2:nth-of-type(3) + p {
-  margin-bottom: 20px;
+.cv-container h2:nth-of-type(2) + p {
+  margin-bottom: 24px;
 }
 
 .cv-container .company {
-  font-weight: bold;
-  color: #000;
+  font-weight: 600;
+  color: #111827;
+  font-size: 14px;
 }
 
 .cv-container .job-date {
-  font-size: 14px;
-  color: #000;
+  font-size: 13px;
+  color: #6b7280;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 /* Job header layout */
-.cv-container p:has(.company) {
+.cv-container p:has(.company),
+.cv-container p strong:first-child + .company {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
+/* Ensure job titles and companies are properly aligned */
+.cv-container strong:first-child {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.cv-container .company {
+  flex-shrink: 0;
+  text-align: right;
+}
+
 /* Job description lists */
 .cv-container p:has(.company) + ul {
-  margin: 8px 0;
+  margin: 12px 0 24px 0;
   padding-left: 20px;
   page-break-inside: avoid;
   break-inside: avoid;
@@ -170,9 +149,34 @@
 .cv-container p:has(.company) + ul li {
   margin-bottom: 8px;
   text-align: justify;
-  color: #000;
-  font-size: 0.75rem;
-  line-height: 1.4;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Education items */
+.cv-container .location-date {
+  text-align: right;
+  font-size: 13px;
+  margin-top: -40px;
+  margin-bottom: 10px;
+  font-style: normal;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Skills section */
+.cv-container h2:contains("Skills") + p {
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.cv-container .highlight {
+  background-color: #fef3c7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: #92400e;
 }
 
 /* Awards section */
@@ -183,66 +187,55 @@
 }
 
 .cv-container .award-year {
-  font-size: 14px;
-  color: #000;
+  font-size: 13px;
+  color: #6b7280;
   font-style: normal;
-  font-weight: normal;
-}
-
-/* Skills section */
-.cv-container h2:contains("Skills") + p {
-  margin-top: 20px;
-  margin-bottom: 8px;
-}
-
-.cv-container .highlight {
-  background-color: #ffeb3b;
-  padding: 1px 3px;
+  font-weight: 400;
 }
 
 /* Position entries */
 .cv-container p {
-  margin-bottom: 0.25rem;
-  color: #000;
-  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+  font-size: 13px;
   page-break-inside: avoid;
   break-inside: avoid;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* Strong elements for job titles and company names */
 .cv-container strong {
-  color: #000;
-  font-weight: bold;
+  color: #111827;
+  font-weight: 600;
 }
 
 /* Italic text for positions and dates */
 .cv-container em {
-  color: #000;
+  color: #6b7280;
   font-style: italic;
-  font-size: 0.75rem;
+  font-size: 13px;
 }
 
 /* List styling */
 .cv-container ul {
-  margin: 0.25rem 0 0.75rem 1rem;
+  margin: 0.5rem 0 1rem 1rem;
   padding: 0;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
 .cv-container ol {
-  margin: 0.25rem 0 0.75rem 1rem;
+  margin: 0.5rem 0 1rem 1rem;
   padding: 0;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
 .cv-container li {
-  margin-bottom: 0.2rem;
-  color: #000;
-  font-size: 0.75rem;
-  line-height: 1.4;
+  margin-bottom: 0.4rem;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.5;
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -270,15 +263,15 @@
   }
   
   .cv-container p {
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.2rem;
   }
   
   .cv-container ul, .cv-container ol {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.3rem;
   }
   
   .cv-container li {
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.15rem;
   }
   
   .cv-container .location-date,
@@ -291,7 +284,7 @@
 /* Responsive design for different screen sizes */
 @media screen and (max-width: 768px) {
   .cv-container {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
   
   .cv-container h1 {
@@ -299,10 +292,10 @@
   }
   
   .cv-container h2 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
   
   .cv-container h3 {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 } 

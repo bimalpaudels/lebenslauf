@@ -133,6 +133,58 @@ export default function BuilderPage({ params }: BuilderPageProps) {
     }
   };
 
+  // Handle page format change
+  const handlePageFormatChange = (format: "A4" | "Letter") => {
+    setPageFormat(format);
+    if (cvId && cvData) {
+      updateCV(cvId, {
+        style: {
+          ...cvData.style,
+          pageSize: format,
+        },
+      });
+    }
+  };
+
+  // Handle page padding change
+  const handlePagePaddingChange = (value: number) => {
+    setPagePadding(value);
+    if (cvId && cvData) {
+      updateCV(cvId, {
+        style: {
+          ...cvData.style,
+          marginV: value,
+        },
+      });
+    }
+  };
+
+  // Handle line height change
+  const handleLineHeightChange = (value: number) => {
+    setLineHeight(value);
+    if (cvId && cvData) {
+      updateCV(cvId, {
+        style: {
+          ...cvData.style,
+          lineHeight: value,
+        },
+      });
+    }
+  };
+
+  // Handle paragraph spacing change
+  const handleParagraphSpacingChange = (value: number) => {
+    setParagraphSpacing(value);
+    if (cvId && cvData) {
+      updateCV(cvId, {
+        style: {
+          ...cvData.style,
+          paragraphSpace: value,
+        },
+      });
+    }
+  };
+
   // Handle theme color change
   const handleThemeColorChange = (color: string) => {
     setThemeColor(color);
@@ -254,7 +306,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => setPageFormat("A4")}
+                    onClick={() => handlePageFormatChange("A4")}
                     className={`p-2 rounded text-xs transition-colors ${
                       pageFormat === "A4"
                         ? "bg-[#3ECF8E] text-slate-900 font-medium"
@@ -264,7 +316,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                     A4
                   </button>
                   <button
-                    onClick={() => setPageFormat("Letter")}
+                    onClick={() => handlePageFormatChange("Letter")}
                     className={`p-2 rounded text-xs transition-colors ${
                       pageFormat === "Letter"
                         ? "bg-[#3ECF8E] text-slate-900 font-medium"
@@ -286,7 +338,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   min="8"
                   max="48"
                   value={pagePadding}
-                  onChange={(e) => setPagePadding(parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handlePagePaddingChange(parseInt(e.target.value))
+                  }
                   className="w-full accent-[#3ECF8E]"
                 />
               </div>
@@ -329,7 +383,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   max="1.6"
                   step="0.1"
                   value={lineHeight}
-                  onChange={(e) => setLineHeight(parseFloat(e.target.value))}
+                  onChange={(e) =>
+                    handleLineHeightChange(parseFloat(e.target.value))
+                  }
                   className="w-full accent-[#3ECF8E]"
                 />
               </div>
@@ -346,7 +402,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   step="0.1"
                   value={paragraphSpacing}
                   onChange={(e) =>
-                    setParagraphSpacing(parseFloat(e.target.value))
+                    handleParagraphSpacingChange(parseFloat(e.target.value))
                   }
                   className="w-full accent-[#3ECF8E]"
                 />
