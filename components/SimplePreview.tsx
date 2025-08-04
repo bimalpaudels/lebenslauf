@@ -26,7 +26,7 @@ export interface SimplePreviewRef {
 }
 
 const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
-  (
+  function SimplePreview(
     {
       markdown,
       templateCss,
@@ -38,7 +38,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       themeColor = "#3ECF8E",
     },
     ref
-  ) => {
+  ) {
     const containerRef = useRef<HTMLDivElement>(null);
     const measureRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);

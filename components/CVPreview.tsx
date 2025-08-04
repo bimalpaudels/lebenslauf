@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
-import SimplePreview from "./SimplePreview";
 
 interface CVPreviewProps {
   markdown: string;
@@ -14,8 +13,6 @@ interface CVPreviewProps {
   paragraphSpacing?: number;
   themeColor?: string;
   className?: string;
-  showControls?: boolean;
-  isTemplate?: boolean;
   standalone?: boolean;
 }
 
@@ -29,8 +26,6 @@ const CVPreview: React.FC<CVPreviewProps> = ({
   paragraphSpacing = 1,
   themeColor = "#3ECF8E",
   className = "",
-  showControls = false,
-  isTemplate = false,
   standalone = false,
 }) => {
   const [scale, setScale] = useState(0.3);
@@ -235,15 +230,15 @@ const CVPreview: React.FC<CVPreviewProps> = ({
     `;
   }, [
     css,
-    pageFormat,
     fontSize,
     pagePadding,
     lineHeight,
-    pageDimensions,
     scale,
     paragraphSpacing,
     themeColor,
     standalone,
+    pageDimensions.height,
+    pageDimensions.width,
   ]);
 
   const previewHtml = useMemo(() => {
