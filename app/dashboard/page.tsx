@@ -6,14 +6,6 @@ import { fileBasedTemplates } from "@/lib/template-loader";
 import { getAllCVs, createNewCV, deleteCV, type CVData } from "@/lib/storage";
 import CVPreview from "@/components/CVPreview";
 
-// Generate a simple unique ID
-const generateId = () => {
-  return (
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15)
-  );
-};
-
 export default function Dashboard() {
   const [savedCVs, setSavedCVs] = useState<{ [key: string]: CVData }>({});
   const [loading, setLoading] = useState(true);

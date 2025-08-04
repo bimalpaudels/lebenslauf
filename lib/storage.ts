@@ -93,7 +93,7 @@ export async function createNewCV(
     created_at: now,
     design: templateCss,
     content: templateMarkdown,
-    name: "New Resume",
+    name: templateName,
     style: {
       fontSize: 12,
       lineHeight: 1.4,

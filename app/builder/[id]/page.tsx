@@ -32,7 +32,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   const [templateMarkdown, setTemplateMarkdown] = useState<string>("");
   const [templateCss, setTemplateCss] = useState<string>("");
-  const [templateName, setTemplateName] = useState<string>("");
   const [pagePadding, setPagePadding] = useState(16);
   const [paragraphSpacing, setParagraphSpacing] = useState(1);
   const [lineHeight, setLineHeight] = useState(1.4);
@@ -58,7 +57,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
           setCvData(savedCV);
           setTemplateMarkdown(savedCV.content);
           setTemplateCss(savedCV.design);
-          setTemplateName(savedCV.name);
 
           // Load styles from saved data
           if (savedCV.style) {
