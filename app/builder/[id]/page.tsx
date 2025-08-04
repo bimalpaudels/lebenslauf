@@ -118,7 +118,7 @@ export default function BuilderPage({
               <div className="w-5 h-5 bg-[#3ECF8E] rounded flex items-center justify-center">
                 <span className="text-slate-900 font-bold text-xs">CV</span>
               </div>
-              <span className="text-white font-medium text-sm">BuildCV</span>
+              <span className="text-white font-medium text-sm">lebenslauf</span>
             </Link>
           </div>
 

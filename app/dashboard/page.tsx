@@ -21,7 +21,7 @@ export default function Dashboard() {
             <div className="w-8 h-8 bg-[#3ECF8E] rounded-lg flex items-center justify-center">
               <span className="text-slate-900 font-bold text-lg">CV</span>
             </div>
-            <span className="text-white font-semibold text-xl">BuildCV</span>
+            <span className="text-white font-semibold text-xl">lebenslauf</span>
           </Link>
           <div className="hidden md:flex items-center space-x-8">
             <a
