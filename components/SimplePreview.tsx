@@ -328,7 +328,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       document.head.removeChild(styleElement);
 
       console.log(`Created ${pages.length} pages`);
-      return pages.length > 0 ? pages : [container.innerHTML];
+      return pages.length > 0 ? pages : [""];
     };
 
     const customStyles = useMemo(() => {
@@ -364,6 +364,12 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         background: #4BE4B4;
       }
       
+      .page-wrapper {
+        width: ${pageDimensions.width * scale}px;
+        height: ${pageDimensions.height * scale}px;
+        flex-shrink: 0;
+      }
+      
       .page {
         background: white;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -373,7 +379,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         position: relative;
         overflow: hidden;
         transition: box-shadow 0.3s ease;
-        transform-origin: top center;
+        transform-origin: top left;
         transform: scale(${scale});
         flex-shrink: 0;
       }
@@ -538,6 +544,12 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         font-size: ${fontSize}px !important;
       }
       
+      .empty-state-wrapper {
+        width: ${pageDimensions.width * scale}px;
+        height: ${pageDimensions.height * scale}px;
+        flex-shrink: 0;
+      }
+      
       .empty-state {
         display: flex;
         flex-direction: column;
@@ -550,8 +562,8 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         background: white;
         border-radius: 0;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform-origin: top left;
         transform: scale(${scale});
-        transform-origin: top center;
         margin: 20px 0;
       }
       
@@ -585,7 +597,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
           box-shadow: none !important;
           border-radius: 0 !important;
           margin: 0 !important;
-          transform: none !important;
           page-break-after: always;
           width: 100% !important;
           height: 100% !important;
@@ -610,6 +621,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
           line-height: ${lineHeight} !important;
           color: #1f2937 !important;
           visibility: visible !important;
+          transform: none !important;
         }
         
         body {
@@ -633,19 +645,21 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
     const renderContent = () => {
       if (!previewHtml) {
         return (
-          <div className="empty-state">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0.621 0 1.125-.504 1.125-1.125V9.375c0-.621.504-1.125 1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-            </svg>
-            <p className="text-lg font-medium">No content to preview</p>
-            <p className="text-sm opacity-75 mt-2">
-              Start typing in the editor to see your CV come to life
-            </p>
+          <div className="empty-state-wrapper">
+            <div className="empty-state">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0.621 0 1.125-.504 1.125-1.125V9.375c0-.621.504-1.125 1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+              </svg>
+              <p className="text-lg font-medium">No content to preview</p>
+              <p className="text-sm opacity-75 mt-2">
+                Start typing in the editor to see your CV come to life
+              </p>
+            </div>
           </div>
         );
       }
@@ -653,13 +667,12 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       return (
         <>
           {pages.map((pageContent, index) => (
-            <div key={index} className="page">
-              <div className="page-content">
-                <div dangerouslySetInnerHTML={{ __html: pageContent }} />
+            <div key={index} className="page-wrapper">
+              <div className="page">
+                <div className="page-content">
+                  <div dangerouslySetInnerHTML={{ __html: pageContent }} />
+                </div>
               </div>
-              {pages.length > 1 && (
-                <div className="page-number">Page {index + 1}</div>
-              )}
             </div>
           ))}
         </>
