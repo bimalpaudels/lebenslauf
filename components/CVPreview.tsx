@@ -37,19 +37,19 @@ const CVPreview: React.FC<CVPreviewProps> = ({
       const container = containerRef;
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
-      
+
       if (standalone) {
         // For dashboard previews, calculate scale to fit the card properly
         const pageWidth = pageFormat === "A4" ? 794 : 816;
         const pageHeight = pageFormat === "A4" ? 1123 : 1056;
-        
+
         // Leave minimal padding for dashboard cards
         const availableWidth = containerWidth - 20;
         const availableHeight = containerHeight - 20;
-        
+
         const scaleX = availableWidth / pageWidth;
         const scaleY = availableHeight / pageHeight;
-        
+
         // Use smaller scale but ensure readability
         const newScale = Math.min(scaleX, scaleY, 0.5);
         setScale(Math.max(0.2, newScale));
@@ -57,13 +57,13 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         // For full editor preview, use different logic
         const pageWidth = pageFormat === "A4" ? 794 : 816;
         const pageHeight = pageFormat === "A4" ? 1123 : 1056;
-        
+
         const availableWidth = containerWidth - 40;
         const availableHeight = containerHeight - 40;
-        
+
         const scaleX = availableWidth / pageWidth;
         const scaleY = availableHeight / pageHeight;
-        
+
         const newScale = Math.min(scaleX, scaleY, 1);
         setScale(Math.max(0.3, newScale));
       }
@@ -109,14 +109,17 @@ const CVPreview: React.FC<CVPreviewProps> = ({
       
       .cv-preview-page {
         background: white;
-        box-shadow: ${standalone ? "0 2px 8px -2px rgba(0, 0, 0, 0.1)" : "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06)"};
+        box-shadow: ${
+          standalone
+            ? "0 2px 8px -2px rgba(0, 0, 0, 0.1)"
+            : "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06)"
+        };
         border-radius: ${standalone ? "4px" : "4px"};
         width: ${pageDimensions.width}px;
         height: ${pageDimensions.height}px;
         position: relative;
         overflow: hidden;
         transform-origin: ${standalone ? "top center" : "center center"};
-        transform: scale(${scale});
         margin: ${standalone ? "0" : "10px 0"};
         flex-shrink: 0;
       }
@@ -131,23 +134,80 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         overflow: hidden;
         position: relative;
         color: #1f2937;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: white;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
       
-      ${css
-        .split("\n")
-        .map((line) => {
-          if (line.includes(".cv-container")) {
-            return line.replace(".cv-container", ".cv-preview-content");
-          }
-          return line.startsWith(".") ? `.cv-preview-content ${line}` : line;
-        })
-        .join("\n")}
+      ${
+        css
+          ? css
+              .split("\n")
+              .map((line) => {
+                if (line.includes(".cv-container")) {
+                  return line.replace(".cv-container", ".cv-preview-content");
+                }
+                return line.startsWith(".")
+                  ? `.cv-preview-content ${line}`
+                  : line;
+              })
+              .join("\n")
+          : ""
+      }
       
-      .cv-preview-content h1 {
+      /* Baseline styling for content without template CSS */
+      ${
+        !css
+          ? `
+      .cv-preview-content {
+        text-align: left !important;
+      }
+      
+      .cv-preview-content > *:first-child {
+        margin-top: 0 !important;
+      }
+      
+      .cv-preview-content > *:last-child {
+        margin-bottom: 0 !important;
+      }
+      
+      .cv-preview-content p {
+        margin: 0 0 ${paragraphSpacing * 0.8}rem 0 !important;
+      }
+      
+      .cv-preview-content ul, .cv-preview-content ol {
+        margin: ${
+          paragraphSpacing * 0.5
+        }rem 0 ${paragraphSpacing}rem 1.2rem !important;
+        padding: 0 !important;
+      }
+      
+      .cv-preview-content li {
+        margin-bottom: ${paragraphSpacing * 0.3}rem !important;
+      }
+      `
+          : ""
+      }
+      
+      /* Force individual props to override any CSS with highest specificity */
+      .cv-preview-content,
+      .cv-preview-content * {
+        font-size: ${fontSize}px !important;
+        line-height: ${lineHeight} !important;
+      }
+      
+      .cv-preview-content {
+        padding: ${pagePadding}px !important;
+      }
+      
+      .cv-preview-content h1,
+      .cv-preview-content .cv-header h1 {
         color: ${themeColor} !important;
         margin-top: 0 !important;
         margin-bottom: ${paragraphSpacing}rem !important;
         line-height: ${lineHeight} !important;
+        font-size: ${fontSize * 2.2}px !important;
       }
       
       .cv-preview-content h2 {
@@ -155,64 +215,83 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         margin-top: ${paragraphSpacing * 1.5}rem !important;
         margin-bottom: ${paragraphSpacing * 0.5}rem !important;
         line-height: ${lineHeight} !important;
+        font-size: ${fontSize * 1.6}px !important;
       }
       
       .cv-preview-content h3 {
-        color: #111827;
-        margin-top: ${paragraphSpacing * 1.2}rem;
-        margin-bottom: ${paragraphSpacing * 0.4}rem;
-        line-height: ${lineHeight};
+        color: #111827 !important;
+        margin-top: ${paragraphSpacing * 1.2}rem !important;
+        margin-bottom: ${paragraphSpacing * 0.4}rem !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize * 1.3}px !important;
       }
       
       .cv-preview-content p {
-        color: #4b5563;
-        margin-bottom: ${paragraphSpacing * 0.8}rem;
-        line-height: ${lineHeight};
+        color: #4b5563 !important;
+        margin-bottom: ${paragraphSpacing * 0.8}rem !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
       }
       
       .cv-preview-content li {
-        color: #4b5563;
-        margin-bottom: ${paragraphSpacing * 0.3}rem;
-        line-height: ${lineHeight};
+        color: #4b5563 !important;
+        margin-bottom: ${paragraphSpacing * 0.3}rem !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
       }
       
       .cv-preview-content ul,
       .cv-preview-content ol {
-        margin-bottom: ${paragraphSpacing}rem;
-        line-height: ${lineHeight};
+        margin-bottom: ${paragraphSpacing}rem !important;
+        line-height: ${lineHeight} !important;
       }
       
       .cv-preview-content dl {
-        margin-bottom: ${paragraphSpacing}rem;
-        line-height: ${lineHeight};
+        margin-bottom: ${paragraphSpacing}rem !important;
+        line-height: ${lineHeight} !important;
       }
       
       .cv-preview-content dt {
-        font-weight: 600;
-        color: #111827;
-        line-height: ${lineHeight};
+        font-weight: 600 !important;
+        color: #111827 !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
       }
       
       .cv-preview-content dd {
-        margin-left: 0;
-        margin-bottom: ${paragraphSpacing * 0.5}rem;
-        color: #6b7280;
-        line-height: ${lineHeight};
+        margin-left: 0 !important;
+        margin-bottom: ${paragraphSpacing * 0.5}rem !important;
+        color: #6b7280 !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
       }
       
       .cv-preview-content strong {
-        color: #111827;
-        line-height: ${lineHeight};
+        color: #111827 !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
       }
       
       .cv-preview-content em {
-        color: #6b7280;
-        line-height: ${lineHeight};
+        color: #6b7280 !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
       }
       
       .cv-preview-content a {
         color: ${themeColor} !important;
-        text-decoration: underline;
+        text-decoration: underline !important;
+        line-height: ${lineHeight} !important;
+        font-size: ${fontSize}px !important;
+      }
+      
+      /* Override any template-specific classes that might interfere */
+      .cv-preview-content .company,
+      .cv-preview-content .job-date,
+      .cv-preview-content .location-date,
+      .cv-preview-content .award-year,
+      .cv-preview-content .header-item {
+        font-size: ${fontSize}px !important;
         line-height: ${lineHeight} !important;
       }
       
@@ -221,14 +300,17 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: ${pageDimensions.height * scale}px;
-        width: ${pageDimensions.width * scale}px;
+        height: ${pageDimensions.height}px;
+        width: ${pageDimensions.width}px;
         color: #6b7280;
         text-align: center;
         background: white;
         border-radius: ${standalone ? "0" : "8px"};
-        box-shadow: ${standalone ? "0 2px 4px -1px rgba(0, 0, 0, 0.1)" : "0 4px 6px -1px rgba(0, 0, 0, 0.1)"};
-        transform: scale(${scale});
+        box-shadow: ${
+          standalone
+            ? "0 2px 4px -1px rgba(0, 0, 0, 0.1)"
+            : "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+        };
         transform-origin: ${standalone ? "top center" : "center center"};
         margin: ${standalone ? "0" : "10px 0"};
       }
@@ -245,7 +327,6 @@ const CVPreview: React.FC<CVPreviewProps> = ({
     fontSize,
     pagePadding,
     lineHeight,
-    scale,
     paragraphSpacing,
     themeColor,
     standalone,
@@ -260,7 +341,12 @@ const CVPreview: React.FC<CVPreviewProps> = ({
   const renderContent = () => {
     if (!previewHtml) {
       return (
-        <div className="cv-preview-empty">
+        <div 
+          className="cv-preview-empty"
+          style={{
+            transform: `scale(${scale})`,
+          }}
+        >
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -275,7 +361,12 @@ const CVPreview: React.FC<CVPreviewProps> = ({
     }
 
     return (
-      <div className="cv-preview-page">
+      <div 
+        className="cv-preview-page"
+        style={{
+          transform: `scale(${scale})`,
+        }}
+      >
         <div className="cv-preview-content">
           <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
         </div>

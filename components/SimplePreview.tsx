@@ -79,11 +79,11 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         if (!containerRef.current) return;
         const container = containerRef.current;
         const containerWidth = container.clientWidth;
-        
+
         // Calculate scale to fit width with some padding
         const availableWidth = containerWidth - 80; // 40px padding on each side
         const scaleX = availableWidth / pageDimensions.width;
-        
+
         // For split pane, we want to show full page at reasonable scale
         const newScale = Math.min(scaleX, 1);
         setScale(Math.max(0.3, newScale));
