@@ -79,9 +79,14 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         if (!containerRef.current) return;
         const container = containerRef.current;
         const containerWidth = container.clientWidth;
-        const availableWidth = containerWidth - 40;
-        const newScale = Math.min(availableWidth / pageDimensions.width, 1);
-        setScale(Math.max(0.2, newScale));
+        
+        // Calculate scale to fit width with some padding
+        const availableWidth = containerWidth - 80; // 40px padding on each side
+        const scaleX = availableWidth / pageDimensions.width;
+        
+        // For split pane, we want to show full page at reasonable scale
+        const newScale = Math.min(scaleX, 1);
+        setScale(Math.max(0.3, newScale));
       };
 
       updateScale();
@@ -168,15 +173,16 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       return `
       .preview-container {
         height: 100%;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: #f8f9fa;
         overflow-x: hidden;
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: #3ECF8E #1e293b;
-        padding: 20px;
+        padding: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
+        gap: 20px;
       }
       
       .preview-container::-webkit-scrollbar {
@@ -199,7 +205,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       .page {
         background: white;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border-radius: 8px;
+        border-radius: 0;
         width: ${pageDimensions.width}px;
         height: ${pageDimensions.height}px;
         position: relative;
@@ -208,6 +214,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         transform-origin: top center;
         transform: scale(${scale});
         flex-shrink: 0;
+        margin: 20px 0;
       }
       
       .page:hover {
@@ -381,10 +388,11 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         color: #6b7280;
         text-align: center;
         background: white;
-        border-radius: 8px;
+        border-radius: 0;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         transform: scale(${scale});
         transform-origin: top center;
+        margin: 20px 0;
       }
       
       .empty-state svg {

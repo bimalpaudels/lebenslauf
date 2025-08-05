@@ -29,6 +29,38 @@ export default function Dashboard() {
     loadSavedCVs();
   }, []);
 
+  // Separate effect for refresh handlers
+  useEffect(() => {
+    const refreshData = async () => {
+      try {
+        const cvs = await getAllCVs();
+        setSavedCVs(cvs);
+      } catch (error) {
+        console.error("Error refreshing CVs:", error);
+      }
+    };
+
+    // Add visibility change listener to refresh data when user returns to tab
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshData();
+      }
+    };
+
+    // Add focus listener to refresh data when window gets focus
+    const handleFocus = () => {
+      refreshData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   // Load template previews
   useEffect(() => {
     const loadTemplatePreviews = async () => {
@@ -120,6 +152,15 @@ export default function Dashboard() {
             <span className="text-white font-semibold text-xl">lebenslauf</span>
           </Link>
           <div className="hidden md:flex items-center space-x-8">
+            <button
+              onClick={() => window.location.reload()}
+              className="text-slate-300 hover:text-[#3ECF8E] transition-colors"
+              title="Refresh dashboard"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
             <a
               href="https://github.com/bimalpaudels/lebenslauf"
               className="text-slate-300 hover:text-[#3ECF8E] transition-colors"
@@ -167,14 +208,15 @@ export default function Dashboard() {
                 {Object.entries(savedCVs).map(([cvId, cvData]) => (
                   <div
                     key={cvId}
-                    className="group bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative cursor-pointer"
+                    className="group rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative cursor-pointer bg-transparent"
                     title={`Edit ${cvData.name} - Last edited: ${formatDate(
                       cvData.updated_at
                     )}`}
                     onClick={() => (window.location.href = `/builder/${cvId}`)}
                   >
-                    <div className="flex-1 relative p-1 overflow-hidden">
+                    <div className="flex-1 relative overflow-hidden">
                       <CVPreview
+                        key={`${cvId}-${cvData.updated_at}`}
                         markdown={cvData.content}
                         css={cvData.design}
                         pageFormat={cvData.style.pageSize as "A4" | "Letter"}
@@ -270,10 +312,10 @@ export default function Dashboard() {
                 return (
                   <div
                     key={template.id}
-                    className="group bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative"
+                    className="group rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative bg-transparent"
                     title={`Use ${template.name} template - ${template.description}`}
                   >
-                    <div className="flex-1 relative p-1 overflow-hidden">
+                    <div className="flex-1 relative overflow-hidden">
                       {preview ? (
                         <CVPreview
                           markdown={preview.markdown}

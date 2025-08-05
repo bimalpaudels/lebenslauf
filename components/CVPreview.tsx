@@ -28,7 +28,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({
   className = "",
   standalone = false,
 }) => {
-  const [scale, setScale] = useState(0.3);
+  const [scale, setScale] = useState(standalone ? 0.3 : 0.4);
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,24 +37,36 @@ const CVPreview: React.FC<CVPreviewProps> = ({
       const container = containerRef;
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
-      // For dashboard previews, use minimal padding to fit within container
-      const padding = standalone ? 4 : 20;
-      const availableWidth = containerWidth - padding * 2;
-      const availableHeight = containerHeight - padding * 2;
-
-      const pageWidth = pageFormat === "A4" ? 794 : 816;
-      const pageHeight = pageFormat === "A4" ? 1123 : 1056;
-
-      // Calculate scale based on both width and height constraints
-      const scaleX = availableWidth / pageWidth;
-      const scaleY = availableHeight / pageHeight;
-
-      // Use the smaller scale to ensure the page fits in both dimensions
-      // Use the smaller scale to ensure the page fits in both dimensions
-      // Be more conservative with scale for dashboard previews
-      const maxScale = standalone ? 0.4 : 0.5;
-      const newScale = Math.min(scaleX, scaleY, maxScale);
-      setScale(Math.max(0.1, newScale));
+      
+      if (standalone) {
+        // For dashboard previews, calculate scale to fit the card properly
+        const pageWidth = pageFormat === "A4" ? 794 : 816;
+        const pageHeight = pageFormat === "A4" ? 1123 : 1056;
+        
+        // Leave minimal padding for dashboard cards
+        const availableWidth = containerWidth - 20;
+        const availableHeight = containerHeight - 20;
+        
+        const scaleX = availableWidth / pageWidth;
+        const scaleY = availableHeight / pageHeight;
+        
+        // Use smaller scale but ensure readability
+        const newScale = Math.min(scaleX, scaleY, 0.5);
+        setScale(Math.max(0.2, newScale));
+      } else {
+        // For full editor preview, use different logic
+        const pageWidth = pageFormat === "A4" ? 794 : 816;
+        const pageHeight = pageFormat === "A4" ? 1123 : 1056;
+        
+        const availableWidth = containerWidth - 40;
+        const availableHeight = containerHeight - 40;
+        
+        const scaleX = availableWidth / pageWidth;
+        const scaleY = availableHeight / pageHeight;
+        
+        const newScale = Math.min(scaleX, scaleY, 1);
+        setScale(Math.max(0.3, newScale));
+      }
     };
 
     updateScale();
@@ -83,41 +95,40 @@ const CVPreview: React.FC<CVPreviewProps> = ({
     return `
       .cv-preview-container {
         height: 100%;
-        ${
-          standalone
-            ? "background: transparent;"
-            : "background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);"
-        }
-        ${standalone ? "overflow: visible;" : "overflow: hidden;"}
-        ${standalone ? "padding: 0;" : "padding: 10px;"}
+        width: 100%;
+        ${standalone ? "background: transparent;" : "background: #f8f9fa;"}
+        ${standalone ? "overflow: hidden;" : "overflow: hidden;"}
+        ${standalone ? "padding: 10px;" : "padding: 20px;"}
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: ${standalone ? "flex-start" : "center"};
         ${standalone ? "" : "border-radius: 8px;"}
+        position: relative;
       }
       
       .cv-preview-page {
         background: white;
-        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
-        border-radius: 4px;
+        box-shadow: ${standalone ? "0 2px 8px -2px rgba(0, 0, 0, 0.1)" : "0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06)"};
+        border-radius: ${standalone ? "4px" : "4px"};
         width: ${pageDimensions.width}px;
         height: ${pageDimensions.height}px;
         position: relative;
-        overflow: visible;
-        transform-origin: center center;
+        overflow: hidden;
+        transform-origin: ${standalone ? "top center" : "center center"};
         transform: scale(${scale});
+        margin: ${standalone ? "0" : "10px 0"};
         flex-shrink: 0;
       }
       
       .cv-preview-content {
-        padding: ${pagePadding}px;
-        font-size: ${fontSize}px;
-        line-height: ${lineHeight};
+        padding: ${pagePadding}px !important;
+        font-size: ${fontSize}px !important;
+        line-height: ${lineHeight} !important;
         height: 100%;
         width: 100%;
         box-sizing: border-box;
-        overflow: visible;
+        overflow: hidden;
         position: relative;
         color: #1f2937;
       }
@@ -133,17 +144,17 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         .join("\n")}
       
       .cv-preview-content h1 {
-        color: ${themeColor};
-        margin-top: 0;
-        margin-bottom: ${paragraphSpacing}rem;
-        line-height: ${lineHeight};
+        color: ${themeColor} !important;
+        margin-top: 0 !important;
+        margin-bottom: ${paragraphSpacing}rem !important;
+        line-height: ${lineHeight} !important;
       }
       
       .cv-preview-content h2 {
-        color: ${themeColor};
-        margin-top: ${paragraphSpacing * 1.5}rem;
-        margin-bottom: ${paragraphSpacing * 0.5}rem;
-        line-height: ${lineHeight};
+        color: ${themeColor} !important;
+        margin-top: ${paragraphSpacing * 1.5}rem !important;
+        margin-bottom: ${paragraphSpacing * 0.5}rem !important;
+        line-height: ${lineHeight} !important;
       }
       
       .cv-preview-content h3 {
@@ -200,9 +211,9 @@ const CVPreview: React.FC<CVPreviewProps> = ({
       }
       
       .cv-preview-content a {
-        color: ${themeColor};
+        color: ${themeColor} !important;
         text-decoration: underline;
-        line-height: ${lineHeight};
+        line-height: ${lineHeight} !important;
       }
       
       .cv-preview-empty {
@@ -215,10 +226,11 @@ const CVPreview: React.FC<CVPreviewProps> = ({
         color: #6b7280;
         text-align: center;
         background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: ${standalone ? "0" : "8px"};
+        box-shadow: ${standalone ? "0 2px 4px -1px rgba(0, 0, 0, 0.1)" : "0 4px 6px -1px rgba(0, 0, 0, 0.1)"};
         transform: scale(${scale});
-        transform-origin: center center;
+        transform-origin: ${standalone ? "top center" : "center center"};
+        margin: ${standalone ? "0" : "10px 0"};
       }
       
       .cv-preview-empty svg {
