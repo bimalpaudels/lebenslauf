@@ -580,53 +580,87 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       }
       
       @media print {
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+        
+        .preview-container {
+          display: block !important;
+          position: static !important;
+          background: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          gap: 0 !important;
+          overflow: visible !important;
+          height: auto !important;
+          width: 100% !important;
+        }
+        
+        .page-wrapper {
+          width: 100% !important;
+          height: 100vh !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          display: block !important;
+          page-break-after: always !important;
+          page-break-inside: avoid !important;
+          position: relative !important;
+        }
+        
+        .page-wrapper:last-child {
+          page-break-after: avoid !important;
+        }
+        
+        .page {
+          width: 100% !important;
+          height: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+          border-radius: 0 !important;
+          transform: none !important;
+          position: relative !important;
+          overflow: visible !important;
+          background: white !important;
+          display: block !important;
+        }
+        
+        .page-content {
+          width: 100% !important;
+          height: 100% !important;
+          padding: ${pagePadding}px !important;
+          margin: 0 !important;
+          font-size: ${fontSize}px !important;
+          line-height: ${lineHeight} !important;
+          color: #1f2937 !important;
+          background: white !important;
+          box-sizing: border-box !important;
+          overflow: visible !important;
+          position: relative !important;
+        }
+        
         .page-number {
           display: none !important;
         }
         
-        .preview-container {
-          position: static !important;
-          background: none !important;
-          padding: 0 !important;
-          gap: 0 !important;
-          overflow: visible !important;
-          display: block !important;
+        .empty-state-wrapper,
+        .empty-state {
+          display: none !important;
         }
         
-        .page {
-          box-shadow: none !important;
-          border-radius: 0 !important;
-          margin: 0 !important;
-          page-break-after: always;
-          width: 100% !important;
-          height: 100% !important;
-          max-width: none !important;
-          max-height: none !important;
-          display: block !important;
-          position: relative !important;
-          visibility: visible !important;
-          overflow: visible !important;
+        /* Ensure all content is visible */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
         }
         
-        .page:last-child {
-          page-break-after: avoid;
-        }
-        
-        .page-content {
-          overflow: visible !important;
-          height: 100% !important;
-          width: 100% !important;
-          padding: ${pagePadding}px !important;
-          font-size: ${fontSize}px !important;
-          line-height: ${lineHeight} !important;
-          color: #1f2937 !important;
-          visibility: visible !important;
-          transform: none !important;
-        }
-        
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
+        /* Hide any scrollbars or overflow issues */
+        ::-webkit-scrollbar {
+          display: none !important;
         }
       }
     `;
