@@ -122,11 +122,17 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handleFontSizeChange = (value: number) => {
     setFontSize(value);
     if (cvId && cvData) {
+      const updatedStyle = {
+        ...cvData.style,
+        fontSize: value,
+      };
       updateCV(cvId, {
-        style: {
-          ...cvData.style,
-          fontSize: value,
-        },
+        style: updatedStyle,
+      });
+      // Update local cvData state to keep it in sync
+      setCvData({
+        ...cvData,
+        style: updatedStyle,
       });
     }
   };
@@ -135,11 +141,17 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handlePageFormatChange = (format: "A4" | "Letter") => {
     setPageFormat(format);
     if (cvId && cvData) {
+      const updatedStyle = {
+        ...cvData.style,
+        pageSize: format,
+      };
       updateCV(cvId, {
-        style: {
-          ...cvData.style,
-          pageSize: format,
-        },
+        style: updatedStyle,
+      });
+      // Update local cvData state to keep it in sync
+      setCvData({
+        ...cvData,
+        style: updatedStyle,
       });
     }
   };
@@ -148,11 +160,17 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handlePagePaddingChange = (value: number) => {
     setPagePadding(value);
     if (cvId && cvData) {
+      const updatedStyle = {
+        ...cvData.style,
+        marginV: value,
+      };
       updateCV(cvId, {
-        style: {
-          ...cvData.style,
-          marginV: value,
-        },
+        style: updatedStyle,
+      });
+      // Update local cvData state to keep it in sync
+      setCvData({
+        ...cvData,
+        style: updatedStyle,
       });
     }
   };
@@ -161,11 +179,17 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handleLineHeightChange = (value: number) => {
     setLineHeight(value);
     if (cvId && cvData) {
+      const updatedStyle = {
+        ...cvData.style,
+        lineHeight: value,
+      };
       updateCV(cvId, {
-        style: {
-          ...cvData.style,
-          lineHeight: value,
-        },
+        style: updatedStyle,
+      });
+      // Update local cvData state to keep it in sync
+      setCvData({
+        ...cvData,
+        style: updatedStyle,
       });
     }
   };
@@ -174,11 +198,17 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handleParagraphSpacingChange = (value: number) => {
     setParagraphSpacing(value);
     if (cvId && cvData) {
+      const updatedStyle = {
+        ...cvData.style,
+        paragraphSpace: value,
+      };
       updateCV(cvId, {
-        style: {
-          ...cvData.style,
-          paragraphSpace: value,
-        },
+        style: updatedStyle,
+      });
+      // Update local cvData state to keep it in sync
+      setCvData({
+        ...cvData,
+        style: updatedStyle,
       });
     }
   };
@@ -187,11 +217,17 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const handleThemeColorChange = (color: string) => {
     setThemeColor(color);
     if (cvId && cvData) {
+      const updatedStyle = {
+        ...cvData.style,
+        theme: color,
+      };
       updateCV(cvId, {
-        style: {
-          ...cvData.style,
-          theme: color,
-        },
+        style: updatedStyle,
+      });
+      // Update local cvData state to keep it in sync
+      setCvData({
+        ...cvData,
+        style: updatedStyle,
       });
     }
   };
