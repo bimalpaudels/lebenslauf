@@ -97,7 +97,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       return () => resizeObserver.disconnect();
     }, [pageDimensions]);
 
-    // --- CORRECTED PAGE BREAKING LOGIC IS HERE ---
+    // FIXED PAGE BREAKING LOGIC
     useEffect(() => {
       if (!previewHtml || !measureRef.current) {
         setPages(previewHtml ? [previewHtml] : []);
@@ -105,17 +105,76 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       }
 
       const measurer = measureRef.current;
+
+      // Clear and set content
+      measurer.innerHTML = "";
+      measurer.style.width = `${pageDimensions.width - pagePadding * 2}px`;
+      measurer.style.padding = `${pagePadding}px`;
+      measurer.style.fontSize = `${fontSize}px`;
+      measurer.style.lineHeight = `${lineHeight}`;
+      measurer.style.fontFamily =
+        "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      measurer.style.color = "#1f2937";
+      measurer.style.background = "white";
+      measurer.style.boxSizing = "border-box";
+      measurer.style.position = "absolute";
+      measurer.style.top = "-9999px";
+      measurer.style.left = "-9999px";
+      measurer.style.visibility = "hidden";
+      measurer.style.overflow = "visible";
+
+      // Apply template CSS to the measurer
+      const styleElement = document.createElement("style");
+      styleElement.textContent = templateCss
+        .split("\n")
+        .map((line) => {
+          if (line.includes(".cv-container")) {
+            return line.replace(".cv-container", ".measuring-container");
+          }
+          return line.startsWith(".") ? `.measuring-container ${line}` : line;
+        })
+        .join("\n");
+      document.head.appendChild(styleElement);
+
       measurer.innerHTML = previewHtml;
 
-      const pageHeight = pageDimensions.height - pagePadding * 2;
+      // Force layout calculation
+      measurer.offsetHeight;
 
-      // The measurer itself gives the total content height including all margins
-      if (measurer.scrollHeight <= pageHeight) {
+      const availableHeight = pageDimensions.height - pagePadding * 2;
+
+      // Check if content fits in one page
+      const totalHeight = measurer.scrollHeight;
+      console.log(
+        `Content height: ${totalHeight}, Available height: ${availableHeight}`
+      );
+      console.log(
+        `Page dimensions: ${pageDimensions.width}x${pageDimensions.height}`
+      );
+      console.log(`Page padding: ${pagePadding}`);
+      console.log(
+        `Content preview:`,
+        measurer.innerHTML.substring(0, 200) + "..."
+      );
+
+      if (totalHeight <= availableHeight) {
+        console.log("Content fits in single page");
+        document.head.removeChild(styleElement);
         setPages([previewHtml]);
         return;
       }
 
-      const splitPages = splitContentIntoPages(measurer, pageHeight);
+      console.log("Content needs to be split across multiple pages");
+      // Split content into pages
+      const splitPages = splitContentIntoPages(
+        measurer,
+        availableHeight,
+        pageDimensions.height
+      );
+      console.log(`Created ${splitPages.length} pages`);
+
+      // Clean up
+      document.head.removeChild(styleElement);
       setPages(splitPages);
     }, [
       previewHtml,
@@ -127,45 +186,148 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       paragraphSpacing,
     ]);
 
-    // --- NEW, ACCURATE PAGE SPLITTING FUNCTION ---
+    // IMPROVED PAGE SPLITTING FUNCTION
     const splitContentIntoPages = (
       container: HTMLElement,
+      availableHeight: number,
       pageHeight: number
     ): string[] => {
       const pages: string[] = [];
       const elements = Array.from(container.children) as HTMLElement[];
-      let currentPageContent = "";
+
+      if (elements.length === 0) {
+        return [container.innerHTML];
+      }
+
+      // If we only have one element and it's too large, look inside it
+      if (elements.length === 1 && elements[0].children.length > 0) {
+        console.log(
+          "Single large container detected, looking inside for smaller elements"
+        );
+        const innerElements = Array.from(elements[0].children) as HTMLElement[];
+        return splitContentIntoPagesInner(
+          innerElements,
+          availableHeight,
+          pageHeight,
+          elements[0].tagName
+        );
+      }
+
+      return splitContentIntoPagesInner(elements, availableHeight, pageHeight);
+    };
+
+    const splitContentIntoPagesInner = (
+      elements: HTMLElement[],
+      availableHeight: number,
+      pageHeight: number,
+      wrapperTag: string = "div"
+    ): string[] => {
+      const pages: string[] = [];
+      let currentPageElements: HTMLElement[] = [];
       let currentPageHeight = 0;
 
-      for (const element of elements) {
-        const style = getComputedStyle(element);
-        // Accurately get the element's full height, including vertical margins
-        const elementHeight =
-          element.offsetHeight +
-          parseFloat(style.marginTop) +
-          parseFloat(style.marginBottom);
+      // Create a temporary container for measuring with proper styles
+      const tempContainer = document.createElement("div");
+      tempContainer.style.cssText = `
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+        width: ${pageDimensions.width - pagePadding * 2}px;
+        padding: ${pagePadding}px;
+        font-size: ${fontSize}px;
+        line-height: ${lineHeight};
+        visibility: hidden;
+        background: white;
+        color: #1f2937;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        box-sizing: border-box;
+        overflow: visible;
+      `;
 
-        // If the current page has content and the next element overflows,
-        // finalize the current page and start a new one.
+      // Apply template CSS to temp container
+      const styleElement = document.createElement("style");
+      styleElement.textContent = templateCss
+        .split("\n")
+        .map((line) => {
+          if (line.includes(".cv-container")) {
+            return line.replace(".cv-container", ".temp-measuring-container");
+          }
+          return line.startsWith(".")
+            ? `.temp-measuring-container ${line}`
+            : line;
+        })
+        .join("\n");
+      document.head.appendChild(styleElement);
+
+      tempContainer.className = "temp-measuring-container";
+      document.body.appendChild(tempContainer);
+
+      console.log(`Splitting ${elements.length} elements across pages`);
+
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        const clonedElement = element.cloneNode(true) as HTMLElement;
+
+        // Clear temp container and add current page elements plus new element
+        tempContainer.innerHTML = "";
+        currentPageElements.forEach((el) => {
+          tempContainer.appendChild(el.cloneNode(true));
+        });
+        tempContainer.appendChild(clonedElement);
+
+        // Get the actual rendered height
+        const measuredHeight = tempContainer.scrollHeight;
+        console.log(
+          `Element ${i} (${element.tagName}): measuredHeight=${measuredHeight}, availableHeight=${availableHeight}`
+        );
+
+        // Check if adding this element would exceed page height
         if (
-          currentPageHeight + elementHeight > pageHeight &&
-          currentPageContent !== ""
+          measuredHeight > availableHeight &&
+          currentPageElements.length > 0
         ) {
-          pages.push(currentPageContent);
-          currentPageContent = element.outerHTML;
-          currentPageHeight = elementHeight;
+          console.log(`Page break at element ${i}, creating new page`);
+          // Save current page
+          const pageContent = currentPageElements
+            .map((el) => el.outerHTML)
+            .join("");
+          if (wrapperTag !== "div") {
+            // Wrap in the original container tag
+            pages.push(`<${wrapperTag}>${pageContent}</${wrapperTag}>`);
+          } else {
+            pages.push(pageContent);
+          }
+
+          // Start new page with current element
+          currentPageElements = [element];
+          tempContainer.innerHTML = "";
+          tempContainer.appendChild(element.cloneNode(true));
+          currentPageHeight = tempContainer.scrollHeight;
         } else {
-          // Otherwise, add the element to the current page.
-          currentPageContent += element.outerHTML;
-          currentPageHeight += elementHeight;
+          // Add element to current page
+          currentPageElements.push(element);
+          currentPageHeight = measuredHeight;
         }
       }
 
-      // Add the last page to the array if it has content.
-      if (currentPageContent !== "") {
-        pages.push(currentPageContent);
+      // Add remaining elements as last page
+      if (currentPageElements.length > 0) {
+        const pageContent = currentPageElements
+          .map((el) => el.outerHTML)
+          .join("");
+        if (wrapperTag !== "div") {
+          // Wrap in the original container tag
+          pages.push(`<${wrapperTag}>${pageContent}</${wrapperTag}>`);
+        } else {
+          pages.push(pageContent);
+        }
       }
 
+      // Clean up temporary container and style
+      document.body.removeChild(tempContainer);
+      document.head.removeChild(styleElement);
+
+      console.log(`Created ${pages.length} pages`);
       return pages.length > 0 ? pages : [container.innerHTML];
     };
 
@@ -178,7 +340,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: #3ECF8E #1e293b;
-        padding: 0;
+        padding: 20px 0;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -214,7 +376,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         transform-origin: top center;
         transform: scale(${scale});
         flex-shrink: 0;
-        margin: 20px 0;
       }
       
       .page:hover {
@@ -254,6 +415,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         line-height: ${lineHeight};
         visibility: hidden;
         overflow: visible;
+        background: white;
       }
       
       ${templateCss
@@ -376,8 +538,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         font-size: ${fontSize}px !important;
       }
       
-
-      
       .empty-state {
         display: flex;
         flex-direction: column;
@@ -401,8 +561,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         margin-bottom: 16px;
         opacity: 0.5;
       }
-      
-
       
       @page {
         size: ${pageFormat === "A4" ? "A4" : "letter"};
@@ -457,89 +615,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         body {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-        }
-        
-        ${templateCss
-          .split("\n")
-          .map((line) => {
-            if (line.includes(".cv-container")) {
-              return line.replace(".cv-container", ".page-content");
-            }
-            return line.startsWith(".") ? `.page-content ${line}` : line;
-          })
-          .join("\n")}
-        
-        .page-content h1 {
-          color: ${themeColor} !important;
-          margin-top: 0 !important;
-          margin-bottom: ${paragraphSpacing}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content h2 {
-          color: ${themeColor} !important;
-          margin-top: ${paragraphSpacing * 1.5}rem !important;
-          margin-bottom: ${paragraphSpacing * 0.5}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content h3 {
-          color: #111827 !important;
-          margin-top: ${paragraphSpacing * 1.2}rem !important;
-          margin-bottom: ${paragraphSpacing * 0.4}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content p {
-          color: #4b5563 !important;
-          margin-bottom: ${paragraphSpacing * 0.8}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content li {
-          color: #4b5563 !important;
-          margin-bottom: ${paragraphSpacing * 0.3}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content ul, 
-        .page-content ol {
-          margin-bottom: ${paragraphSpacing}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content dl {
-          margin-bottom: ${paragraphSpacing}rem !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content dt {
-          font-weight: 600 !important;
-          color: #111827 !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content dd {
-          margin-left: 0 !important;
-          margin-bottom: ${paragraphSpacing * 0.5}rem !important;
-          color: #6b7280 !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content strong {
-          color: #111827 !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content em {
-          color: #6b7280 !important;
-          line-height: ${lineHeight} !important;
-        }
-        
-        .page-content a {
-          color: ${themeColor} !important;
-          text-decoration: underline !important;
-          line-height: ${lineHeight} !important;
         }
       }
     `;
