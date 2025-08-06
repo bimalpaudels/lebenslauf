@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
+import { cn } from "@/lib/utils";
 
 interface SavedCVPreviewProps {
   markdown: string;
@@ -67,63 +68,27 @@ const SavedCVPreview: React.FC<SavedCVPreviewProps> = ({
     }
   }, [pageFormat]);
 
-  // Static styles that never change - no useMemo dependencies
-  const containerStyles = `
-    .saved-cv-preview-container {
-      height: 100%;
-      width: 100%;
-      background: transparent;
-      overflow: hidden;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      position: relative;
-    }
-    
-    .saved-cv-preview-page {
-      background: white;
-      box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-      width: ${pageDimensions.width}px;
-      height: ${pageDimensions.height}px;
-      position: relative;
-      overflow: hidden;
-      transform-origin: top center;
-      margin: 0;
-      flex-shrink: 0;
-    }
-    
-    .saved-cv-preview-content {
-      padding: ${pagePadding}px !important;
-      font-size: ${fontSize}px !important;
-      line-height: ${lineHeight} !important;
-      height: 100%;
-      width: 100%;
-      box-sizing: border-box;
-      overflow: hidden;
-      position: relative;
-      color: #1f2937;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: white;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-  `;
+  const containerClasses = cn(
+    "h-full w-full bg-transparent overflow-hidden",
+    "p-2.5 flex flex-col items-center justify-start relative",
+    className
+  );
 
-  // Process the CSS to work with our container classes
+  const pageClasses =
+    "bg-white shadow-md rounded border-0 relative overflow-hidden shrink-0";
+
+  const contentClasses =
+    "h-full w-full box-border overflow-hidden relative text-gray-800 bg-white break-words font-['Inter',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]";
+
   const processedCSS = useMemo(() => {
     if (!css) return "";
-    
+
     return css
       .split("\n")
       .map((line) => {
-        // Replace .cv-container with our specific class
         if (line.includes(".cv-container")) {
           return line.replace(".cv-container", ".saved-cv-preview-content");
         }
-        // Prefix other classes with our container
         return line.startsWith(".")
           ? `.saved-cv-preview-content ${line}`
           : line;
@@ -131,9 +96,7 @@ const SavedCVPreview: React.FC<SavedCVPreviewProps> = ({
       .join("\n");
   }, [css]);
 
-  // Custom property overrides
   const customPropertyStyles = `
-    /* Force individual props to override any CSS with highest specificity */
     .saved-cv-preview-content,
     .saved-cv-preview-content * {
       font-size: ${fontSize}px !important;
@@ -190,7 +153,6 @@ const SavedCVPreview: React.FC<SavedCVPreviewProps> = ({
       font-size: ${fontSize}px !important;
     }
     
-    /* Override any template-specific classes that might interfere */
     .saved-cv-preview-content .company,
     .saved-cv-preview-content .job-date,
     .saved-cv-preview-content .location-date,
@@ -206,31 +168,27 @@ const SavedCVPreview: React.FC<SavedCVPreviewProps> = ({
   }, [markdown]);
 
   const allStyles = `
-    ${containerStyles}
     ${processedCSS}
     ${customPropertyStyles}
   `;
 
   if (!previewHtml) {
     return (
-      <div className={`saved-cv-preview-container ${className}`} ref={setContainerRef}>
+      <div className={containerClasses} ref={setContainerRef}>
         <style dangerouslySetInnerHTML={{ __html: allStyles }} />
-        <div 
-          className="saved-cv-preview-page"
-          style={{ transform: `scale(${scale})` }}
+        <div
+          className={pageClasses}
+          style={{
+            transform: `scale(${scale})`,
+            width: `${pageDimensions.width}px`,
+            height: `${pageDimensions.height}px`,
+            transformOrigin: "top center",
+          }}
         >
-          <div className="saved-cv-preview-content">
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              height: '100%',
-              color: '#6b7280',
-              textAlign: 'center'
-            }}>
+          <div className={cn(contentClasses, "saved-cv-preview-content")}>
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 text-center">
               <svg
-                style={{ width: '32px', height: '32px', marginBottom: '12px', opacity: 0.5 }}
+                className="w-8 h-8 mb-3 opacity-50"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -238,7 +196,7 @@ const SavedCVPreview: React.FC<SavedCVPreviewProps> = ({
               >
                 <path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0.621 0 1.125-.504 1.125-1.125V9.375c0-.621.504-1.125 1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
               </svg>
-              <p style={{ fontSize: '14px', fontWeight: '500' }}>No content</p>
+              <p className="text-sm font-medium">No content</p>
             </div>
           </div>
         </div>
@@ -247,13 +205,18 @@ const SavedCVPreview: React.FC<SavedCVPreviewProps> = ({
   }
 
   return (
-    <div className={`saved-cv-preview-container ${className}`} ref={setContainerRef}>
+    <div className={containerClasses} ref={setContainerRef}>
       <style dangerouslySetInnerHTML={{ __html: allStyles }} />
-      <div 
-        className="saved-cv-preview-page"
-        style={{ transform: `scale(${scale})` }}
+      <div
+        className={pageClasses}
+        style={{
+          transform: `scale(${scale})`,
+          width: `${pageDimensions.width}px`,
+          height: `${pageDimensions.height}px`,
+          transformOrigin: "top center",
+        }}
       >
-        <div className="saved-cv-preview-content">
+        <div className={cn(contentClasses, "saved-cv-preview-content")}>
           <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
         </div>
       </div>
