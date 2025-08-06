@@ -23,6 +23,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const [cvData, setCvData] = useState<CVData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const [templateMarkdown, setTemplateMarkdown] = useState<string>("");
   const [templateCss, setTemplateCss] = useState<string>("");
@@ -83,6 +84,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
     async (markdown: string) => {
       if (!cvId || !cvData) return;
 
+      // Set typing state immediately
+      setIsTyping(true);
+
       // Clear existing timer
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
@@ -92,6 +96,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
       autoSaveTimerRef.current = setTimeout(async () => {
         try {
           setIsSaving(true);
+          setIsTyping(false);
           await updateCV(cvId, {
             content: markdown,
             updated_at: Date.now().toString(),
@@ -312,11 +317,19 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                     <div className="flex items-center space-x-1">
                       <div
                         className={`w-2 h-2 rounded-full animate-pulse ${
-                          isSaving ? "bg-amber-400" : "bg-green-400"
+                          isSaving
+                            ? "bg-amber-400"
+                            : isTyping
+                            ? "bg-gray-400"
+                            : "bg-green-400"
                         }`}
                       ></div>
                       <span className="text-xs text-slate-400">
-                        {isSaving ? "Saving..." : "Auto-save"}
+                        {isSaving
+                          ? "Saving..."
+                          : isTyping
+                          ? "Saving..."
+                          : "Auto-save"}
                       </span>
                     </div>
                   </div>
