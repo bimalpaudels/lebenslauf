@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 
-interface SimpleSplitPaneProps {
+interface SplitPaneProps {
   leftPanel: React.ReactNode;
   rightPanel: React.ReactNode;
   defaultSize?: number;
@@ -11,7 +11,7 @@ interface SimpleSplitPaneProps {
   className?: string;
 }
 
-const SimpleSplitPane: React.FC<SimpleSplitPaneProps> = ({
+const SplitPane: React.FC<SplitPaneProps> = ({
   leftPanel,
   rightPanel,
   defaultSize = 50,
@@ -32,7 +32,7 @@ const SimpleSplitPane: React.FC<SimpleSplitPaneProps> = ({
       if (!isDragging) return;
 
       const container = document.querySelector(
-        ".simple-split-pane"
+        ".split-pane-container"
       ) as HTMLElement;
       if (!container) return;
 
@@ -70,81 +70,33 @@ const SimpleSplitPane: React.FC<SimpleSplitPaneProps> = ({
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className={`simple-split-pane h-full w-full ${className}`}>
-      <div className="split-container h-full flex">
+    <div className={`split-pane-container h-full w-full ${className}`}>
+      <div className="h-full flex">
         <div
-          className="split-pane-left overflow-hidden"
+          className="h-full overflow-hidden"
           style={{ width: `${leftSize}%` }}
         >
           {leftPanel}
         </div>
 
         <div
-          className="split-resizer cursor-col-resize relative"
+          className="bg-slate-600 border-l border-r border-slate-500 cursor-col-resize w-1.5 md:w-2 flex-shrink-0 relative transition-all duration-200 ease-in-out hover:bg-emerald-400 hover:border-emerald-300 active:bg-emerald-300"
           onMouseDown={handleMouseDown}
         >
-          <div className="resizer-handle absolute inset-0 flex items-center justify-center">
-            <div className="w-1 h-8 bg-slate-400 rounded-full"></div>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-0.5 h-8 bg-slate-400 rounded-full"></div>
           </div>
         </div>
 
         <div
-          className="split-pane-right overflow-hidden"
+          className="h-full overflow-hidden"
           style={{ width: `${100 - leftSize}%` }}
         >
           {rightPanel}
         </div>
       </div>
-
-      <style jsx>{`
-        .simple-split-pane {
-          height: 100%;
-          width: 100%;
-        }
-
-        .split-container {
-          height: 100%;
-        }
-
-        .split-pane-left,
-        .split-pane-right {
-          height: 100% !important;
-          overflow: hidden;
-        }
-
-        .split-resizer {
-          background: #334155 !important;
-          border-left: 1px solid #475569 !important;
-          border-right: 1px solid #475569 !important;
-          cursor: col-resize !important;
-          width: 6px !important;
-          transition: all 0.2s ease !important;
-          position: relative !important;
-          flex-shrink: 0;
-        }
-
-        .split-resizer:hover {
-          background: #3ecf8e !important;
-          border-color: #4be4b4 !important;
-        }
-
-        .split-resizer:active {
-          background: #4be4b4 !important;
-        }
-
-        .resizer-handle {
-          pointer-events: none;
-        }
-
-        /* Responsive behavior */
-        @media (max-width: 768px) {
-          .split-resizer {
-            width: 8px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };
 
-export default SimpleSplitPane;
+export default SplitPane;
