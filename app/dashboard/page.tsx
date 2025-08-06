@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fileBasedTemplates } from "@/lib/template-loader";
 import { getAllCVs, createNewCV, deleteCV, type CVData } from "@/lib/storage";
-import CVPreview from "@/components/CVPreview";
-import SavedCVPreview from "@/components/SavedCVPreview";
+import DashboardPreview from "@/components/DashboardPreview";
 
 export default function Dashboard() {
   const [savedCVs, setSavedCVs] = useState<{ [key: string]: CVData }>({});
@@ -175,7 +174,7 @@ export default function Dashboard() {
                     onClick={() => (window.location.href = `/builder/${cvId}`)}
                   >
                     <div className="flex-1 relative overflow-hidden">
-                      <SavedCVPreview
+                      <DashboardPreview
                         key={`${cvId}-${cvData.updated_at}`}
                         markdown={cvData.content}
                         css={cvData.design}
@@ -186,6 +185,7 @@ export default function Dashboard() {
                         paragraphSpacing={cvData.style.paragraphSpace}
                         themeColor={cvData.style.theme}
                         className="h-full"
+                        variant="saved"
                       />
 
                       {/* Overlay with CV info */}
@@ -276,11 +276,11 @@ export default function Dashboard() {
                   >
                     <div className="flex-1 relative overflow-hidden">
                       {preview ? (
-                        <CVPreview
+                        <DashboardPreview
                           markdown={preview.markdown}
                           css={preview.css}
                           className="h-full"
-                          standalone={true}
+                          variant="template"
                         />
                       ) : (
                         <div className="h-full bg-slate-100 rounded-lg flex items-center justify-center relative overflow-hidden">
