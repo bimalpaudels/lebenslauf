@@ -5,6 +5,7 @@ import Link from "next/link";
 import { loadCV, updateCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
 import SimplePreview, { SimplePreviewRef } from "@/components/SimplePreview";
+import BuilderPreview, { BuilderPreviewRef } from "@/components/BuilderPreview";
 import SplitPane from "@/components/SplitPane";
 
 interface BuilderPageProps {
@@ -41,8 +42,8 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   // Auto-save timer ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Ref to access the SimplePreview export functionality
-  const previewRef = useRef<SimplePreviewRef>(null);
+  // Ref to access the BuilderPreview export functionality
+  const previewRef = useRef<BuilderPreviewRef>(null);
 
   useEffect(() => {
     const initializeBuilder = async () => {
@@ -592,7 +593,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
                 {/* Preview Container - ADDED .preview-print-container class */}
                 <div className="flex-1 overflow-hidden preview-print-container">
-                  <SimplePreview
+                  <BuilderPreview
                     ref={previewRef}
                     markdown={templateMarkdown}
                     templateCss={templateCss}
