@@ -113,7 +113,7 @@ export const usePageBreaking = ({
     templateCss,
   ]);
 
-  // Original page splitting function from SimplePreview
+  // Page splitting function for content pagination
   const splitContentIntoPages = (
     container: HTMLElement,
     availableHeight: number,

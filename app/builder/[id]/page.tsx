@@ -4,8 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { loadCV, updateCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
-import SimplePreview, { SimplePreviewRef } from "@/components/SimplePreview";
-import BuilderPreview, { BuilderPreviewRef } from "@/components/BuilderPreview";
+import BuilderPreview, { BuilderPreviewRef } from "@/components/builder/BuilderPreview";
 import SplitPane from "@/components/SplitPane";
 
 interface BuilderPageProps {

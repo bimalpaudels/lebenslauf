@@ -6,9 +6,9 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
-import { useBuilderScaling } from "../hooks/useBuilderScaling";
-import { usePageBreaking } from "../hooks/usePageBreaking";
-import { usePDFExport } from "../hooks/usePDFExport";
+import { useBuilderScaling } from "../../hooks/useBuilderScaling";
+import { usePageBreaking } from "../../hooks/usePageBreaking";
+import { usePDFExport } from "../../hooks/usePDFExport";
 import { BuilderPageContainer } from "./BuilderPageContainer";
 import { BuilderPage } from "./BuilderPage";
 import { BuilderEmptyState } from "./BuilderEmptyState";
