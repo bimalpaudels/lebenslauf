@@ -269,48 +269,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   return (
     <>
-      {/* --- CORRECTED PRINT STYLES --- */}
-      <style jsx global>{`
-        @media print {
-          /* Hide any element with this class */
-          .print-hide {
-            display: none !important;
-          }
-
-          /* Reset the body and main containers to allow content to be visible */
-          body,
-          #__next,
-          .h-screen {
-            height: auto !important;
-            overflow: visible !important;
-            background: #fff !important;
-          }
-
-          /* Override the split pane layout for printing */
-          .simple-split-pane .split-container {
-            display: block !important;
-          }
-
-          .simple-split-pane .split-pane-left,
-          .simple-split-pane .split-resizer {
-            display: none !important;
-          }
-
-          .simple-split-pane .split-pane-right {
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-          }
-
-          /* Ensure the preview container itself is not hidden by an ancestor */
-          .preview-print-container {
-            overflow: visible !important;
-            height: auto !important;
-            position: static !important;
-          }
-        }
-      `}</style>
-
       <div className="h-screen bg-slate-900 flex overflow-hidden">
         {/* Left Sidebar - Controls */}
         <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0 print-hide">
@@ -557,7 +515,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
             rightPanel={
               <div className="h-full flex flex-col bg-slate-900">
                 {/* Preview Header */}
-                <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0 print-hide">
+                <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="text-[#3ECF8E] text-lg">
                       <svg
@@ -588,8 +546,8 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   </div>
                 </div>
 
-                {/* Preview Container - ADDED .preview-print-container class */}
-                <div className="flex-1 overflow-hidden preview-print-container">
+                {/* Preview Container */}
+                <div className="flex-1 overflow-hidden">
                   <BuilderPreview
                     ref={previewRef}
                     markdown={templateMarkdown}
