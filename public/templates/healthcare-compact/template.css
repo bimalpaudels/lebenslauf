@@ -1,13 +1,13 @@
 .cv-container {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
+  line-height: 1.5;
   color: #1f2937;
   background: white;
   max-width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
   word-wrap: break-word;
-  font-size: 11pt;
+  font-size: 10pt;
   padding: 0;
   margin: 0;
 }
@@ -15,18 +15,18 @@
 /* Header styling with YAML support */
 .cv-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   page-break-after: avoid;
   break-after: avoid;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
 .cv-header h1 {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   border: none;
   padding: 0;
   page-break-after: avoid;
@@ -36,17 +36,17 @@
 
 .cv-header .header-item {
   display: block;
-  margin: 0.5rem 0;
-  font-size: 14px;
+  margin: 0.4rem 0;
+  font-size: 13px;
   color: #6b7280;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .cv-header .header-item:first-child {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: #374151;
 }
 
@@ -62,9 +62,9 @@
 
 /* Regular header styling for markdown */
 .cv-container h1 {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: #111827;
   text-align: center;
   border: none;
@@ -74,55 +74,55 @@
   letter-spacing: -0.025em;
 }
 
-/* Section headers */
+/* Section headers - more compact */
 .cv-container h2 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #111827;
-  margin-top: 32px;
-  margin-bottom: 16px;
+  margin-top: 20px;
+  margin-bottom: 12px;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   text-transform: none;
   page-break-after: avoid;
   break-after: avoid;
   letter-spacing: -0.025em;
 }
 
-/* Professional Summary */
+/* Professional Summary - more compact */
 .cv-container h2:first-of-type + p {
-  margin-bottom: 24px;
-  font-size: 14px;
-  line-height: 1.6;
+  margin-bottom: 16px;
+  font-size: 12px;
+  line-height: 1.5;
   color: #4b5563;
   text-align: justify;
 }
 
-/* Experience items */
+/* Experience items - compact layout */
 .cv-container h2:nth-of-type(2) + p {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .cv-container .company {
   font-weight: 600;
   color: #111827;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .cv-container .job-date {
-  font-size: 13px;
+  font-size: 11px;
   color: #6b7280;
   font-style: normal;
   font-weight: 400;
 }
 
-/* Job header layout */
+/* Job header layout - compact */
 .cv-container p:has(.company),
 .cv-container p strong:first-child + .company {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -130,7 +130,7 @@
 /* Ensure job titles and companies are properly aligned */
 .cv-container strong:first-child {
   flex: 1;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .cv-container .company {
@@ -138,69 +138,70 @@
   text-align: right;
 }
 
-/* Job description lists */
+/* Job description lists - compact */
 .cv-container p:has(.company) + ul {
-  margin: 12px 0 24px 0;
-  padding-left: 20px;
+  margin: 8px 0 16px 0;
+  padding-left: 16px;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
 .cv-container p:has(.company) + ul li {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-align: justify;
   color: #4b5563;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 11px;
+  line-height: 1.4;
 }
 
-/* Education items */
+/* Education items - compact */
 .cv-container .location-date {
   text-align: right;
-  font-size: 13px;
-  margin-top: -40px;
-  margin-bottom: 10px;
+  font-size: 11px;
+  margin-top: -32px;
+  margin-bottom: 8px;
   font-style: normal;
   font-weight: 400;
   color: #6b7280;
 }
 
-/* Skills section */
+/* Skills section - compact */
 .cv-container h2:contains("Skills") + p {
-  margin-top: 20px;
-  margin-bottom: 8px;
+  margin-top: 16px;
+  margin-bottom: 6px;
 }
 
 .cv-container .highlight {
   background-color: #fef3c7;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1px 4px;
+  border-radius: 3px;
   font-weight: 500;
   color: #92400e;
+  font-size: 10px;
 }
 
-/* Awards section */
+/* Professional Development section */
 .cv-container h2:last-of-type + p {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .cv-container .award-year {
-  font-size: 13px;
+  font-size: 11px;
   color: #6b7280;
   font-style: normal;
   font-weight: 400;
 }
 
-/* Position entries */
+/* Position entries - compact */
 .cv-container p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   color: #4b5563;
-  font-size: 13px;
+  font-size: 11px;
   page-break-inside: avoid;
   break-inside: avoid;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 /* Strong elements for job titles and company names */
@@ -213,89 +214,94 @@
 .cv-container em {
   color: #6b7280;
   font-style: italic;
-  font-size: 13px;
+  font-size: 11px;
 }
 
-/* List styling */
+/* List styling - compact */
 .cv-container ul {
-  margin: 0.5rem 0 1rem 1rem;
+  margin: 0.4rem 0 0.8rem 0.8rem;
   padding: 0;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
 .cv-container ol {
-  margin: 0.5rem 0 1rem 1rem;
+  margin: 0.4rem 0 0.8rem 0.8rem;
   padding: 0;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
 .cv-container li {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
   color: #4b5563;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 11px;
+  line-height: 1.4;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-/* Print optimizations */
+/* Print optimizations for compact design */
 @media print {
   .cv-container {
     padding: 0;
     margin: 0;
-    font-size: 10pt;
-    line-height: 1.4;
+    font-size: 9pt;
+    line-height: 1.3;
   }
   
   .cv-container h1 {
-    font-size: 18pt;
+    font-size: 16pt;
     margin-top: 0;
   }
   
   .cv-container h2 {
-    font-size: 12pt;
+    font-size: 11pt;
   }
   
   .cv-container h3 {
-    font-size: 10pt;
+    font-size: 9pt;
   }
   
   .cv-container p {
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.15rem;
   }
   
   .cv-container ul, .cv-container ol {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
   }
   
   .cv-container li {
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.1rem;
   }
   
   .cv-container .location-date,
   .cv-container .job-date,
   .cv-container .award-year {
-    font-size: 9pt;
+    font-size: 8pt;
+  }
+  
+  .cv-container .highlight {
+    font-size: 8pt;
+    padding: 1px 3px;
   }
 }
 
 /* Responsive design for different screen sizes */
 @media screen and (max-width: 768px) {
   .cv-container {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .cv-container h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   
   .cv-container h2 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .cv-container h3 {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 } 
