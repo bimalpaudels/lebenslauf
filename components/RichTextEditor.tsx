@@ -97,19 +97,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   return (
-    <div className={`rich-text-editor ${className}`}>
+    <div className={`h-full flex flex-col ${className}`}>
       {/* Toolbar */}
-      <div className="editor-toolbar bg-slate-800 border-b border-slate-600 px-4 py-2 flex items-center space-x-2">
+      <div className="flex-shrink-0 bg-slate-800 border-b border-slate-600 px-4 py-2 flex items-center space-x-2">
         <button
           onClick={() => insertMarkdown("**", "**")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Bold (Ctrl+B)"
         >
           <strong>B</strong>
         </button>
         <button
           onClick={() => insertMarkdown("*", "*")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Italic (Ctrl+I)"
         >
           <em>I</em>
@@ -117,21 +117,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className="w-px h-4 bg-slate-600"></div>
         <button
           onClick={() => insertMarkdown("# ")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Heading 1"
         >
           H1
         </button>
         <button
           onClick={() => insertMarkdown("## ")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Heading 2"
         >
           H2
         </button>
         <button
           onClick={() => insertMarkdown("### ")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Heading 3"
         >
           H3
@@ -139,14 +139,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className="w-px h-4 bg-slate-600"></div>
         <button
           onClick={() => insertMarkdown("- ")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Bullet List"
         >
           •
         </button>
         <button
           onClick={() => insertMarkdown("1. ")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Numbered List"
         >
           1.
@@ -154,14 +154,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className="w-px h-4 bg-slate-600"></div>
         <button
           onClick={() => insertMarkdown("[", "](url)")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Link"
         >
           🔗
         </button>
         <button
           onClick={() => insertMarkdown("`", "`")}
-          className="toolbar-btn"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
           title="Inline Code"
         >
           &lt;/&gt;
@@ -169,7 +169,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       </div>
 
       {/* Editor */}
-      <div className="editor-container relative h-full">
+      <div className="flex-1 overflow-hidden relative">
         <textarea
           ref={textareaRef}
           value={value}
@@ -178,70 +178,32 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className={`w-full h-full bg-slate-800 text-slate-200 border-none p-4 font-mono text-sm resize-none focus:outline-none transition-colors overflow-y-auto editor-textarea ${
-            isFocused ? "ring-1 ring-[#3ECF8E]" : ""
+          className={`w-full h-full bg-slate-800 text-slate-200 border-none p-4 text-sm resize-none focus:outline-none transition-colors overflow-y-auto font-mono placeholder-slate-500 leading-relaxed ${
+            isFocused ? "ring-1 ring-emerald-400" : ""
           }`}
           style={{
-            lineHeight: "1.6",
+            scrollbarWidth: "thin",
+            scrollbarColor: "#3ecf8e #1e293b",
           }}
         />
       </div>
 
       <style jsx>{`
-        .rich-text-editor {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .editor-toolbar {
-          flex-shrink: 0;
-        }
-
-        .editor-container {
-          flex: 1;
-          overflow: hidden;
-        }
-
-        .toolbar-btn {
-          @apply px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors;
-          min-width: 32px;
-          height: 28px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .toolbar-btn:hover {
-          @apply bg-slate-600 text-white;
-        }
-
-        .editor-textarea {
-          font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas",
-            monospace;
-          scrollbar-width: thin;
-          scrollbar-color: #3ecf8e #1e293b;
-        }
-
-        .editor-textarea::-webkit-scrollbar {
+        textarea::-webkit-scrollbar {
           width: 8px;
         }
 
-        .editor-textarea::-webkit-scrollbar-track {
+        textarea::-webkit-scrollbar-track {
           background: #1e293b;
         }
 
-        .editor-textarea::-webkit-scrollbar-thumb {
+        textarea::-webkit-scrollbar-thumb {
           background: #3ecf8e;
           border-radius: 4px;
         }
 
-        .editor-textarea::-webkit-scrollbar-thumb:hover {
+        textarea::-webkit-scrollbar-thumb:hover {
           background: #4be4b4;
-        }
-
-        .editor-textarea::placeholder {
-          color: #64748b;
         }
       `}</style>
     </div>
