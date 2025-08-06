@@ -45,7 +45,126 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
     const [pages, setPages] = useState<string[]>([]);
 
     const exportToPDF = () => {
-      window.print();
+      // 1. Guard against no content
+      if (!pages || pages.length === 0) {
+        console.error("Export failed: No pages to print.");
+        return;
+      }
+
+      console.log(
+        `Starting PDF export for ${pages.length} pages using cloning strategy.`
+      );
+
+      // 2. Create a dedicated, hidden container for printing
+      const printRoot = document.createElement("div");
+      printRoot.id = "print-root";
+      document.body.appendChild(printRoot);
+
+      // 3. Populate the print container with clean page elements
+      // The content already comes from the `pages` state array
+      printRoot.innerHTML = pages
+        .map((pageContent) => `<div class="print-page">${pageContent}</div>`)
+        .join("");
+
+      console.log("Created and appended #print-root with clean page data.");
+
+      // 4. Create a print-specific stylesheet targeting only the new container
+      const printStyleId = "simple-print-styles";
+      const existingPrintStyle = document.getElementById(printStyleId);
+      if (existingPrintStyle) {
+        existingPrintStyle.remove();
+      }
+
+      const printStyle = document.createElement("style");
+      printStyle.id = printStyleId;
+      printStyle.textContent = `
+        @media print {
+            @page {
+                size: ${pageFormat};
+                margin: 0;
+            }
+
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Hide the entire live application */
+            body > *:not(#print-root) {
+                display: none !important;
+            }
+
+            /* Show ONLY our cloned print container */
+            #print-root {
+                display: block !important;
+            }
+
+            /* Define the layout for each page */
+            .print-page {
+                width: 100%;
+                height: 100%; /* Important: Use 100% of the @page context */
+                overflow: hidden;
+                page-break-after: always;
+
+                /* Apply user-controlled styles directly to the page */
+                padding: ${pagePadding}px !important;
+                font-size: ${fontSize}px !important;
+                line-height: ${lineHeight} !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                color: #1f2937 !important;
+            }
+            
+            /* Don't add a page break after the final page */
+            .print-page:last-child {
+                page-break-after: auto;
+            }
+
+            /* Apply base typography from your settings */
+            .print-page h1 { color: ${themeColor} !important; font-size: ${
+        fontSize * 1.8
+      }px !important; margin-top: 0 !important; margin-bottom: ${paragraphSpacing}rem !important; }
+            .print-page h2 { color: ${themeColor} !important; font-size: ${
+        fontSize * 1.4
+      }px !important; margin-top: ${
+        paragraphSpacing * 1.5
+      }rem !important; margin-bottom: ${paragraphSpacing * 0.5}rem !important; }
+            .print-page h3 { color: #111827 !important; font-size: ${
+              fontSize * 1.2
+            }px !important; margin-top: ${
+        paragraphSpacing * 1.2
+      }rem !important; margin-bottom: ${paragraphSpacing * 0.4}rem !important; }
+            .print-page p { color: #4b5563 !important; margin-bottom: ${
+              paragraphSpacing * 0.8
+            }rem !important; }
+            .print-page li { color: #4b5563 !important; margin-bottom: ${
+              paragraphSpacing * 0.3
+            }rem !important; }
+            .print-page ul, .print-page ol { margin-bottom: ${paragraphSpacing}rem !important; padding-left: 1.5rem !important; }
+            .print-page a { color: ${themeColor} !important; text-decoration: underline !important; }
+            .print-page strong { color: #111827 !important; }
+
+            /* Scope all template-specific CSS inside our print page */
+            ${templateCss.replace(/.cv-container/g, ".print-page")}
+        }
+      `;
+      document.head.appendChild(printStyle);
+      console.log("Injected print-specific stylesheet targeting #print-root.");
+
+      // 5. Trigger print and schedule cleanup
+      const triggerPrint = () => {
+        try {
+          console.log("Triggering window.print()...");
+          window.print();
+        } finally {
+          // Cleanup always runs after the print dialog is closed
+          console.log("Print dialog closed. Cleaning up temporary elements.");
+          document.body.removeChild(printRoot);
+          document.head.removeChild(printStyle);
+        }
+      };
+
+      // Use a short timeout to ensure the browser has processed the new DOM and CSS
+      setTimeout(triggerPrint, 500);
     };
 
     useImperativeHandle(ref, () => ({
@@ -97,7 +216,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       return () => resizeObserver.disconnect();
     }, [pageDimensions]);
 
-    // FIXED PAGE BREAKING LOGIC
+    // PAGE BREAKING LOGIC
     useEffect(() => {
       if (!previewHtml || !measureRef.current) {
         setPages(previewHtml ? [previewHtml] : []);
@@ -136,6 +255,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         .join("\n");
       document.head.appendChild(styleElement);
 
+      measurer.className = "measuring-container";
       measurer.innerHTML = previewHtml;
 
       // Force layout calculation
@@ -147,14 +267,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       const totalHeight = measurer.scrollHeight;
       console.log(
         `Content height: ${totalHeight}, Available height: ${availableHeight}`
-      );
-      console.log(
-        `Page dimensions: ${pageDimensions.width}x${pageDimensions.height}`
-      );
-      console.log(`Page padding: ${pagePadding}`);
-      console.log(
-        `Content preview:`,
-        measurer.innerHTML.substring(0, 200) + "..."
       );
 
       if (totalHeight <= availableHeight) {
@@ -224,7 +336,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
     ): string[] => {
       const pages: string[] = [];
       let currentPageElements: HTMLElement[] = [];
-      let currentPageHeight = 0;
 
       // Create a temporary container for measuring with proper styles
       const tempContainer = document.createElement("div");
@@ -302,11 +413,9 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
           currentPageElements = [element];
           tempContainer.innerHTML = "";
           tempContainer.appendChild(element.cloneNode(true));
-          currentPageHeight = tempContainer.scrollHeight;
         } else {
           // Add element to current page
           currentPageElements.push(element);
-          currentPageHeight = measuredHeight;
         }
       }
 
@@ -447,7 +556,7 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
       /* Override template padding and font-size to ensure dynamic controls work */
       .page-content {
         padding: ${pagePadding}px !important;
-        font-size: ${fontSize}px !important;
+        font-sze: ${fontSize}px !important;
       }
       
       .measuring-container {
@@ -572,96 +681,6 @@ const SimplePreview = forwardRef<SimplePreviewRef, SimplePreviewProps>(
         height: 48px;
         margin-bottom: 16px;
         opacity: 0.5;
-      }
-      
-      @page {
-        size: ${pageFormat === "A4" ? "A4" : "letter"};
-        margin: 0;
-      }
-      
-      @media print {
-        html, body {
-          margin: 0 !important;
-          padding: 0 !important;
-          height: auto !important;
-          overflow: visible !important;
-        }
-        
-        .preview-container {
-          display: block !important;
-          position: static !important;
-          background: none !important;
-          padding: 0 !important;
-          margin: 0 !important;
-          gap: 0 !important;
-          overflow: visible !important;
-          height: auto !important;
-          width: 100% !important;
-        }
-        
-        .page-wrapper {
-          width: 100% !important;
-          height: 100vh !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          display: block !important;
-          page-break-after: always !important;
-          page-break-inside: avoid !important;
-          position: relative !important;
-        }
-        
-        .page-wrapper:last-child {
-          page-break-after: avoid !important;
-        }
-        
-        .page {
-          width: 100% !important;
-          height: 100% !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          box-shadow: none !important;
-          border-radius: 0 !important;
-          transform: none !important;
-          position: relative !important;
-          overflow: visible !important;
-          background: white !important;
-          display: block !important;
-        }
-        
-        .page-content {
-          width: 100% !important;
-          height: 100% !important;
-          padding: ${pagePadding}px !important;
-          margin: 0 !important;
-          font-size: ${fontSize}px !important;
-          line-height: ${lineHeight} !important;
-          color: #1f2937 !important;
-          background: white !important;
-          box-sizing: border-box !important;
-          overflow: visible !important;
-          position: relative !important;
-        }
-        
-        .page-number {
-          display: none !important;
-        }
-        
-        .empty-state-wrapper,
-        .empty-state {
-          display: none !important;
-        }
-        
-        /* Ensure all content is visible */
-        * {
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-          color-adjust: exact !important;
-        }
-        
-        /* Hide any scrollbars or overflow issues */
-        ::-webkit-scrollbar {
-          display: none !important;
-        }
       }
     `;
     }, [
