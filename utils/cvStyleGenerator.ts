@@ -5,6 +5,7 @@ export interface CVStyleConfig {
   lineHeight: number;
   paragraphSpacing: number;
   themeColor: string;
+  className?: string;
 }
 
 export const generateCVStyles = (config: CVStyleConfig): string => {
@@ -15,6 +16,7 @@ export const generateCVStyles = (config: CVStyleConfig): string => {
     lineHeight,
     paragraphSpacing,
     themeColor,
+    className = "cv-preview-content",
   } = config;
 
   const processedCSS = css
@@ -22,34 +24,34 @@ export const generateCVStyles = (config: CVStyleConfig): string => {
         .split("\n")
         .map((line) =>
           line.includes(".cv-container")
-            ? line.replace(".cv-container", ".cv-preview-content")
+            ? line.replace(".cv-container", `.${className}`)
             : line.startsWith(".")
-            ? `.cv-preview-content ${line}`
+            ? `.${className} ${line}`
             : line
         )
         .join("\n")
     : "";
 
   const baseStyles = `
-    .cv-preview-content {
+    .${className} {
       padding: ${pagePadding}px !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
       text-align: left !important;
     }
     
-    .cv-preview-content > *:first-child {
+    .${className} > *:first-child {
       margin-top: 0 !important;
     }
     
-    .cv-preview-content > *:last-child {
+    .${className} > *:last-child {
       margin-bottom: 0 !important;
     }
   `;
 
   const typographyStyles = `
-    .cv-preview-content h1,
-    .cv-preview-content .cv-header h1 {
+    .${className} h1,
+    .${className} .cv-header h1 {
       color: ${themeColor} !important;
       margin-top: 0 !important;
       margin-bottom: ${paragraphSpacing}rem !important;
@@ -57,7 +59,7 @@ export const generateCVStyles = (config: CVStyleConfig): string => {
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content h2 {
+    .${className} h2 {
       color: ${themeColor} !important;
       margin-top: ${paragraphSpacing * 1.5}rem !important;
       margin-bottom: ${paragraphSpacing * 0.5}rem !important;
@@ -65,7 +67,7 @@ export const generateCVStyles = (config: CVStyleConfig): string => {
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content h3 {
+    .${className} h3 {
       color: #111827 !important;
       margin-top: ${paragraphSpacing * 1.2}rem !important;
       margin-bottom: ${paragraphSpacing * 0.4}rem !important;
@@ -73,34 +75,34 @@ export const generateCVStyles = (config: CVStyleConfig): string => {
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content p {
+    .${className} p {
       color: #4b5563 !important;
       margin-bottom: ${paragraphSpacing * 0.8}rem !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content li {
+    .${className} li {
       color: #4b5563 !important;
       margin-bottom: ${paragraphSpacing * 0.3}rem !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content a {
+    .${className} a {
       color: ${themeColor} !important;
       text-decoration: underline !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content strong {
+    .${className} strong {
       color: #111827 !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content em {
+    .${className} em {
       color: #6b7280 !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
@@ -108,29 +110,38 @@ export const generateCVStyles = (config: CVStyleConfig): string => {
   `;
 
   const listStyles = `
-    .cv-preview-content ul,
-    .cv-preview-content ol {
+    .${className} ul,
+    .${className} ol {
       margin: ${
         paragraphSpacing * 0.5
       }rem 0 ${paragraphSpacing}rem 1.2rem !important;
       padding: 0 !important;
     }
     
-    .cv-preview-content dl {
+    .${className} dl {
       margin-bottom: ${paragraphSpacing}rem !important;
     }
     
-    .cv-preview-content dt {
+    .${className} dt {
       font-weight: 600 !important;
       color: #111827 !important;
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
     }
     
-    .cv-preview-content dd {
+    .${className} dd {
       margin-left: 0 !important;
       margin-bottom: ${paragraphSpacing * 0.5}rem !important;
       color: #6b7280 !important;
+      font-size: ${fontSize}px !important;
+      line-height: ${lineHeight} !important;
+    }
+    
+    .${className} .company,
+    .${className} .job-date,
+    .${className} .location-date,
+    .${className} .award-year,
+    .${className} .header-item {
       font-size: ${fontSize}px !important;
       line-height: ${lineHeight} !important;
     }

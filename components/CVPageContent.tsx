@@ -7,6 +7,7 @@ interface CVPageContentProps {
   height: number;
   scale: number;
   standalone: boolean;
+  className?: string;
 }
 
 export const CVPageContent: React.FC<CVPageContentProps> = ({
@@ -15,6 +16,7 @@ export const CVPageContent: React.FC<CVPageContentProps> = ({
   height,
   scale,
   standalone,
+  className = "cv-preview-content",
 }) => {
   const pageClasses = cn(
     "bg-white relative overflow-hidden shrink-0 rounded",
@@ -24,7 +26,7 @@ export const CVPageContent: React.FC<CVPageContentProps> = ({
   const contentClasses = cn(
     "h-full w-full box-border overflow-hidden relative text-gray-800 bg-white break-words",
     "font-[Inter,-apple-system,BlinkMacSystemFont,Segoe_UI,Roboto,sans-serif]",
-    "cv-preview-content"
+    className
   );
 
   return (
