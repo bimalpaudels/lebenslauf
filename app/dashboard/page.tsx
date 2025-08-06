@@ -30,38 +30,6 @@ export default function Dashboard() {
     loadSavedCVs();
   }, []);
 
-  // Separate effect for refresh handlers
-  useEffect(() => {
-    const refreshData = async () => {
-      try {
-        const cvs = await getAllCVs();
-        setSavedCVs(cvs);
-      } catch (error) {
-        console.error("Error refreshing CVs:", error);
-      }
-    };
-
-    // Add visibility change listener to refresh data when user returns to tab
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        refreshData();
-      }
-    };
-
-    // Add focus listener to refresh data when window gets focus
-    const handleFocus = () => {
-      refreshData();
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []);
-
   // Load template previews
   useEffect(() => {
     const loadTemplatePreviews = async () => {
@@ -153,15 +121,6 @@ export default function Dashboard() {
             <span className="text-white font-semibold text-xl">lebenslauf</span>
           </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => window.location.reload()}
-              className="text-slate-300 hover:text-[#3ECF8E] transition-colors"
-              title="Refresh dashboard"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
             <a
               href="https://github.com/bimalpaudels/lebenslauf"
               className="text-slate-300 hover:text-[#3ECF8E] transition-colors"

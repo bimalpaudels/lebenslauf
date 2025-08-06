@@ -5,7 +5,7 @@ import Link from "next/link";
 import { loadCV, updateCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
 import SimplePreview, { SimplePreviewRef } from "@/components/SimplePreview";
-import SimpleSplitPane from "@/components/SimpleSplitPane";
+import SplitPane from "@/components/SplitPane";
 
 interface BuilderPageProps {
   params: Promise<{
@@ -500,7 +500,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
         </div>
 
         <div className="flex-1 flex overflow-hidden">
-          <SimpleSplitPane
+          <SplitPane
             leftPanel={
               <div className="h-full flex flex-col bg-slate-900 print-hide">
                 {/* Editor Header */}
