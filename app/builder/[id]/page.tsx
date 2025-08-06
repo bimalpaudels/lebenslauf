@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import { loadCV, updateCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
-import BuilderPreview, { BuilderPreviewRef } from "@/components/builder/BuilderPreview";
+import BuilderPreview, {
+  BuilderPreviewRef,
+} from "@/components/builder/BuilderPreview";
+import { BuilderSidebar } from "@/components/builder/BuilderSidebar";
 import SplitPane from "@/components/SplitPane";
 
 interface BuilderPageProps {
@@ -13,15 +15,6 @@ interface BuilderPageProps {
   }>;
 }
 
-// Theme color options
-const themeColors = [
-  { name: "Site Theme", value: "#3ECF8E" },
-  { name: "Blue", value: "#377BB5" },
-  { name: "Purple", value: "#8B5CF6" },
-  { name: "Red", value: "#EF4444" },
-  { name: "Orange", value: "#F97316" },
-];
-
 export default function BuilderPage({ params }: BuilderPageProps) {
   const [pageFormat, setPageFormat] = useState<"A4" | "Letter">("A4");
   const [fontSize, setFontSize] = useState(12);
@@ -29,6 +22,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const [cvData, setCvData] = useState<CVData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const [templateMarkdown, setTemplateMarkdown] = useState<string>("");
   const [templateCss, setTemplateCss] = useState<string>("");
@@ -89,6 +83,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
     async (markdown: string) => {
       if (!cvId || !cvData) return;
 
+      // Set typing state immediately
+      setIsTyping(true);
+
       // Clear existing timer
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
@@ -98,6 +95,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
       autoSaveTimerRef.current = setTimeout(async () => {
         try {
           setIsSaving(true);
+          setIsTyping(false);
           await updateCV(cvId, {
             content: markdown,
             updated_at: Date.now().toString(),
@@ -267,237 +265,23 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   return (
     <>
-      {/* --- CORRECTED PRINT STYLES --- */}
-      <style jsx global>{`
-        @media print {
-          /* Hide any element with this class */
-          .print-hide {
-            display: none !important;
-          }
-
-          /* Reset the body and main containers to allow content to be visible */
-          body,
-          #__next,
-          .h-screen {
-            height: auto !important;
-            overflow: visible !important;
-            background: #fff !important;
-          }
-
-          /* Override the split pane layout for printing */
-          .simple-split-pane .split-container {
-            display: block !important;
-          }
-
-          .simple-split-pane .split-pane-left,
-          .simple-split-pane .split-resizer {
-            display: none !important;
-          }
-
-          .simple-split-pane .split-pane-right {
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-          }
-
-          /* Ensure the preview container itself is not hidden by an ancestor */
-          .preview-print-container {
-            overflow: visible !important;
-            height: auto !important;
-            position: static !important;
-          }
-        }
-      `}</style>
-
       <div className="h-screen bg-slate-900 flex overflow-hidden">
-        {/* Left Sidebar - Controls */}
-        <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0 print-hide">
-          {/* Header */}
-          <div className="p-4 border-b border-slate-700">
-            <Link
-              href="/dashboard"
-              className="flex items-center space-x-2 mb-3"
-            >
-              <div className="w-5 h-5 bg-[#3ECF8E] rounded flex items-center justify-center">
-                <span className="text-slate-900 font-bold text-xs">CV</span>
-              </div>
-              <span className="text-white font-medium text-sm">lebenslauf</span>
-            </Link>
-          </div>
-
-          {/* Controls */}
-          <div className="flex-1 p-4 space-y-8 overflow-y-auto">
-            {/* Page Settings */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
-                Page Settings
-              </h3>
-
-              {/* Page Format */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Page Format
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => handlePageFormatChange("A4")}
-                    className={`p-2 rounded text-xs transition-colors ${
-                      pageFormat === "A4"
-                        ? "bg-[#3ECF8E] text-slate-900 font-medium"
-                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                    }`}
-                  >
-                    A4
-                  </button>
-                  <button
-                    onClick={() => handlePageFormatChange("Letter")}
-                    className={`p-2 rounded text-xs transition-colors ${
-                      pageFormat === "Letter"
-                        ? "bg-[#3ECF8E] text-slate-900 font-medium"
-                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                    }`}
-                  >
-                    Letter
-                  </button>
-                </div>
-              </div>
-
-              {/* Page Padding */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Content Padding: {pagePadding}px
-                </label>
-                <input
-                  type="range"
-                  min="8"
-                  max="48"
-                  value={pagePadding}
-                  onChange={(e) =>
-                    handlePagePaddingChange(parseInt(e.target.value))
-                  }
-                  className="w-full accent-[#3ECF8E]"
-                />
-              </div>
-            </div>
-
-            {/* Separator */}
-            <div className="border-t border-slate-700/50"></div>
-
-            {/* Typography Settings */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
-                Typography
-              </h3>
-
-              {/* Font Size */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Font Size: {fontSize}px
-                </label>
-                <input
-                  type="range"
-                  min="10"
-                  max="16"
-                  value={fontSize}
-                  onChange={(e) =>
-                    handleFontSizeChange(parseInt(e.target.value))
-                  }
-                  className="w-full accent-[#3ECF8E]"
-                />
-              </div>
-
-              {/* Line Height */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Line Height: {lineHeight}
-                </label>
-                <input
-                  type="range"
-                  min="1.2"
-                  max="1.6"
-                  step="0.1"
-                  value={lineHeight}
-                  onChange={(e) =>
-                    handleLineHeightChange(parseFloat(e.target.value))
-                  }
-                  className="w-full accent-[#3ECF8E]"
-                />
-              </div>
-
-              {/* Paragraph Spacing */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Paragraph Spacing: {paragraphSpacing}rem
-                </label>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="1.5"
-                  step="0.1"
-                  value={paragraphSpacing}
-                  onChange={(e) =>
-                    handleParagraphSpacingChange(parseFloat(e.target.value))
-                  }
-                  className="w-full accent-[#3ECF8E]"
-                />
-              </div>
-            </div>
-
-            {/* Separator */}
-            <div className="border-t border-slate-700/50"></div>
-
-            {/* Theme Settings */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
-                Theme
-              </h3>
-
-              {/* Theme Color Options */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Theme Color
-                </label>
-                <div className="grid grid-cols-5 gap-2 mb-3">
-                  {themeColors.map((color) => (
-                    <button
-                      key={color.value}
-                      onClick={() => handleThemeColorChange(color.value)}
-                      className={`w-8 h-8 rounded border-2 transition-all ${
-                        themeColor === color.value
-                          ? "border-white scale-110"
-                          : "border-slate-600 hover:border-slate-400"
-                      }`}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom Color Input */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2">
-                  Custom Color
-                </label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={themeColor}
-                    onChange={(e) => handleThemeColorChange(e.target.value)}
-                    className="w-8 h-8 rounded border border-slate-600 cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    placeholder="#3ECF8E"
-                    value={customColor}
-                    onChange={(e) => handleCustomColorChange(e.target.value)}
-                    className="flex-1 bg-slate-700 text-slate-300 text-xs rounded p-2 border border-slate-600 focus:border-[#3ECF8E] focus:outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <BuilderSidebar
+          pageFormat={pageFormat}
+          fontSize={fontSize}
+          pagePadding={pagePadding}
+          lineHeight={lineHeight}
+          paragraphSpacing={paragraphSpacing}
+          themeColor={themeColor}
+          customColor={customColor}
+          onPageFormatChange={handlePageFormatChange}
+          onFontSizeChange={handleFontSizeChange}
+          onPagePaddingChange={handlePagePaddingChange}
+          onLineHeightChange={handleLineHeightChange}
+          onParagraphSpacingChange={handleParagraphSpacingChange}
+          onThemeColorChange={handleThemeColorChange}
+          onCustomColorChange={handleCustomColorChange}
+        />
 
         <div className="flex-1 flex overflow-hidden">
           <SplitPane
@@ -532,11 +316,19 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                     <div className="flex items-center space-x-1">
                       <div
                         className={`w-2 h-2 rounded-full animate-pulse ${
-                          isSaving ? "bg-amber-400" : "bg-green-400"
+                          isSaving
+                            ? "bg-amber-400"
+                            : isTyping
+                            ? "bg-gray-400"
+                            : "bg-green-400"
                         }`}
                       ></div>
                       <span className="text-xs text-slate-400">
-                        {isSaving ? "Saving..." : "Auto-save"}
+                        {isSaving
+                          ? "Saving..."
+                          : isTyping
+                          ? "Saving..."
+                          : "Auto-save"}
                       </span>
                     </div>
                   </div>
@@ -555,7 +347,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
             rightPanel={
               <div className="h-full flex flex-col bg-slate-900">
                 {/* Preview Header */}
-                <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0 print-hide">
+                <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="text-[#3ECF8E] text-lg">
                       <svg
@@ -577,10 +369,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-400">Live</span>
-                    </div>
                     <button
                       onClick={() => previewRef.current?.exportToPDF()}
                       className="px-3 py-1 text-xs bg-[#3ECF8E] text-slate-900 rounded font-medium hover:bg-[#4BE4B4] transition-colors"
@@ -590,8 +378,8 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   </div>
                 </div>
 
-                {/* Preview Container - ADDED .preview-print-container class */}
-                <div className="flex-1 overflow-hidden preview-print-container">
+                {/* Preview Container */}
+                <div className="flex-1 overflow-hidden">
                   <BuilderPreview
                     ref={previewRef}
                     markdown={templateMarkdown}
