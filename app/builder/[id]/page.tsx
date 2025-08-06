@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { loadCV, updateCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
-import BuilderPreview, { BuilderPreviewRef } from "@/components/builder/BuilderPreview";
+import BuilderPreview, {
+  BuilderPreviewRef,
+} from "@/components/builder/BuilderPreview";
 import SplitPane from "@/components/SplitPane";
 
 interface BuilderPageProps {
@@ -577,10 +579,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-400">Live</span>
-                    </div>
                     <button
                       onClick={() => previewRef.current?.exportToPDF()}
                       className="px-3 py-1 text-xs bg-[#3ECF8E] text-slate-900 rounded font-medium hover:bg-[#4BE4B4] transition-colors"
