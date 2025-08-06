@@ -11,7 +11,6 @@ interface BuilderPageProps {
 
 export const BuilderPage: React.FC<BuilderPageProps> = ({
   pageContent,
-  index,
   width,
   height,
   scale,

@@ -1,5 +1,4 @@
 import React from "react";
-import { cn } from "@/lib/utils";
 
 interface BuilderPageContainerProps {
   children: React.ReactNode;
@@ -17,10 +16,7 @@ export const BuilderPageContainer: React.FC<BuilderPageContainerProps> = ({
   return (
     <div className="h-full w-full relative">
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
-      <script
-        src="https://code.iconify.design/3/3.1.1/iconify.min.js"
-        async
-      />
+      <script src="https://code.iconify.design/3/3.1.1/iconify.min.js" async />
       <div className={containerClasses} ref={containerRef}>
         {children}
       </div>
