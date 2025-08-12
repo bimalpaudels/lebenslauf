@@ -3,10 +3,11 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { cn } from "@/lib/utils";
+import { TemplateHost } from "@/components/builder/TemplateHost";
 
 interface DashboardPreviewProps {
   markdown: string;
-  css: string;
+  css?: string; // optional in TSX template mode
   pageFormat?: "A4" | "Letter";
   fontSize?: number;
   pagePadding?: number;
@@ -15,6 +16,8 @@ interface DashboardPreviewProps {
   themeColor?: string;
   className?: string;
   variant?: "saved" | "template";
+  templateId?: string; // when previewing TSX template
+  contentOverlay?: React.ReactNode; // renders inside the page content (top-right)
 }
 
 const DashboardPreview: React.FC<DashboardPreviewProps> = ({
@@ -28,13 +31,15 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   themeColor = "#3ECF8E",
   className = "",
   variant = "template",
+  templateId,
+  contentOverlay,
 }) => {
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(0.3);
 
   // Page dimensions based on format
   const pageDimensions = useMemo(() => {
-    return pageFormat === "A4" 
+    return pageFormat === "A4"
       ? { width: 794, height: 1123 }
       : { width: 816, height: 1056 };
   }, [pageFormat]);
@@ -43,19 +48,16 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   useEffect(() => {
     const updateScale = () => {
       if (!containerRef) return;
-      
+
       const containerWidth = containerRef.clientWidth;
       const containerHeight = containerRef.clientHeight;
-      const padding = 20;
 
-      const availableWidth = containerWidth - padding;
-      const availableHeight = containerHeight - padding;
+      const scaleX = containerWidth / pageDimensions.width;
+      const scaleY = containerHeight / pageDimensions.height;
 
-      const scaleX = availableWidth / pageDimensions.width;
-      const scaleY = availableHeight / pageDimensions.height;
-
-      const newScale = Math.min(scaleX, scaleY, 0.5); // Max scale 0.5 for dashboard
-      setScale(Math.max(0.2, newScale)); // Min scale 0.2
+      // Fill available space without exceeding 1:1
+      const newScale = Math.min(scaleX, scaleY, 1);
+      setScale(Math.max(0.2, newScale));
     };
 
     updateScale();
@@ -67,8 +69,9 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   }, [containerRef, pageDimensions]);
 
   // Generate styles with appropriate CSS class name
-  const cssClassName = variant === "saved" ? "saved-cv-preview-content" : "cv-preview-content";
-  
+  const cssClassName =
+    variant === "saved" ? "saved-cv-preview-content" : "cv-preview-content";
+
   const customStyles = useMemo(() => {
     const processedCSS = css
       ? css
@@ -153,17 +156,25 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
         line-height: ${lineHeight} !important;
       }
     `;
-  }, [css, fontSize, pagePadding, lineHeight, paragraphSpacing, themeColor, cssClassName]);
+  }, [
+    css,
+    fontSize,
+    pagePadding,
+    lineHeight,
+    paragraphSpacing,
+    themeColor,
+    cssClassName,
+  ]);
 
   const previewHtml = useMemo(() => parseMarkdownToHtml(markdown), [markdown]);
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
-    "p-2.5 flex flex-col items-center justify-start relative",
+    "flex flex-col items-start justify-start relative",
     className
   );
 
-  const pageClasses = "bg-white shadow-md rounded border-0 relative overflow-hidden shrink-0";
+  const pageClasses = "relative overflow-hidden shrink-0";
   const contentClasses = cn(
     "h-full w-full box-border overflow-hidden relative text-gray-800 bg-white break-words",
     "font-['Inter',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]",
@@ -179,11 +190,36 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
           width: `${pageDimensions.width}px`,
           height: `${pageDimensions.height}px`,
           transform: `scale(${scale})`,
-          transformOrigin: "top center",
+          transformOrigin: "top left",
         }}
       >
         <div className={contentClasses}>
-          <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          {contentOverlay ? (
+            <div
+              className="absolute top-2 right-2 z-10 pointer-events-auto"
+              style={{
+                transform: `scale(${1 / Math.max(0.2, Math.min(1, scale))})`,
+                transformOrigin: "top right",
+              }}
+            >
+              {contentOverlay}
+            </div>
+          ) : null}
+          {templateId ? (
+            <TemplateHost
+              templateId={templateId}
+              markdown={markdown}
+              theme={{
+                color: themeColor,
+                fontSize,
+                lineHeight,
+                pagePadding,
+                paragraphSpacing,
+              }}
+            />
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          )}
         </div>
       </div>
     </div>

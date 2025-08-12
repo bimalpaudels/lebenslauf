@@ -1,10 +1,6 @@
 "use client";
 
-import React, {
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { useMemo, forwardRef, useImperativeHandle } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { useBuilderScaling } from "../../hooks/useBuilderScaling";
 import { usePageBreaking } from "../../hooks/usePageBreaking";
@@ -12,6 +8,7 @@ import { usePDFExport } from "../../hooks/usePDFExport";
 import { BuilderPageContainer } from "./BuilderPageContainer";
 import { BuilderPage } from "./BuilderPage";
 import { BuilderEmptyState } from "./BuilderEmptyState";
+import { TemplateHost, type ThemeTokens } from "./TemplateHost";
 
 interface BuilderPreviewProps {
   markdown: string;
@@ -42,12 +39,25 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     },
     ref
   ) {
-    const previewHtml = useMemo(() => parseMarkdownToHtml(markdown), [markdown]);
-    
+    const previewHtml = useMemo(
+      () => parseMarkdownToHtml(markdown),
+      [markdown]
+    );
+    const theme: ThemeTokens = useMemo(
+      () => ({
+        color: themeColor,
+        fontSize,
+        lineHeight,
+        pagePadding,
+        paragraphSpacing,
+      }),
+      [themeColor, fontSize, lineHeight, pagePadding, paragraphSpacing]
+    );
+
     const { scale, pageDimensions, containerRef } = useBuilderScaling({
       pageFormat,
     });
-    
+
     const { pages, measureRef } = usePageBreaking({
       previewHtml,
       pageDimensions,
@@ -57,7 +67,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       templateCss,
       paragraphSpacing,
     });
-    
+
     const { exportToPDF } = usePDFExport();
 
     useImperativeHandle(ref, () => ({
@@ -79,11 +89,11 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       return `
       .preview-container {
         height: 100%;
-        background: #f8f9fa;
+        background: rgb(248 250 252);
         overflow-x: hidden;
         overflow-y: auto;
         scrollbar-width: thin;
-        scrollbar-color: #3ECF8E #1e293b;
+        scrollbar-color: #3ECF8E rgb(203 213 225);
         padding: 20px 0;
         display: flex;
         flex-direction: column;
@@ -91,12 +101,19 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
         gap: 20px;
       }
       
+      @media (prefers-color-scheme: dark) {
+        .preview-container {
+          background: rgb(15 23 42);
+          scrollbar-color: #3ECF8E rgb(51 65 85);
+        }
+      }
+      
       .preview-container::-webkit-scrollbar {
         width: 8px;
       }
       
       .preview-container::-webkit-scrollbar-track {
-        background: #1e293b;
+        background: rgb(203 213 225);
       }
       
       .preview-container::-webkit-scrollbar-thumb {
@@ -106,6 +123,12 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       
       .preview-container::-webkit-scrollbar-thumb:hover {
         background: #4BE4B4;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        .preview-container::-webkit-scrollbar-track {
+          background: rgb(51 65 85);
+        }
       }
       
       .page-content {
@@ -259,6 +282,14 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
 
       return (
         <>
+          {/* TSX template render for measurement (modern-onepage) */}
+          <div style={{ position: "absolute", left: -99999, top: -99999 }}>
+            <TemplateHost
+              templateId="modern-onepage"
+              markdown={markdown}
+              theme={theme}
+            />
+          </div>
           {pages.map((pageContent, index) => (
             <BuilderPage
               key={index}
@@ -277,7 +308,9 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       <BuilderPageContainer
         containerRef={(node) => {
           if (containerRef && containerRef.current !== node) {
-            (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = node;
           }
         }}
         customStyles={customStyles}

@@ -99,69 +99,69 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   return (
     <div className={`h-full flex flex-col ${className}`}>
       {/* Toolbar */}
-      <div className="flex-shrink-0 bg-slate-800 border-b border-slate-600 px-4 py-2 flex items-center space-x-2">
+      <div className="flex-shrink-0 bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 px-4 py-2 flex items-center space-x-2">
         <button
           onClick={() => insertMarkdown("**", "**")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Bold (Ctrl+B)"
         >
           <strong>B</strong>
         </button>
         <button
           onClick={() => insertMarkdown("*", "*")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Italic (Ctrl+I)"
         >
           <em>I</em>
         </button>
-        <div className="w-px h-4 bg-slate-600"></div>
+        <div className="w-px h-4 bg-slate-400 dark:bg-slate-600"></div>
         <button
           onClick={() => insertMarkdown("# ")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Heading 1"
         >
           H1
         </button>
         <button
           onClick={() => insertMarkdown("## ")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Heading 2"
         >
           H2
         </button>
         <button
           onClick={() => insertMarkdown("### ")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Heading 3"
         >
           H3
         </button>
-        <div className="w-px h-4 bg-slate-600"></div>
+        <div className="w-px h-4 bg-slate-400 dark:bg-slate-600"></div>
         <button
           onClick={() => insertMarkdown("- ")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Bullet List"
         >
           •
         </button>
         <button
           onClick={() => insertMarkdown("1. ")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Numbered List"
         >
           1.
         </button>
-        <div className="w-px h-4 bg-slate-600"></div>
+        <div className="w-px h-4 bg-slate-400 dark:bg-slate-600"></div>
         <button
           onClick={() => insertMarkdown("[", "](url)")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Link"
         >
           🔗
         </button>
         <button
           onClick={() => insertMarkdown("`", "`")}
-          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 hover:text-white transition-colors flex items-center justify-center"
+          className="min-w-8 h-7 px-2 py-1 text-xs bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-400 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
           title="Inline Code"
         >
           &lt;/&gt;
@@ -178,12 +178,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className={`w-full h-full bg-slate-800 text-slate-200 border-none p-4 text-sm resize-none focus:outline-none transition-colors overflow-y-auto font-mono placeholder-slate-500 leading-relaxed ${
+          className={`w-full h-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border-none p-4 text-sm resize-none focus:outline-none transition-colors overflow-y-auto font-mono placeholder-slate-400 dark:placeholder-slate-500 leading-relaxed ${
             isFocused ? "ring-1 ring-emerald-400" : ""
           }`}
           style={{
             scrollbarWidth: "thin",
-            scrollbarColor: "#3ecf8e #1e293b",
+            scrollbarColor: "#3ecf8e rgb(226 232 240)",
           }}
         />
       </div>
@@ -194,7 +194,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         textarea::-webkit-scrollbar-track {
-          background: #1e293b;
+          background: rgb(226 232 240);
         }
 
         textarea::-webkit-scrollbar-thumb {
@@ -204,6 +204,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         textarea::-webkit-scrollbar-thumb:hover {
           background: #4be4b4;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          textarea::-webkit-scrollbar-track {
+            background: #1e293b;
+          }
         }
       `}</style>
     </div>

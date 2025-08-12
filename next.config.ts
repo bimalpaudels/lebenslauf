@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  // Simple configuration without external dependencies
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

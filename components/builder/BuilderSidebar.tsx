@@ -44,14 +44,16 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   onCustomColorChange,
 }) => {
   return (
-    <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0">
+    <div className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col flex-shrink-0">
       {/* Header */}
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-700">
         <Link href="/dashboard" className="flex items-center space-x-2 mb-3">
           <div className="w-5 h-5 bg-[#3ECF8E] rounded flex items-center justify-center">
             <span className="text-slate-900 font-bold text-xs">CV</span>
           </div>
-          <span className="text-white font-medium text-sm">lebenslauf</span>
+          <span className="text-slate-900 dark:text-white font-medium text-sm">
+            lebenslauf
+          </span>
         </Link>
       </div>
 
@@ -59,13 +61,13 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
       <div className="flex-1 p-4 space-y-8 overflow-y-auto">
         {/* Page Settings */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+          <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
             Page Settings
           </h3>
 
           {/* Page Format */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Page Format
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -74,7 +76,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                 className={`p-2 rounded text-xs transition-colors ${
                   pageFormat === "A4"
                     ? "bg-[#3ECF8E] text-slate-900 font-medium"
-                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    : "bg-slate-200 text-slate-800 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
                 }`}
               >
                 A4
@@ -84,7 +86,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                 className={`p-2 rounded text-xs transition-colors ${
                   pageFormat === "Letter"
                     ? "bg-[#3ECF8E] text-slate-900 font-medium"
-                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    : "bg-slate-200 text-slate-800 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
                 }`}
               >
                 Letter
@@ -94,7 +96,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
 
           {/* Page Padding */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Content Padding: {pagePadding}px
             </label>
             <input
@@ -109,17 +111,17 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
         </div>
 
         {/* Separator */}
-        <div className="border-t border-slate-700/50"></div>
+        <div className="border-t border-slate-200 dark:border-slate-700/50"></div>
 
         {/* Typography Settings */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+          <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
             Typography
           </h3>
 
           {/* Font Size */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Font Size: {fontSize}px
             </label>
             <input
@@ -134,7 +136,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
 
           {/* Line Height */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Line Height: {lineHeight}
             </label>
             <input
@@ -150,7 +152,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
 
           {/* Paragraph Spacing */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Paragraph Spacing: {paragraphSpacing}rem
             </label>
             <input
@@ -168,17 +170,17 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
         </div>
 
         {/* Separator */}
-        <div className="border-t border-slate-700/50"></div>
+        <div className="border-t border-slate-200 dark:border-slate-700/50"></div>
 
         {/* Theme Settings */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wide">
+          <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
             Theme
           </h3>
 
           {/* Theme Color Options */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Theme Color
             </label>
             <div className="grid grid-cols-5 gap-2 mb-3">
@@ -200,7 +202,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
 
           {/* Custom Color Input */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
               Custom Color
             </label>
             <div className="flex items-center space-x-2">
@@ -208,14 +210,14 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                 type="color"
                 value={themeColor}
                 onChange={(e) => onThemeColorChange(e.target.value)}
-                className="w-8 h-8 rounded border border-slate-600 cursor-pointer"
+                className="w-8 h-8 rounded border border-slate-300 dark:border-slate-600 cursor-pointer"
               />
               <input
                 type="text"
                 placeholder="#3ECF8E"
                 value={customColor}
                 onChange={(e) => onCustomColorChange(e.target.value)}
-                className="flex-1 bg-slate-700 text-slate-300 text-xs rounded p-2 border border-slate-600 focus:border-[#3ECF8E] focus:outline-none"
+                className="flex-1 bg-white text-slate-900 dark:bg-slate-700 dark:text-slate-300 text-xs rounded p-2 border border-slate-300 dark:border-slate-600 focus:border-[#3ECF8E] focus:outline-none"
               />
             </div>
           </div>
