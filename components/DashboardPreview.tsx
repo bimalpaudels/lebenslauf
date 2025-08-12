@@ -171,12 +171,11 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
-    "p-2.5 flex flex-col items-center justify-start relative",
+    "flex flex-col items-center justify-start relative",
     className
   );
 
-  const pageClasses =
-    "bg-white shadow-md rounded border-0 relative overflow-hidden shrink-0";
+  const pageClasses = "relative overflow-hidden shrink-0";
   const contentClasses = cn(
     "h-full w-full box-border overflow-hidden relative text-gray-800 bg-white break-words",
     "font-['Inter',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]",
