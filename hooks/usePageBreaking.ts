@@ -122,45 +122,59 @@ export const usePageBreaking = ({
       const rect = el.getBoundingClientRect();
       const bottomWithinRoot = rect.bottom - rootTop; // includes margins/borders
 
-      if (bottomWithinRoot > availableHeight && i > startIndex) {
+      // Dynamic boundary advances as we add pages
+      const currentBoundary = (pagesHtml.length + 1) * availableHeight;
+
+      if (bottomWithinRoot > currentBoundary && i > startIndex) {
         // Close current page before this element
         pushPage(startIndex, i);
         startIndex = i;
       }
 
-      // If a single block is taller than available height, try to split by its children
-      if (bottomWithinRoot > availableHeight && i === startIndex) {
+      // If a single block is taller than available height for the current page,
+      // try to split by its children across multiple page boundaries
+      if (
+        bottomWithinRoot > (pagesHtml.length + 1) * availableHeight &&
+        i === startIndex
+      ) {
         const childBlocks = Array.from(el.children) as HTMLElement[];
         if (childBlocks.length > 0) {
           let childStart = 0;
-          const elTop = rect.top;
+          let boundary = (pagesHtml.length + 1) * availableHeight;
           for (let c = 0; c < childBlocks.length; c++) {
             const childRect = childBlocks[c].getBoundingClientRect();
-            const childBottomWithin = childRect.bottom - elTop;
-            if (childBottomWithin > availableHeight && c > childStart) {
-              // Wrap subset of child blocks inside the same tag as el
+            const childBottomWithinRoot = childRect.bottom - rootTop;
+            if (childBottomWithinRoot > boundary && c > childStart) {
               const childInner = childBlocks
                 .slice(childStart, c)
                 .map((node) => node.outerHTML)
                 .join("");
-              pagesHtml.push(
-                `<${el.tagName.toLowerCase()} class="${
-                  el.className
-                }">${childInner}</${el.tagName.toLowerCase()}>`
-              );
+              // Wrap split segment with root wrapper to preserve context
+              const wrapperTag = root.tagName.toLowerCase();
+              const wrapperClass = root.className;
+              const elTag = el.tagName.toLowerCase();
+              const segmentHtml =
+                root === measurer
+                  ? `<${elTag} class="${el.className}">${childInner}</${elTag}>`
+                  : `<${wrapperTag} class="${wrapperClass}"><${elTag} class="${el.className}">${childInner}</${elTag}></${wrapperTag}>`;
+              pagesHtml.push(segmentHtml);
               childStart = c;
+              boundary += availableHeight;
             }
           }
-          // Remainder of the tall element
+          // Remainder of the tall element goes into the next page slice
           const childInnerRemainder = childBlocks
             .slice(childStart)
             .map((node) => node.outerHTML)
             .join("");
-          pagesHtml.push(
-            `<${el.tagName.toLowerCase()} class="${
-              el.className
-            }">${childInnerRemainder}</${el.tagName.toLowerCase()}>`
-          );
+          const wrapperTag = root.tagName.toLowerCase();
+          const wrapperClass = root.className;
+          const elTag = el.tagName.toLowerCase();
+          const remainderHtml =
+            root === measurer
+              ? `<${elTag} class="${el.className}">${childInnerRemainder}</${elTag}>`
+              : `<${wrapperTag} class="${wrapperClass}"><${elTag} class="${el.className}">${childInnerRemainder}</${elTag}></${wrapperTag}>`;
+          pagesHtml.push(remainderHtml);
           startIndex = i + 1; // move past this tall element
         }
       }
