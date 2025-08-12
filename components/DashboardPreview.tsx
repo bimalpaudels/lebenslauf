@@ -17,6 +17,7 @@ interface DashboardPreviewProps {
   className?: string;
   variant?: "saved" | "template";
   templateId?: string; // when previewing TSX template
+  contentOverlay?: React.ReactNode; // renders inside the page content (top-right)
 }
 
 const DashboardPreview: React.FC<DashboardPreviewProps> = ({
@@ -31,6 +32,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   className = "",
   variant = "template",
   templateId,
+  contentOverlay,
 }) => {
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(0.3);
@@ -49,16 +51,13 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
 
       const containerWidth = containerRef.clientWidth;
       const containerHeight = containerRef.clientHeight;
-      const padding = 20;
 
-      const availableWidth = containerWidth - padding;
-      const availableHeight = containerHeight - padding;
+      const scaleX = containerWidth / pageDimensions.width;
+      const scaleY = containerHeight / pageDimensions.height;
 
-      const scaleX = availableWidth / pageDimensions.width;
-      const scaleY = availableHeight / pageDimensions.height;
-
-      const newScale = Math.min(scaleX, scaleY, 0.5); // Max scale 0.5 for dashboard
-      setScale(Math.max(0.2, newScale)); // Min scale 0.2
+      // Fill available space without exceeding 1:1
+      const newScale = Math.min(scaleX, scaleY, 1);
+      setScale(Math.max(0.2, newScale));
     };
 
     updateScale();
@@ -171,7 +170,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
-    "flex flex-col items-center justify-start relative",
+    "flex flex-col items-start justify-start relative",
     className
   );
 
@@ -191,10 +190,21 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
           width: `${pageDimensions.width}px`,
           height: `${pageDimensions.height}px`,
           transform: `scale(${scale})`,
-          transformOrigin: "top center",
+          transformOrigin: "top left",
         }}
       >
         <div className={contentClasses}>
+          {contentOverlay ? (
+            <div
+              className="absolute top-2 right-2 z-10 pointer-events-auto"
+              style={{
+                transform: `scale(${1 / Math.max(0.2, Math.min(1, scale))})`,
+                transformOrigin: "top right",
+              }}
+            >
+              {contentOverlay}
+            </div>
+          ) : null}
           {templateId ? (
             <TemplateHost
               templateId={templateId}
