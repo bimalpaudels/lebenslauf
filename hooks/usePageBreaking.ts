@@ -42,7 +42,8 @@ export const usePageBreaking = ({
     measurer.style.padding = `${pagePadding}px`;
     measurer.style.fontSize = `${fontSize}px`;
     measurer.style.lineHeight = `${lineHeight}`;
-    measurer.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    measurer.style.fontFamily =
+      "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     measurer.style.color = "#1f2937";
     measurer.style.background = "white";
     measurer.style.boxSizing = "border-box";
@@ -52,7 +53,7 @@ export const usePageBreaking = ({
     measurer.style.visibility = "hidden";
     measurer.style.overflow = "visible";
 
-    // Apply template CSS to the measurer
+    // Apply template CSS to the measurer (scoped)
     const styleElement = document.createElement("style");
     styleElement.textContent = templateCss
       .split("\n")
@@ -69,41 +70,107 @@ export const usePageBreaking = ({
     measurer.innerHTML = previewHtml;
 
     // Force layout calculation
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     measurer.offsetHeight;
 
     const availableHeight = pageDimensions.height - pagePadding * 2;
 
-    // Check if content fits in one page
+    // If everything fits, short-circuit
     const totalHeight = measurer.scrollHeight;
-    console.log(
-      `Content height: ${totalHeight}, Available height: ${availableHeight}`
-    );
-
     if (totalHeight <= availableHeight) {
-      console.log("Content fits in single page");
       document.head.removeChild(styleElement);
       setPages([previewHtml]);
       return;
     }
 
-    console.log("Content needs to be split across multiple pages");
-    
-    // Split content into pages using the original logic
-    const splitPages = splitContentIntoPages(
-      measurer,
-      availableHeight,
-      pageDimensions.height,
-      pageDimensions,
-      pagePadding,
-      fontSize,
-      lineHeight,
-      templateCss
-    );
-    console.log(`Created ${splitPages.length} pages`);
+    // Determine the root to paginate: if exactly one child, use it; else use measurer
+    const root: HTMLElement =
+      measurer.children.length === 1
+        ? (measurer.children[0] as HTMLElement)
+        : measurer;
 
-    // Clean up
+    const blocks = Array.from(root.children) as HTMLElement[];
+
+    // If no clear blocks, fallback to single page
+    if (blocks.length === 0) {
+      document.head.removeChild(styleElement);
+      setPages([previewHtml]);
+      return;
+    }
+
+    const pagesHtml: string[] = [];
+    let startIndex = 0;
+
+    const rootTop = root.getBoundingClientRect().top;
+
+    const pushPage = (from: number, toExclusive: number) => {
+      if (toExclusive <= from) return;
+      // Build a wrapper preserving root tag and classes if root != measurer
+      const wrapperTag = root.tagName.toLowerCase();
+      const wrapperClass = root.className;
+      const slice = blocks.slice(from, toExclusive);
+      const inner = slice.map((el) => el.outerHTML).join("");
+      const pageContent =
+        root === measurer
+          ? inner
+          : `<${wrapperTag} class="${wrapperClass}">${inner}</${wrapperTag}>`;
+      pagesHtml.push(pageContent);
+    };
+
+    for (let i = 0; i < blocks.length; i++) {
+      const el = blocks[i];
+      const rect = el.getBoundingClientRect();
+      const bottomWithinRoot = rect.bottom - rootTop; // includes margins/borders
+
+      if (bottomWithinRoot > availableHeight && i > startIndex) {
+        // Close current page before this element
+        pushPage(startIndex, i);
+        startIndex = i;
+      }
+
+      // If a single block is taller than available height, try to split by its children
+      if (bottomWithinRoot > availableHeight && i === startIndex) {
+        const childBlocks = Array.from(el.children) as HTMLElement[];
+        if (childBlocks.length > 0) {
+          let childStart = 0;
+          const elTop = rect.top;
+          for (let c = 0; c < childBlocks.length; c++) {
+            const childRect = childBlocks[c].getBoundingClientRect();
+            const childBottomWithin = childRect.bottom - elTop;
+            if (childBottomWithin > availableHeight && c > childStart) {
+              // Wrap subset of child blocks inside the same tag as el
+              const childInner = childBlocks
+                .slice(childStart, c)
+                .map((node) => node.outerHTML)
+                .join("");
+              pagesHtml.push(
+                `<${el.tagName.toLowerCase()} class="${
+                  el.className
+                }">${childInner}</${el.tagName.toLowerCase()}>`
+              );
+              childStart = c;
+            }
+          }
+          // Remainder of the tall element
+          const childInnerRemainder = childBlocks
+            .slice(childStart)
+            .map((node) => node.outerHTML)
+            .join("");
+          pagesHtml.push(
+            `<${el.tagName.toLowerCase()} class="${
+              el.className
+            }">${childInnerRemainder}</${el.tagName.toLowerCase()}>`
+          );
+          startIndex = i + 1; // move past this tall element
+        }
+      }
+    }
+
+    // Push the remainder
+    pushPage(startIndex, blocks.length);
+
     document.head.removeChild(styleElement);
-    setPages(splitPages);
+    setPages(pagesHtml.length > 0 ? pagesHtml : [previewHtml]);
   }, [
     previewHtml,
     pageDimensions,
@@ -124,37 +191,14 @@ export const usePageBreaking = ({
     lineHeight: number,
     templateCss: string
   ): string[] => {
-    const pages: string[] = [];
+    // Deprecated: kept for backward compatibility if needed
     const elements = Array.from(container.children) as HTMLElement[];
-
-    if (elements.length === 0) {
-      return [container.innerHTML];
-    }
-
-    // If we only have one element and it's too large, look inside it
-    if (elements.length === 1 && elements[0].children.length > 0) {
-      console.log(
-        "Single large container detected, looking inside for smaller elements"
-      );
-      const innerElements = Array.from(elements[0].children) as HTMLElement[];
-      return splitContentIntoPagesInner(
-        innerElements,
-        availableHeight,
-        pageHeight,
-        elements[0].tagName,
-        pageDimensions,
-        pagePadding,
-        fontSize,
-        lineHeight,
-        templateCss
-      );
-    }
-
+    if (elements.length === 0) return [container.innerHTML];
     return splitContentIntoPagesInner(
       elements,
       availableHeight,
       pageHeight,
-      "div",
+      container.tagName,
       pageDimensions,
       pagePadding,
       fontSize,
@@ -174,109 +218,51 @@ export const usePageBreaking = ({
     lineHeight: number,
     templateCss: string
   ): string[] => {
+    // Simpler measurement: accumulate by actual offsets in the measuring container
+    const root = document.createElement(wrapperTag.toLowerCase());
     const pages: string[] = [];
-    let currentPageElements: HTMLElement[] = [];
+    let current: HTMLElement[] = [];
 
-    // Create a temporary container for measuring with proper styles
-    const tempContainer = document.createElement("div");
-    tempContainer.style.cssText = `
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      width: ${pageDimensions.width - pagePadding * 2}px;
-      padding: ${pagePadding}px;
-      font-size: ${fontSize}px;
-      line-height: ${lineHeight};
-      visibility: hidden;
-      background: white;
-      color: #1f2937;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      box-sizing: border-box;
-      overflow: visible;
-    `;
-
-    // Apply template CSS to temp container
-    const styleElement = document.createElement("style");
-    styleElement.textContent = templateCss
-      .split("\n")
-      .map((line) => {
-        if (line.includes(".cv-container")) {
-          return line.replace(".cv-container", ".temp-measuring-container");
-        }
-        return line.startsWith(".")
-          ? `.temp-measuring-container ${line}`
-          : line;
-      })
-      .join("\n");
-    document.head.appendChild(styleElement);
-
-    tempContainer.className = "temp-measuring-container";
-    document.body.appendChild(tempContainer);
-
-    console.log(`Splitting ${elements.length} elements across pages`);
+    const getPageHeight = (els: HTMLElement[]): number => {
+      if (els.length === 0) return 0;
+      const first = els[0];
+      const last = els[els.length - 1];
+      const top = first.getBoundingClientRect().top;
+      const bottom = last.getBoundingClientRect().bottom;
+      return bottom - top + pagePadding * 2; // approximate padding
+    };
 
     for (let i = 0; i < elements.length; i++) {
-      const element = elements[i];
-      const clonedElement = element.cloneNode(true) as HTMLElement;
+      const el = elements[i];
+      const tentative = [...current, el];
+      // Temporarily append to root for measurement
+      root.innerHTML = tentative.map((n) => n.outerHTML).join("");
+      document.body.appendChild(root);
+      const height = root.scrollHeight;
+      document.body.removeChild(root);
 
-      // Clear temp container and add current page elements plus new element
-      tempContainer.innerHTML = "";
-      currentPageElements.forEach((el) => {
-        tempContainer.appendChild(el.cloneNode(true));
-      });
-      tempContainer.appendChild(clonedElement);
+      if (height > availableHeight && current.length > 0) {
+        const pageContent = current.map((n) => n.outerHTML).join("");
+        pages.push(
+          wrapperTag !== "div"
+            ? `<${wrapperTag}>${pageContent}</${wrapperTag}>`
+            : pageContent
+        );
+        current = [el];
+      } else {
+        current = tentative;
+      }
+    }
 
-      // Get the actual rendered height
-      const measuredHeight = tempContainer.scrollHeight;
-      console.log(
-        `Element ${i} (${element.tagName}): measuredHeight=${measuredHeight}, availableHeight=${availableHeight}`
+    if (current.length > 0) {
+      const pageContent = current.map((n) => n.outerHTML).join("");
+      pages.push(
+        wrapperTag !== "div"
+          ? `<${wrapperTag}>${pageContent}</${wrapperTag}>`
+          : pageContent
       );
-
-      // Check if adding this element would exceed page height
-      if (
-        measuredHeight > availableHeight &&
-        currentPageElements.length > 0
-      ) {
-        console.log(`Page break at element ${i}, creating new page`);
-        // Save current page
-        const pageContent = currentPageElements
-          .map((el) => el.outerHTML)
-          .join("");
-        if (wrapperTag !== "div") {
-          // Wrap in the original container tag
-          pages.push(`<${wrapperTag}>${pageContent}</${wrapperTag}>`);
-        } else {
-          pages.push(pageContent);
-        }
-
-        // Start new page with current element
-        currentPageElements = [element];
-        tempContainer.innerHTML = "";
-        tempContainer.appendChild(element.cloneNode(true));
-      } else {
-        // Add element to current page
-        currentPageElements.push(element);
-      }
     }
 
-    // Add remaining elements as last page
-    if (currentPageElements.length > 0) {
-      const pageContent = currentPageElements
-        .map((el) => el.outerHTML)
-        .join("");
-      if (wrapperTag !== "div") {
-        // Wrap in the original container tag
-        pages.push(`<${wrapperTag}>${pageContent}</${wrapperTag}>`);
-      } else {
-        pages.push(pageContent);
-      }
-    }
-
-    // Clean up temporary container and style
-    document.body.removeChild(tempContainer);
-    document.head.removeChild(styleElement);
-
-    console.log(`Created ${pages.length} pages`);
     return pages.length > 0 ? pages : [""];
   };
 

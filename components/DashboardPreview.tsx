@@ -2,11 +2,12 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 
 interface DashboardPreviewProps {
   markdown: string;
-  css: string;
+  css?: string; // optional in TSX template mode
   pageFormat?: "A4" | "Letter";
   fontSize?: number;
   pagePadding?: number;
@@ -15,6 +16,7 @@ interface DashboardPreviewProps {
   themeColor?: string;
   className?: string;
   variant?: "saved" | "template";
+  templateId?: string; // when previewing TSX template
 }
 
 const DashboardPreview: React.FC<DashboardPreviewProps> = ({
@@ -28,13 +30,14 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   themeColor = "#3ECF8E",
   className = "",
   variant = "template",
+  templateId,
 }) => {
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(0.3);
 
   // Page dimensions based on format
   const pageDimensions = useMemo(() => {
-    return pageFormat === "A4" 
+    return pageFormat === "A4"
       ? { width: 794, height: 1123 }
       : { width: 816, height: 1056 };
   }, [pageFormat]);
@@ -43,7 +46,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   useEffect(() => {
     const updateScale = () => {
       if (!containerRef) return;
-      
+
       const containerWidth = containerRef.clientWidth;
       const containerHeight = containerRef.clientHeight;
       const padding = 20;
@@ -67,8 +70,9 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   }, [containerRef, pageDimensions]);
 
   // Generate styles with appropriate CSS class name
-  const cssClassName = variant === "saved" ? "saved-cv-preview-content" : "cv-preview-content";
-  
+  const cssClassName =
+    variant === "saved" ? "saved-cv-preview-content" : "cv-preview-content";
+
   const customStyles = useMemo(() => {
     const processedCSS = css
       ? css
@@ -153,9 +157,31 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
         line-height: ${lineHeight} !important;
       }
     `;
-  }, [css, fontSize, pagePadding, lineHeight, paragraphSpacing, themeColor, cssClassName]);
+  }, [
+    css,
+    fontSize,
+    pagePadding,
+    lineHeight,
+    paragraphSpacing,
+    themeColor,
+    cssClassName,
+  ]);
 
   const previewHtml = useMemo(() => parseMarkdownToHtml(markdown), [markdown]);
+  const Template = templateId
+    ? (dynamic(() => import(`@/templates/${templateId}/Template`), {
+        ssr: false,
+      }) as unknown as React.ComponentType<{
+        markdown: string;
+        theme: {
+          color: string;
+          fontSize: number;
+          lineHeight: number;
+          pagePadding: number;
+          paragraphSpacing: number;
+        };
+      }>)
+    : null;
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
@@ -163,7 +189,8 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
     className
   );
 
-  const pageClasses = "bg-white shadow-md rounded border-0 relative overflow-hidden shrink-0";
+  const pageClasses =
+    "bg-white shadow-md rounded border-0 relative overflow-hidden shrink-0";
   const contentClasses = cn(
     "h-full w-full box-border overflow-hidden relative text-gray-800 bg-white break-words",
     "font-['Inter',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]",
@@ -183,7 +210,21 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
         }}
       >
         <div className={contentClasses}>
-          <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          {Template ? (
+            // Render TSX template directly
+            <Template
+              markdown={markdown}
+              theme={{
+                color: themeColor,
+                fontSize,
+                lineHeight,
+                pagePadding,
+                paragraphSpacing,
+              }}
+            />
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          )}
         </div>
       </div>
     </div>

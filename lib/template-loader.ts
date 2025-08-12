@@ -11,8 +11,8 @@ export interface FileBasedTemplate {
   id: string;
   name: string;
   description: string;
-  markdownPath: string;
-  cssPath: string;
+  markdownPath?: string;
+  cssPath?: string;
 }
 
 interface ParsedMarkdown {
@@ -65,25 +65,26 @@ function renderHeader(frontmatter: Record<string, unknown> | null): string {
 
 export async function loadTemplateContent(template: FileBasedTemplate) {
   try {
-    const [markdownResponse, cssResponse] = await Promise.all([
-      fetch(template.markdownPath),
-      fetch(template.cssPath),
-    ]);
-
-    if (!markdownResponse.ok || !cssResponse.ok) {
-      throw new Error("Failed to load template files");
+    if (template.markdownPath && template.cssPath) {
+      const [markdownResponse, cssResponse] = await Promise.all([
+        fetch(template.markdownPath),
+        fetch(template.cssPath),
+      ]);
+      if (!markdownResponse.ok || !cssResponse.ok) {
+        throw new Error("Failed to load template files");
+      }
+      const [markdownContent, cssContent] = await Promise.all([
+        markdownResponse.text(),
+        cssResponse.text(),
+      ]);
+      return {
+        markdown: markdownContent,
+        css: cssContent,
+        html: parseMarkdownToHtml(markdownContent),
+      };
     }
 
-    const [markdownContent, cssContent] = await Promise.all([
-      markdownResponse.text(),
-      cssResponse.text(),
-    ]);
-
-    return {
-      markdown: markdownContent,
-      css: cssContent,
-      html: parseMarkdownToHtml(markdownContent),
-    };
+    return { markdown: "", css: "", html: "" };
   } catch (error) {
     console.error("Error loading template:", error);
     return {
@@ -102,17 +103,8 @@ export function parseMarkdownToHtml(markdown: string): string {
   return `<div class="cv-container">${headerHtml}${contentHtml}</div>`;
 }
 
-// Available file-based templates
-export const fileBasedTemplates: FileBasedTemplate[] = [
-  {
-    id: "healthcare-compact",
-    name: "Healthcare Compact",
-    description:
-      "Single-page compact design optimized for healthcare professionals with clinical focus",
-    markdownPath: "/templates/healthcare-compact/template.md",
-    cssPath: "/templates/healthcare-compact/template.css",
-  },
-];
+// File-based templates are deprecated; templates now live under templates/ with sample content in registry.ts
+export const fileBasedTemplates: FileBasedTemplate[] = [];
 
 export function getFileBasedTemplateById(
   id: string

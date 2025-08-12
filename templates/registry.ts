@@ -1,4 +1,16 @@
----
+export type TemplateMeta = {
+  id: string;
+  name: string;
+  description: string;
+  sampleMarkdown: string;
+};
+
+export const templates: TemplateMeta[] = [
+  {
+    id: "modern-onepage",
+    name: "Modern One-Page",
+    description: "Clean one-page CV with styled header and sections",
+    sampleMarkdown: `---
 name: Dr. Emily Rodriguez
 header:
   - text: |
@@ -59,3 +71,6 @@ _Magna Cum Laude, GPA: 3.8/4.0_
 **Professional Memberships:** American Association of Critical-Care Nurses (AACN), Emergency Nurses Association (ENA)
 
 **Languages:** English (Native), Spanish (Fluent)
+`,
+  },
+];

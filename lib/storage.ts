@@ -5,6 +5,7 @@ export interface CVData {
   design: string;
   content: string;
   name: string;
+  templateId?: string;
   style: {
     fontSize: number;
     lineHeight: number;
@@ -94,6 +95,7 @@ export async function createNewCV(
     design: templateCss,
     content: templateMarkdown,
     name: templateName,
+    templateId,
     style: {
       fontSize: 12,
       lineHeight: 1.4,

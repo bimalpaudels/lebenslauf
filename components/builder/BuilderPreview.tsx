@@ -1,10 +1,6 @@
 "use client";
 
-import React, {
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { useMemo, forwardRef, useImperativeHandle } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { useBuilderScaling } from "../../hooks/useBuilderScaling";
 import { usePageBreaking } from "../../hooks/usePageBreaking";
@@ -12,6 +8,7 @@ import { usePDFExport } from "../../hooks/usePDFExport";
 import { BuilderPageContainer } from "./BuilderPageContainer";
 import { BuilderPage } from "./BuilderPage";
 import { BuilderEmptyState } from "./BuilderEmptyState";
+import { TemplateHost, type ThemeTokens } from "./TemplateHost";
 
 interface BuilderPreviewProps {
   markdown: string;
@@ -42,12 +39,25 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     },
     ref
   ) {
-    const previewHtml = useMemo(() => parseMarkdownToHtml(markdown), [markdown]);
-    
+    const previewHtml = useMemo(
+      () => parseMarkdownToHtml(markdown),
+      [markdown]
+    );
+    const theme: ThemeTokens = useMemo(
+      () => ({
+        color: themeColor,
+        fontSize,
+        lineHeight,
+        pagePadding,
+        paragraphSpacing,
+      }),
+      [themeColor, fontSize, lineHeight, pagePadding, paragraphSpacing]
+    );
+
     const { scale, pageDimensions, containerRef } = useBuilderScaling({
       pageFormat,
     });
-    
+
     const { pages, measureRef } = usePageBreaking({
       previewHtml,
       pageDimensions,
@@ -57,7 +67,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       templateCss,
       paragraphSpacing,
     });
-    
+
     const { exportToPDF } = usePDFExport();
 
     useImperativeHandle(ref, () => ({
@@ -259,6 +269,14 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
 
       return (
         <>
+          {/* TSX template render for measurement (modern-onepage) */}
+          <div style={{ position: "absolute", left: -99999, top: -99999 }}>
+            <TemplateHost
+              templateId="modern-onepage"
+              markdown={markdown}
+              theme={theme}
+            />
+          </div>
           {pages.map((pageContent, index) => (
             <BuilderPage
               key={index}
@@ -277,7 +295,9 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       <BuilderPageContainer
         containerRef={(node) => {
           if (containerRef && containerRef.current !== node) {
-            (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = node;
           }
         }}
         customStyles={customStyles}
