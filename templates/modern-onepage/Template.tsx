@@ -32,7 +32,7 @@ export default function Template({
         lineHeight: theme.lineHeight,
       }}
     >
-      {frontmatter?.name && (
+      {(frontmatter as any)?.name && (
         <div className="border-b pb-3 mb-4">
           <div className="cv-header">
             <h1
@@ -43,7 +43,7 @@ export default function Template({
                 fontSize: theme.fontSize * 2,
               }}
             >
-              {String(frontmatter.name)}
+              {String((frontmatter as any).name)}
             </h1>
             {Array.isArray((frontmatter as any).header) && (
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[0.95em] text-slate-600">

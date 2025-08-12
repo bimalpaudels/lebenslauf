@@ -1,7 +1,7 @@
 import * as yaml from "js-yaml";
 
 export type ParsedFrontmatter = {
-  frontmatter: any | null;
+  frontmatter: Record<string, unknown> | null;
   content: string;
 };
 
@@ -11,7 +11,7 @@ export function parseFrontmatter(markdown: string): ParsedFrontmatter {
 
   if (match) {
     try {
-      const frontmatter = yaml.load(match[1]);
+      const frontmatter = yaml.load(match[1]) as Record<string, unknown>;
       const content = match[2];
       return { frontmatter, content };
     } catch {

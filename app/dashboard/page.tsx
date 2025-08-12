@@ -2,6 +2,7 @@
 
 import SiteHeader from "@/components/SiteHeader";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 // Templates are now chosen on a dedicated page
 import { getAllCVs, deleteCV, type CVData } from "@/lib/storage";
 import DashboardPreview from "@/components/DashboardPreview";
@@ -69,7 +70,7 @@ export default function Dashboard() {
                 Continue editing an existing CV or start from a template.
               </p>
             </div>
-            <a
+            <Link
               href="/templates"
               className="inline-flex items-center gap-2 rounded-md bg-[#3ECF8E] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-offset-slate-900 transition"
             >
@@ -85,7 +86,7 @@ export default function Dashboard() {
                 <path d="M5 12h14" />
                 <path d="M12 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </div>
 
           {/* Saved CVs Grid */}

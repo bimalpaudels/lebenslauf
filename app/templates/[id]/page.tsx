@@ -1,6 +1,7 @@
 "use client";
 
 import React, { use, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import {
   TemplateHost,
@@ -39,7 +40,7 @@ export default function TemplatePreviewPage({ params }: PageProps) {
         if (!isActive) return;
         setMarkdown(sample || "# Sample");
         setError(null);
-      } catch (e) {
+      } catch {
         if (!isActive) return;
         setError(`Template \"${templateId}\" not found.`);
         setMarkdown(
@@ -90,13 +91,13 @@ export default function TemplatePreviewPage({ params }: PageProps) {
       <main className="relative z-10 px-6 py-10">
         <div className="max-w-7xl mx-auto">
           <nav className="mb-6 text-xs text-slate-500 dark:text-slate-400">
-            <a href="/dashboard" className="hover:underline">
+            <Link href="/dashboard" className="hover:underline">
               Dashboard
-            </a>
+            </Link>
             <span className="mx-2">/</span>
-            <a href="/templates" className="hover:underline">
+            <Link href="/templates" className="hover:underline">
               Templates
-            </a>
+            </Link>
             <span className="mx-2">/</span>
             <span>{templateMeta?.name || templateId}</span>
           </nav>
