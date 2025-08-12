@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import { useState, useEffect } from "react";
 import { getTemplates, getSampleMarkdown } from "@/templates/registry";
-import { getAllCVs, deleteCV, type CVData, saveCV } from "@/lib/storage";
+import { getAllCVs, deleteCV, type CVData } from "@/lib/storage";
 import DashboardPreview from "@/components/DashboardPreview";
 
 export default function Dashboard() {
@@ -13,9 +12,6 @@ export default function Dashboard() {
   const [templateSamples, setTemplateSamples] = useState<
     Record<string, string>
   >({});
-  // Templates registry (single source of truth)
-  const templates = getTemplates();
-
   useEffect(() => {
     // Load saved CVs from localForage
     const loadSavedCVs = async () => {
@@ -32,6 +28,7 @@ export default function Dashboard() {
     // Load sample markdown for template previews from registry
     const loadTemplateSamples = async () => {
       try {
+        const templates = getTemplates(); // Get templates inside useEffect
         const entries = await Promise.all(
           templates.map(
             async (t) =>
@@ -46,7 +43,10 @@ export default function Dashboard() {
 
     loadSavedCVs();
     loadTemplateSamples();
-  }, [templates]);
+  }, []); // Remove templates dependency
+
+  // Templates registry (single source of truth) - moved after useEffect
+  const templates = getTemplates();
 
   // Load template previews
   // Previews are seeded from registry; no async fetch needed
@@ -117,7 +117,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Navigation */}
       <SiteHeader />
 
@@ -126,14 +126,14 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto">
           {/* Saved CVs Grid */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6">Your CVs</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Your CVs</h2>
             {loading ? (
-              <div className="text-slate-400">Loading...</div>
+              <div className="text-slate-600 dark:text-slate-400">Loading...</div>
             ) : Object.keys(savedCVs).length === 0 ? (
-              <div className="text-slate-400 text-center py-12">
-                <div className="w-16 h-16 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="text-slate-600 dark:text-slate-400 text-center py-12">
+                <div className="w-16 h-16 bg-slate-200/50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-slate-500"
+                    className="w-8 h-8 text-slate-400 dark:text-slate-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -251,7 +251,7 @@ export default function Dashboard() {
 
           {/* Templates Section */}
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
               Choose a Template
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

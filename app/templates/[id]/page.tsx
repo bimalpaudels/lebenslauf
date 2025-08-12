@@ -53,7 +53,7 @@ export default function TemplatePreviewPage({ params }: PageProps) {
   }, [templateId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-100">
       <SiteHeader />
       <main className="relative z-10 px-6 py-10">
         <div className="max-w-3xl mx-auto">
@@ -62,12 +62,12 @@ export default function TemplatePreviewPage({ params }: PageProps) {
           </div>
 
           {error && (
-            <div className="mb-4 rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+            <div className="mb-4 rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200 dark:text-red-200">
               {error}
             </div>
           )}
 
-          <article className="rounded-lg bg-white text-slate-800 shadow-lg border border-slate-200">
+          <article className="rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700">
             <div className="p-6">
               <TemplateHost
                 templateId={templateId}

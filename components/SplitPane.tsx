@@ -80,11 +80,11 @@ const SplitPane: React.FC<SplitPaneProps> = ({
         </div>
 
         <div
-          className="bg-slate-600 border-l border-r border-slate-500 cursor-col-resize w-1.5 md:w-2 flex-shrink-0 relative transition-all duration-200 ease-in-out hover:bg-emerald-400 hover:border-emerald-300 active:bg-emerald-300"
+          className="bg-slate-400 dark:bg-slate-600 border-l border-r border-slate-300 dark:border-slate-500 cursor-col-resize w-1.5 md:w-2 flex-shrink-0 relative transition-all duration-200 ease-in-out hover:bg-emerald-400 hover:border-emerald-300 active:bg-emerald-300"
           onMouseDown={handleMouseDown}
         >
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-0.5 h-8 bg-slate-400 rounded-full"></div>
+            <div className="w-0.5 h-8 bg-slate-300 dark:bg-slate-400 rounded-full"></div>
           </div>
         </div>
 

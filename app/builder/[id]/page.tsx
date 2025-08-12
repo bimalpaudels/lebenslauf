@@ -261,23 +261,23 @@ export default function BuilderPage({ params }: BuilderPageProps) {
 
   if (loading) {
     return (
-      <div className="h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-slate-900 dark:text-white">Loading...</div>
       </div>
     );
   }
 
   if (!cvData) {
     return (
-      <div className="h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-white">CV not found</div>
+      <div className="h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-slate-900 dark:text-white">CV not found</div>
       </div>
     );
   }
 
   return (
     <>
-      <div className="h-screen bg-slate-900 flex overflow-hidden">
+      <div className="h-screen bg-slate-50 dark:bg-slate-900 flex overflow-hidden">
         <BuilderSidebar
           pageFormat={pageFormat}
           fontSize={fontSize}
@@ -298,9 +298,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
         <div className="flex-1 flex overflow-hidden">
           <SplitPane
             leftPanel={
-              <div className="h-full flex flex-col bg-slate-900 print-hide">
+              <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 print-hide">
                 {/* Editor Header */}
-                <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                <div className="bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="text-[#3ECF8E] text-lg">
                       <svg
@@ -319,7 +319,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-white">
+                      <h3 className="text-sm font-medium text-slate-900 dark:text-white">
                         Edit CV
                       </h3>
                     </div>
@@ -335,7 +335,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                             : "bg-green-400"
                         }`}
                       ></div>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-600 dark:text-slate-400">
                         {isSaving
                           ? "Saving..."
                           : isTyping
@@ -357,9 +357,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
               </div>
             }
             rightPanel={
-              <div className="h-full flex flex-col bg-slate-900">
+              <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900">
                 {/* Preview Header */}
-                <div className="bg-slate-800 border-b border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                <div className="bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="text-[#3ECF8E] text-lg">
                       <svg
@@ -375,7 +375,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-white">
+                      <h3 className="text-sm font-medium text-slate-900 dark:text-white">
                         Live Preview
                       </h3>
                     </div>
