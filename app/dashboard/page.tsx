@@ -2,16 +2,13 @@
 
 import SiteHeader from "@/components/SiteHeader";
 import { useState, useEffect } from "react";
-import { getTemplates, getSampleMarkdown } from "@/templates/registry";
+// Templates are now chosen on a dedicated page
 import { getAllCVs, deleteCV, type CVData } from "@/lib/storage";
 import DashboardPreview from "@/components/DashboardPreview";
 
 export default function Dashboard() {
   const [savedCVs, setSavedCVs] = useState<{ [key: string]: CVData }>({});
   const [loading, setLoading] = useState(true);
-  const [templateSamples, setTemplateSamples] = useState<
-    Record<string, string>
-  >({});
   useEffect(() => {
     // Load saved CVs from localForage
     const loadSavedCVs = async () => {
@@ -25,70 +22,8 @@ export default function Dashboard() {
       }
     };
 
-    // Load sample markdown for template previews from registry
-    const loadTemplateSamples = async () => {
-      try {
-        const templates = getTemplates(); // Get templates inside useEffect
-        const entries = await Promise.all(
-          templates.map(
-            async (t) =>
-              [t.id, (await getSampleMarkdown(t.id)) || "# Sample"] as const
-          )
-        );
-        setTemplateSamples(Object.fromEntries(entries));
-      } catch (error) {
-        console.error("Error loading template samples:", error);
-      }
-    };
-
     loadSavedCVs();
-    loadTemplateSamples();
   }, []); // Remove templates dependency
-
-  // Templates registry (single source of truth) - moved after useEffect
-  const templates = getTemplates();
-
-  // Load template previews
-  // Previews are seeded from registry; no async fetch needed
-
-  const handleCreateNewCV = async (templateId: string) => {
-    try {
-      // Load template content
-      const template = templates.find((t) => t.id === templateId);
-      if (!template) return;
-
-      // Seed with sample markdown from registry when available
-      const sample = (await getSampleMarkdown(templateId)) || `# New CV`;
-
-      // Create new CV id and stage data in sessionStorage for builder to finalize
-      const cvId = Date.now().toString();
-      const now = Date.now().toString();
-      const cvData: CVData = {
-        created_at: now,
-        design: "",
-        content: sample,
-        name: template.name,
-        templateId,
-        style: {
-          fontSize: 12,
-          lineHeight: 1.4,
-          marginV: 20,
-          pageSize: "A4",
-          paragraphSpace: 1,
-          theme: "#3ECF8E",
-        },
-        updated_at: now,
-      };
-
-      // Stage pending CV for the builder page to persist; avoids flashing in list before navigation
-      try {
-        sessionStorage.setItem(`pending_cv_${cvId}`, JSON.stringify(cvData));
-      } catch {}
-      window.location.href = `/builder/${cvId}`;
-    } catch (error) {
-      console.error("Error creating new CV:", error);
-    }
-  };
 
   const handleDeleteCV = async (cvId: string) => {
     try {
@@ -124,11 +59,32 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="relative z-10 px-6 py-12">
         <div className="max-w-7xl mx-auto">
-          {/* Saved CVs Grid */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+          {/* Header with CTA */}
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               Your CVs
             </h2>
+            <a
+              href="/templates"
+              className="inline-flex items-center gap-2 rounded-md bg-[#3ECF8E] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-offset-slate-900 transition"
+            >
+              Choose Template
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="w-4 h-4"
+              >
+                <path d="M5 12h14" />
+                <path d="M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+
+          {/* Saved CVs Grid */}
+          <div className="mb-12">
             {loading ? (
               <div className="text-slate-600 dark:text-slate-400">
                 Loading...
@@ -151,9 +107,7 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <p className="text-lg font-medium">No CVs yet</p>
-                <p className="text-sm">
-                  Create your first CV by selecting a template below
-                </p>
+                <p className="text-sm">Choose a template to get started.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -224,61 +178,6 @@ export default function Dashboard() {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Templates Section */}
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-              Choose a Template
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...templates].map((template) => {
-                return (
-                  <div
-                    key={template.id}
-                    className="transition-all duration-200 flex flex-col relative bg-transparent"
-                    title={`${template.name}`}
-                  >
-                    <div
-                      className="group relative overflow-hidden cursor-pointer w-full aspect-[794/1123]"
-                      onClick={() => handleCreateNewCV(template.id)}
-                    >
-                      <DashboardPreview
-                        markdown={templateSamples[template.id] || "# Sample"}
-                        className="h-full"
-                        variant="template"
-                        templateId={template.id}
-                        contentOverlay={
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // no-op for now
-                            }}
-                            className="w-7 h-7 rounded bg-black/50 text-white flex items-center justify-center"
-                            title="View Template"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              className="w-4 h-4"
-                            >
-                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                              <circle cx="12" cy="12" r="3" />
-                            </svg>
-                          </button>
-                        }
-                      />
-                    </div>
-                    <div className="mt-3 text-xs font-medium text-center bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
-                      {template.name}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
       </main>
