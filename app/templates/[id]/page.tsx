@@ -88,6 +88,19 @@ export default function TemplatePreviewPage({ params }: PageProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-100">
       <SiteHeader />
       <main className="relative z-10 px-6 py-10">
+        <div className="max-w-7xl mx-auto">
+          <nav className="mb-6 text-xs text-slate-500 dark:text-slate-400">
+            <a href="/dashboard" className="hover:underline">
+              Dashboard
+            </a>
+            <span className="mx-2">/</span>
+            <a href="/templates" className="hover:underline">
+              Templates
+            </a>
+            <span className="mx-2">/</span>
+            <span>{templateMeta?.name || templateId}</span>
+          </nav>
+        </div>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
           {/* Left: meta */}
           <div className="lg:col-span-2 order-2 lg:order-1">
@@ -130,15 +143,17 @@ export default function TemplatePreviewPage({ params }: PageProps) {
 
           {/* Right: preview */}
           <div className="lg:col-span-3 order-1 lg:order-2">
-            <article className="rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700">
-              <div className="p-6">
-                <TemplateHost
-                  templateId={templateId}
-                  markdown={markdown}
-                  theme={theme}
-                />
-              </div>
-            </article>
+            <div className="sticky top-16">
+              <article className="rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700">
+                <div className="p-6">
+                  <TemplateHost
+                    templateId={templateId}
+                    markdown={markdown}
+                    theme={theme}
+                  />
+                </div>
+              </article>
+            </div>
           </div>
         </div>
       </main>

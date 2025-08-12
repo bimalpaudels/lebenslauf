@@ -57,13 +57,18 @@ export default function Dashboard() {
       <SiteHeader />
 
       {/* Main Content */}
-      <main className="relative z-10 px-6 py-12">
+      <main className="relative z-10 px-6 py-10">
         <div className="max-w-7xl mx-auto">
           {/* Header with CTA */}
-          <div className="mb-6 flex items-center justify-between gap-4">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Your CVs
-            </h2>
+          <div className="mb-8 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Your CVs
+              </h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                Continue editing an existing CV or start from a template.
+              </p>
+            </div>
             <a
               href="/templates"
               className="inline-flex items-center gap-2 rounded-md bg-[#3ECF8E] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-offset-slate-900 transition"
@@ -114,64 +119,67 @@ export default function Dashboard() {
                 {Object.entries(savedCVs).map(([cvId, cvData]) => (
                   <div
                     key={cvId}
-                    className="transition-all duration-200 flex flex-col relative bg-transparent"
+                    className="transition-all duration-200 flex flex-col relative"
                     title={`Last edited: ${formatDate(cvData.updated_at)}`}
                   >
-                    <div
-                      className={`group relative overflow-hidden cursor-pointer w-full ${
-                        (cvData.style.pageSize as "A4" | "Letter") === "Letter"
-                          ? "aspect-[816/1056]"
-                          : "aspect-[794/1123]"
-                      }`}
-                      onClick={() =>
-                        (window.location.href = `/builder/${cvId}`)
-                      }
-                    >
-                      <DashboardPreview
-                        key={`${cvId}-${cvData.updated_at}`}
-                        markdown={cvData.content}
-                        css={cvData.design}
-                        pageFormat={cvData.style.pageSize as "A4" | "Letter"}
-                        fontSize={cvData.style.fontSize}
-                        pagePadding={cvData.style.marginV}
-                        lineHeight={cvData.style.lineHeight}
-                        paragraphSpacing={cvData.style.paragraphSpace}
-                        themeColor={cvData.style.theme}
-                        className="h-full"
-                        variant="saved"
-                        contentOverlay={
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (
-                                confirm(
-                                  `Are you sure you want to delete this CV? This action cannot be undone.`
-                                )
-                              ) {
-                                handleDeleteCV(cvId);
-                              }
-                            }}
-                            className="w-7 h-7 rounded bg-black/50 text-white hidden group-hover:flex items-center justify-center"
-                            title="Delete CV"
-                          >
-                            <svg
-                              className="w-3.5 h-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
+                    <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/80 dark:bg-slate-800/70 shadow-sm backdrop-blur-sm hover:shadow-md hover:-translate-y-0.5 transition">
+                      <div
+                        className={`group relative overflow-hidden cursor-pointer w-full ${
+                          (cvData.style.pageSize as "A4" | "Letter") ===
+                          "Letter"
+                            ? "aspect-[816/1056]"
+                            : "aspect-[794/1123]"
+                        }`}
+                        onClick={() =>
+                          (window.location.href = `/builder/${cvId}`)
                         }
-                      />
+                      >
+                        <DashboardPreview
+                          key={`${cvId}-${cvData.updated_at}`}
+                          markdown={cvData.content}
+                          css={cvData.design}
+                          pageFormat={cvData.style.pageSize as "A4" | "Letter"}
+                          fontSize={cvData.style.fontSize}
+                          pagePadding={cvData.style.marginV}
+                          lineHeight={cvData.style.lineHeight}
+                          paragraphSpacing={cvData.style.paragraphSpace}
+                          themeColor={cvData.style.theme}
+                          className="h-full"
+                          variant="saved"
+                          contentOverlay={
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (
+                                  confirm(
+                                    `Are you sure you want to delete this CV? This action cannot be undone.`
+                                  )
+                                ) {
+                                  handleDeleteCV(cvId);
+                                }
+                              }}
+                              className="w-7 h-7 rounded bg-black/50 text-white hidden group-hover:flex items-center justify-center"
+                              title="Delete CV"
+                            >
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          }
+                        />
+                      </div>
                     </div>
-                    <div className="mt-3 text-[11px] text-center bg-gradient-to-r from-slate-500 to-slate-700 dark:from-slate-400 dark:to-slate-300 bg-clip-text text-transparent">
+                    <div className="mt-2 text-[11px] text-center text-slate-600 dark:text-slate-400">
                       Last edited: {formatDate(cvData.updated_at)}
                     </div>
                   </div>
