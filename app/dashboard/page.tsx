@@ -160,11 +160,19 @@ export default function Dashboard() {
                 {Object.entries(savedCVs).map(([cvId, cvData]) => (
                   <div
                     key={cvId}
-                    className="group transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative cursor-pointer bg-transparent"
+                    className="transition-all duration-200 flex flex-col relative bg-transparent"
                     title={`Last edited: ${formatDate(cvData.updated_at)}`}
-                    onClick={() => (window.location.href = `/builder/${cvId}`)}
                   >
-                    <div className="flex-1 relative overflow-hidden">
+                    <div
+                      className={`group relative overflow-hidden cursor-pointer w-full ${
+                        (cvData.style.pageSize as "A4" | "Letter") === "Letter"
+                          ? "aspect-[816/1056]"
+                          : "aspect-[794/1123]"
+                      }`}
+                      onClick={() =>
+                        (window.location.href = `/builder/${cvId}`)
+                      }
+                    >
                       <DashboardPreview
                         key={`${cvId}-${cvData.updated_at}`}
                         markdown={cvData.content}
@@ -208,10 +216,8 @@ export default function Dashboard() {
                           </button>
                         }
                       />
-
-                      {/* no outside icon; action handled inside the page via contentOverlay */}
                     </div>
-                    <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                    <div className="mt-3 text-[11px] text-center bg-gradient-to-r from-slate-500 to-slate-700 dark:from-slate-400 dark:to-slate-300 bg-clip-text text-transparent">
                       Last edited: {formatDate(cvData.updated_at)}
                     </div>
                   </div>
@@ -230,11 +236,11 @@ export default function Dashboard() {
                 return (
                   <div
                     key={template.id}
-                    className="group transition-all duration-200 aspect-[3/4] min-h-[300px] flex flex-col relative bg-transparent"
+                    className="transition-all duration-200 flex flex-col relative bg-transparent"
                     title={`${template.name}`}
                   >
                     <div
-                      className="flex-1 relative overflow-hidden cursor-pointer"
+                      className="group relative overflow-hidden cursor-pointer w-full aspect-[794/1123]"
                       onClick={() => handleCreateNewCV(template.id)}
                     >
                       <DashboardPreview
@@ -265,9 +271,8 @@ export default function Dashboard() {
                           </button>
                         }
                       />
-                      {/* no outside icon; action handled inside the page via contentOverlay */}
                     </div>
-                    <div className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+                    <div className="mt-3 text-xs font-medium text-center bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
                       {template.name}
                     </div>
                   </div>
