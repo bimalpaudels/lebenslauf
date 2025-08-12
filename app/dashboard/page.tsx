@@ -2,14 +2,25 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { templates as tsxTemplates } from "@/templates/registry";
+import {
+  templateMeta as modernOneMeta,
+  sampleMarkdown as modernOneSample,
+} from "@/templates/modern-onepage/Template";
 import { getAllCVs, createNewCV, deleteCV, type CVData } from "@/lib/storage";
 import DashboardPreview from "@/components/DashboardPreview";
 
 export default function Dashboard() {
   const [savedCVs, setSavedCVs] = useState<{ [key: string]: CVData }>({});
   const [loading, setLoading] = useState(true);
-  // Previews are driven directly from the registry sample markdown
+  // Define available TSX templates (imported per-template)
+  const tsxTemplates = [
+    {
+      id: modernOneMeta.id,
+      name: modernOneMeta.name,
+      description: modernOneMeta.description,
+      sampleMarkdown: modernOneSample,
+    },
+  ];
 
   const sampleMarkdown: { [key: string]: string } = Object.fromEntries(
     tsxTemplates.map((t) => [t.id, t.sampleMarkdown])
