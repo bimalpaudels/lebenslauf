@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import {
   TemplateHost,
@@ -10,11 +10,11 @@ import { getTemplateById, getSampleMarkdown } from "@/templates/registry";
 import type { CVData } from "@/lib/storage";
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default function TemplatePreviewPage({ params }: PageProps) {
-  const templateId = params.id;
+  const { id: templateId } = use(params);
   const templateMeta = getTemplateById(templateId);
 
   const [markdown, setMarkdown] = useState<string>("");
