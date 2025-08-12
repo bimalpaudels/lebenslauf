@@ -16,7 +16,6 @@ export const BuilderPageContainer: React.FC<BuilderPageContainerProps> = ({
   return (
     <div className="h-full w-full relative">
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
-      <script src="https://code.iconify.design/3/3.1.1/iconify.min.js" async />
       <div className={containerClasses} ref={containerRef}>
         {children}
       </div>
