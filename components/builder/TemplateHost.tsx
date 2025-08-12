@@ -1,6 +1,6 @@
 "use client";
-import dynamic from "next/dynamic";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { loadTemplateModule } from "@/templates/registry";
 
 export type ThemeTokens = {
   color: string;
@@ -21,13 +21,36 @@ export function TemplateHost({
   markdown,
   theme,
 }: TemplateHostProps) {
-  const Template = dynamic(() => import(`@/templates/${templateId}/Template`), {
-    ssr: false,
-  });
-  // TS can't infer MDX component props; cast to React.ComponentType
-  const Cmp = Template as unknown as React.ComponentType<{
+  const [Component, setComponent] = useState<React.ComponentType<{
     markdown: string;
     theme: ThemeTokens;
-  }>;
-  return <Cmp markdown={markdown} theme={theme} />;
+  }> | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const mod = await loadTemplateModule(templateId);
+      if (!active) return;
+      if (mod && mod.default) {
+        setComponent(
+          () =>
+            mod.default as React.ComponentType<{
+              markdown: string;
+              theme: ThemeTokens;
+            }>
+        );
+      } else {
+        setComponent(() => null);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [templateId]);
+
+  if (!Component) {
+    return null;
+  }
+
+  return <Component markdown={markdown} theme={theme} />;
 }

@@ -2,8 +2,8 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
-import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
+import { TemplateHost } from "@/components/builder/TemplateHost";
 
 interface DashboardPreviewProps {
   markdown: string;
@@ -168,20 +168,6 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   ]);
 
   const previewHtml = useMemo(() => parseMarkdownToHtml(markdown), [markdown]);
-  const Template = templateId
-    ? (dynamic(() => import(`@/templates/${templateId}/Template`), {
-        ssr: false,
-      }) as unknown as React.ComponentType<{
-        markdown: string;
-        theme: {
-          color: string;
-          fontSize: number;
-          lineHeight: number;
-          pagePadding: number;
-          paragraphSpacing: number;
-        };
-      }>)
-    : null;
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
@@ -210,9 +196,9 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
         }}
       >
         <div className={contentClasses}>
-          {Template ? (
-            // Render TSX template directly
-            <Template
+          {templateId ? (
+            <TemplateHost
+              templateId={templateId}
               markdown={markdown}
               theme={{
                 color: themeColor,

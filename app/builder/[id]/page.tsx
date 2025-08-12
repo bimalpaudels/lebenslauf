@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadCV, updateCV, type CVData } from "@/lib/storage";
+import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";
 import RichTextEditor from "@/components/RichTextEditor";
 import BuilderPreview, {
   BuilderPreviewRef,
@@ -46,7 +46,19 @@ export default function BuilderPage({ params }: BuilderPageProps) {
         setCvId(id);
 
         // Load CV data from localForage
-        const savedCV = await loadCV(id);
+        let savedCV = await loadCV(id);
+        // If coming from dashboard fast-create, persist staged CV then continue
+        if (!savedCV) {
+          try {
+            const staged = sessionStorage.getItem(`pending_cv_${id}`);
+            if (staged) {
+              const data = JSON.parse(staged) as CVData;
+              await saveCV(id, data);
+              sessionStorage.removeItem(`pending_cv_${id}`);
+              savedCV = data;
+            }
+          } catch {}
+        }
         if (savedCV) {
           setCvData(savedCV);
           setTemplateMarkdown(savedCV.content);

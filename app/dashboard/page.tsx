@@ -4,7 +4,7 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import { useState, useEffect } from "react";
 import { getTemplates, getSampleMarkdown } from "@/templates/registry";
-import { getAllCVs, createNewCV, deleteCV, type CVData } from "@/lib/storage";
+import { getAllCVs, deleteCV, type CVData, saveCV } from "@/lib/storage";
 import DashboardPreview from "@/components/DashboardPreview";
 
 export default function Dashboard() {
@@ -57,13 +57,33 @@ export default function Dashboard() {
       const template = templates.find((t) => t.id === templateId);
       if (!template) return;
 
-      // Fallback markdown; actual sample will be shown in preview, but we seed a basic CV
-      const markdown = `---\nname: New Candidate\nheader:\n  - text: example@email.com\n---\n\n## Summary\n\nShort professional summary...`;
+      // Seed with sample markdown from registry when available
+      const sample = (await getSampleMarkdown(templateId)) || `# New CV`;
 
-      // Create new CV in storage
-      const cvId = await createNewCV(templateId, markdown, "", template.name);
+      // Create new CV id and stage data in sessionStorage for builder to finalize
+      const cvId = Date.now().toString();
+      const now = Date.now().toString();
+      const cvData: CVData = {
+        created_at: now,
+        design: "",
+        content: sample,
+        name: template.name,
+        templateId,
+        style: {
+          fontSize: 12,
+          lineHeight: 1.4,
+          marginV: 20,
+          pageSize: "A4",
+          paragraphSpace: 1,
+          theme: "#3ECF8E",
+        },
+        updated_at: now,
+      };
 
-      // Navigate to builder
+      // Stage pending CV for the builder page to persist; avoids flashing in list before navigation
+      try {
+        sessionStorage.setItem(`pending_cv_${cvId}`, JSON.stringify(cvData));
+      } catch {}
       window.location.href = `/builder/${cvId}`;
     } catch (error) {
       console.error("Error creating new CV:", error);
