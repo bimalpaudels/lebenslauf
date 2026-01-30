@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";
 import NotionEditor from "@/components/builder/NotionEditor";
 import BuilderPreview, {
   BuilderPreviewRef,
 } from "@/components/builder/BuilderPreview";
-import { BuilderSidebar } from "@/components/builder/BuilderSidebar";
+import { PreviewToolbar } from "@/components/builder/PreviewToolbar";
 import SplitPane from "@/components/SplitPane";
 
 interface BuilderPageProps {
@@ -30,7 +31,6 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   const [paragraphSpacing, setParagraphSpacing] = useState(1);
   const [lineHeight, setLineHeight] = useState(1.4);
   const [themeColor, setThemeColor] = useState("#3ECF8E");
-  const [customColor, setCustomColor] = useState("");
 
   // Auto-save timer ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -242,12 +242,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
     }
   };
 
-  // Handle custom color input
-  const handleCustomColorChange = (color: string) => {
-    setCustomColor(color);
-    if (color.match(/^#[0-9A-F]{6}$/i)) {
-      handleThemeColorChange(color);
-    }
+  // Handle export PDF
+  const handleExportPDF = () => {
+    previewRef.current?.exportToPDF();
   };
 
   // Cleanup timer on unmount
@@ -276,142 +273,90 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   }
 
   return (
-    <>
-      <div className="h-screen bg-slate-50 dark:bg-slate-900 flex overflow-hidden">
-        <BuilderSidebar
-          pageFormat={pageFormat}
-          fontSize={fontSize}
-          pagePadding={pagePadding}
-          lineHeight={lineHeight}
-          paragraphSpacing={paragraphSpacing}
-          themeColor={themeColor}
-          customColor={customColor}
-          onPageFormatChange={handlePageFormatChange}
-          onFontSizeChange={handleFontSizeChange}
-          onPagePaddingChange={handlePagePaddingChange}
-          onLineHeightChange={handleLineHeightChange}
-          onParagraphSpacingChange={handleParagraphSpacingChange}
-          onThemeColorChange={handleThemeColorChange}
-          onCustomColorChange={handleCustomColorChange}
-        />
-
-        <div className="flex-1 flex overflow-hidden">
-          <SplitPane
-            leftPanel={
-              <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 print-hide">
-                {/* Editor Header */}
-                <div className="bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-[#3ECF8E] text-lg">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14,2 14,8 20,8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10,9 9,9 8,9" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-slate-900 dark:text-white">
-                        Edit CV
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1">
-                      <div
-                        className={`w-2 h-2 rounded-full animate-pulse ${
-                          isSaving
-                            ? "bg-amber-400"
-                            : isTyping
-                            ? "bg-gray-400"
-                            : "bg-green-400"
-                        }`}
-                      ></div>
-                      <span className="text-xs text-slate-600 dark:text-slate-400">
-                        {isSaving
-                          ? "Saving..."
-                          : isTyping
-                          ? "Saving..."
-                          : "Auto-save"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Notion-style Editor */}
-                <div className="flex-1 overflow-hidden">
-                  <NotionEditor
-                    value={templateMarkdown}
-                    onChange={handleMarkdownChange}
-                    placeholder="Start writing your CV..."
-                  />
-                </div>
-              </div>
-            }
-            rightPanel={
-              <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900">
-                {/* Preview Header */}
-                <div className="bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-[#3ECF8E] text-lg">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-slate-900 dark:text-white">
-                        Live Preview
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => previewRef.current?.exportToPDF()}
-                      className="px-3 py-1 text-xs bg-[#3ECF8E] text-slate-900 rounded font-medium hover:bg-[#4BE4B4] transition-colors"
-                    >
-                      Export PDF
-                    </button>
-                  </div>
-                </div>
-
-                {/* Preview Container */}
-                <div className="flex-1 overflow-hidden">
-                  <BuilderPreview
-                    ref={previewRef}
-                    markdown={templateMarkdown}
-                    templateCss={templateCss}
-                    pageFormat={pageFormat}
-                    fontSize={fontSize}
-                    pagePadding={pagePadding}
-                    lineHeight={lineHeight}
-                    paragraphSpacing={paragraphSpacing}
-                    themeColor={themeColor}
-                  />
-                </div>
-              </div>
-            }
-            defaultSize={50}
-            minSize={30}
-            maxSize={70}
-          />
-        </div>
+    <div className="h-screen bg-slate-50 dark:bg-slate-900 flex flex-col overflow-hidden">
+      {/* Minimal Top Bar - Site Title Only */}
+      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
+        <Link href="/dashboard" className="flex items-center space-x-2 w-fit">
+          <div className="w-7 h-7 bg-[#3ECF8E] rounded-lg flex items-center justify-center shadow-sm">
+            <span className="text-slate-900 font-bold text-sm">CV</span>
+          </div>
+          <span className="text-slate-900 dark:text-white font-semibold text-lg">
+            lebenslauf
+          </span>
+        </Link>
       </div>
-    </>
+
+      {/* Main Content - Split Panes */}
+      <div className="flex-1 overflow-hidden">
+        <SplitPane
+          leftPanel={
+            <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 print-hide relative">
+              {/* Notion-style Editor */}
+              <div className="flex-1 overflow-hidden">
+                <NotionEditor
+                  value={templateMarkdown}
+                  onChange={handleMarkdownChange}
+                  placeholder="Start writing your CV..."
+                />
+              </div>
+
+              {/* Auto-save indicator - positioned at bottom-right of editor */}
+              <div className="absolute bottom-3 right-3 flex items-center space-x-1.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isSaving
+                      ? "bg-amber-400 animate-pulse"
+                      : isTyping
+                      ? "bg-gray-400 animate-pulse"
+                      : "bg-green-400"
+                  }`}
+                ></div>
+                <span className="text-xs text-slate-600 dark:text-slate-400">
+                  {isSaving ? "Saving..." : isTyping ? "Typing..." : "Saved"}
+                </span>
+              </div>
+            </div>
+          }
+          rightPanel={
+            <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900">
+              {/* Floating Preview Toolbar */}
+              <PreviewToolbar
+                pageFormat={pageFormat}
+                fontSize={fontSize}
+                pagePadding={pagePadding}
+                lineHeight={lineHeight}
+                paragraphSpacing={paragraphSpacing}
+                themeColor={themeColor}
+                onPageFormatChange={handlePageFormatChange}
+                onFontSizeChange={handleFontSizeChange}
+                onPagePaddingChange={handlePagePaddingChange}
+                onLineHeightChange={handleLineHeightChange}
+                onParagraphSpacingChange={handleParagraphSpacingChange}
+                onThemeColorChange={handleThemeColorChange}
+                onExportPDF={handleExportPDF}
+              />
+
+              {/* Preview Container */}
+              <div className="flex-1 overflow-hidden">
+                <BuilderPreview
+                  ref={previewRef}
+                  markdown={templateMarkdown}
+                  templateCss={templateCss}
+                  pageFormat={pageFormat}
+                  fontSize={fontSize}
+                  pagePadding={pagePadding}
+                  lineHeight={lineHeight}
+                  paragraphSpacing={paragraphSpacing}
+                  themeColor={themeColor}
+                />
+              </div>
+            </div>
+          }
+          defaultSize={60}
+          minSize={40}
+          maxSize={75}
+        />
+      </div>
+    </div>
   );
 }
