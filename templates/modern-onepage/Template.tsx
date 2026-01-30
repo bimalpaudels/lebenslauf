@@ -1,14 +1,10 @@
+"use client";
+
 import React, { useMemo } from "react";
-import { marked } from "marked";
+import { MarkdownRenderer, type ThemeConfig } from "@/components/MarkdownRenderer";
 import { parseFrontmatter } from "@/lib/markdown";
 
-export type Theme = {
-  color: string;
-  fontSize: number;
-  lineHeight: number;
-  pagePadding: number;
-  paragraphSpacing: number;
-};
+export type Theme = ThemeConfig;
 
 export default function Template({
   markdown,
@@ -21,7 +17,6 @@ export default function Template({
     () => parseFrontmatter(markdown || ""),
     [markdown]
   );
-  const html = useMemo(() => marked.parse(content || "") as string, [content]);
 
   return (
     <div
@@ -32,6 +27,7 @@ export default function Template({
         lineHeight: theme.lineHeight,
       }}
     >
+      {/* Header from frontmatter */}
       {(frontmatter as any)?.name && (
         <div className="border-b pb-3 mb-4">
           <div className="cv-header">
@@ -48,12 +44,11 @@ export default function Template({
             {Array.isArray((frontmatter as any).header) && (
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[0.95em] text-slate-600">
                 {(frontmatter as any).header.map((item: any, idx: number) => (
-                  <div
+                  <MarkdownRenderer
                     key={idx}
+                    content={String(item.text || "")}
+                    theme={theme}
                     className="header-item"
-                    dangerouslySetInnerHTML={{
-                      __html: String(item.text || ""),
-                    }}
                   />
                 ))}
               </div>
@@ -62,32 +57,8 @@ export default function Template({
         </div>
       )}
 
-      <style>
-        {`
-          h1 { color: ${theme.color}; margin: 0 0 ${
-          theme.paragraphSpacing
-        }rem; font-size: ${theme.fontSize * 1.8}px; }
-          h2 { color: ${theme.color}; margin: ${
-          theme.paragraphSpacing * 1.5
-        }rem 0 ${theme.paragraphSpacing * 0.5}rem; font-size: ${
-          theme.fontSize * 1.4
-        }px; }
-          h3 { color: #111827; margin: ${theme.paragraphSpacing * 1.2}rem 0 ${
-          theme.paragraphSpacing * 0.4
-        }rem; font-size: ${theme.fontSize * 1.2}px; }
-          p  { color: #4b5563; margin: 0 0 ${theme.paragraphSpacing * 0.8}rem; }
-          ul, ol { margin: 0 0 ${
-            theme.paragraphSpacing
-          }rem; padding-left: 1.25rem; }
-          li { margin-bottom: ${theme.paragraphSpacing * 0.3}rem; }
-          a { color: ${theme.color}; text-decoration: underline; }
-          .company { color: #111827; font-weight: 600; }
-          .job-date, .location-date { color: #6b7280; }
-          .highlight { background: rgba(62, 207, 142, 0.15); color: #065f46; padding: 0 0.25rem; border-radius: 0.25rem; }
-        `}
-      </style>
-
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      {/* Markdown content rendered with Tailwind-styled components */}
+      <MarkdownRenderer content={content} theme={theme} />
     </div>
   );
 }

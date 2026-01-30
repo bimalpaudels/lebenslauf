@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { generateTypographyStyles, scopeTemplateCss } from "@/lib/cv-styles";
 
 interface PDFExportProps {
   pages: string[];
@@ -12,30 +13,31 @@ interface PDFExportProps {
 }
 
 export const usePDFExport = () => {
-  const exportToPDF = useCallback(({
-    pages,
-    pageFormat,
-    fontSize,
-    pagePadding,
-    lineHeight,
-    paragraphSpacing,
-    themeColor,
-    templateCss,
-  }: PDFExportProps) => {
-    // Guard against no content
-    if (!pages || pages.length === 0) {
-      console.error("Export failed: No pages to print.");
-      return;
-    }
+  const exportToPDF = useCallback(
+    ({
+      pages,
+      pageFormat,
+      fontSize,
+      pagePadding,
+      lineHeight,
+      paragraphSpacing,
+      themeColor,
+      templateCss,
+    }: PDFExportProps) => {
+      // Guard against no content
+      if (!pages || pages.length === 0) {
+        console.error("Export failed: No pages to print.");
+        return;
+      }
 
-    console.log(
-      `Starting PDF export for ${pages.length} pages using cloning strategy.`
-    );
+      console.log(
+        `Starting PDF export for ${pages.length} pages using cloning strategy.`
+      );
 
-    // Create a dedicated, hidden container for printing (completely isolated)
-    const printRoot = document.createElement("div");
-    printRoot.id = "print-root";
-    printRoot.style.cssText = `
+      // Create a dedicated, hidden container for printing (completely isolated)
+      const printRoot = document.createElement("div");
+      printRoot.id = "print-root";
+      printRoot.style.cssText = `
       position: absolute;
       top: -99999px;
       left: -99999px;
@@ -45,25 +47,40 @@ export const usePDFExport = () => {
       pointer-events: none;
       z-index: -1;
     `;
-    document.body.appendChild(printRoot);
+      document.body.appendChild(printRoot);
 
-    // Populate the print container with clean page elements
-    printRoot.innerHTML = pages
-      .map((pageContent) => `<div class="print-page">${pageContent}</div>`)
-      .join("");
+      // Populate the print container with clean page elements
+      printRoot.innerHTML = pages
+        .map((pageContent) => `<div class="print-page">${pageContent}</div>`)
+        .join("");
 
-    console.log("Created and appended #print-root with clean page data.");
+      console.log("Created and appended #print-root with clean page data.");
 
-    // Create print-specific stylesheet that only affects print media
-    const printStyleId = "builder-print-styles";
-    const existingPrintStyle = document.getElementById(printStyleId);
-    if (existingPrintStyle) {
-      existingPrintStyle.remove();
-    }
+      // Build theme config for shared utilities
+      const theme = {
+        color: themeColor,
+        fontSize,
+        lineHeight,
+        pagePadding,
+        paragraphSpacing,
+      };
 
-    const printStyle = document.createElement("style");
-    printStyle.id = printStyleId;
-    printStyle.textContent = `
+      // Generate typography styles using shared utility
+      const typographyStyles = generateTypographyStyles(theme, ".print-page");
+
+      // Scope template CSS to print pages
+      const scopedTemplateCss = scopeTemplateCss(templateCss, ".print-page");
+
+      // Create print-specific stylesheet that only affects print media
+      const printStyleId = "builder-print-styles";
+      const existingPrintStyle = document.getElementById(printStyleId);
+      if (existingPrintStyle) {
+        existingPrintStyle.remove();
+      }
+
+      const printStyle = document.createElement("style");
+      printStyle.id = printStyleId;
+      printStyle.textContent = `
       /* CRITICAL: Only apply styles during actual printing */
       @media print {
           @page {
@@ -134,97 +151,11 @@ export const usePDFExport = () => {
               break-after: auto !important;
           }
 
-          /* Apply base typography to match preview exactly */
-          .print-page h1 { 
-              color: ${themeColor} !important; 
-              font-size: ${fontSize * 1.8}px !important; 
-              margin-top: 0 !important; 
-              margin-bottom: ${paragraphSpacing}rem !important;
-              line-height: ${lineHeight} !important;
-              font-weight: bold !important;
-          }
-          .print-page h2 { 
-              color: ${themeColor} !important; 
-              font-size: ${fontSize * 1.4}px !important; 
-              margin-top: ${paragraphSpacing * 1.5}rem !important; 
-              margin-bottom: ${paragraphSpacing * 0.5}rem !important;
-              line-height: ${lineHeight} !important;
-              font-weight: bold !important;
-          }
-          .print-page h3 { 
-              color: #111827 !important; 
-              font-size: ${fontSize * 1.2}px !important; 
-              margin-top: ${paragraphSpacing * 1.2}rem !important; 
-              margin-bottom: ${paragraphSpacing * 0.4}rem !important;
-              line-height: ${lineHeight} !important;
-              font-weight: bold !important;
-          }
-          .print-page p { 
-              color: #4b5563 !important; 
-              margin-bottom: ${paragraphSpacing * 0.8}rem !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page li { 
-              color: #4b5563 !important; 
-              margin-bottom: ${paragraphSpacing * 0.3}rem !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page ul, .print-page ol { 
-              margin-bottom: ${paragraphSpacing}rem !important; 
-              padding-left: 1.5rem !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page a { 
-              color: ${themeColor} !important; 
-              text-decoration: underline !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page strong { 
-              color: #111827 !important;
-              font-weight: 600 !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page em {
-              color: #6b7280 !important;
-              font-style: italic !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page dt {
-              font-weight: 600 !important;
-              color: #111827 !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
-          .print-page dd {
-              margin-left: 0 !important;
-              margin-bottom: ${paragraphSpacing * 0.5}rem !important;
-              color: #6b7280 !important;
-              line-height: ${lineHeight} !important;
-              font-size: ${fontSize}px !important;
-          }
+          /* Typography styles from shared utility */
+          ${typographyStyles}
 
-          /* Apply template-specific CSS with .print-page prefix */
-          ${templateCss
-            .split("\n")
-            .map((line) => {
-              if (line.includes(".cv-container")) {
-                return line.replace(".cv-container", ".print-page");
-              }
-              if (
-                line.trim().startsWith(".") &&
-                !line.includes(".print-page")
-              ) {
-                return `.print-page ${line}`;
-              }
-              return line;
-            })
-            .join("\n")}
+          /* Template-specific CSS */
+          ${scopedTemplateCss}
       }
       
       /* Screen styles: keep print root completely hidden during normal use */
@@ -239,30 +170,32 @@ export const usePDFExport = () => {
           }
       }
     `;
-    document.head.appendChild(printStyle);
-    console.log("Injected print-specific stylesheet targeting #print-root.");
+      document.head.appendChild(printStyle);
+      console.log("Injected print-specific stylesheet targeting #print-root.");
 
-    // Trigger print and schedule cleanup
-    const triggerPrint = () => {
-      console.log("Triggering window.print()...");
-      window.print();
+      // Trigger print and schedule cleanup
+      const triggerPrint = () => {
+        console.log("Triggering window.print()...");
+        window.print();
 
-      // Cleanup after print dialog closes
-      setTimeout(() => {
-        console.log("Print dialog closed. Cleaning up temporary elements.");
-        if (document.body.contains(printRoot)) {
-          document.body.removeChild(printRoot);
-        }
-        const styleElement = document.getElementById(printStyleId);
-        if (styleElement) {
-          document.head.removeChild(styleElement);
-        }
-      }, 1000);
-    };
+        // Cleanup after print dialog closes
+        setTimeout(() => {
+          console.log("Print dialog closed. Cleaning up temporary elements.");
+          if (document.body.contains(printRoot)) {
+            document.body.removeChild(printRoot);
+          }
+          const styleElement = document.getElementById(printStyleId);
+          if (styleElement) {
+            document.head.removeChild(styleElement);
+          }
+        }, 1000);
+      };
 
-    // Use a short timeout to ensure the browser has processed the new DOM and CSS
-    setTimeout(triggerPrint, 300);
-  }, []);
+      // Use a short timeout to ensure the browser has processed the new DOM and CSS
+      setTimeout(triggerPrint, 300);
+    },
+    []
+  );
 
   return { exportToPDF };
 };
