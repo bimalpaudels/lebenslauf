@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";
-import BlockEditor from "@/components/builder/BlockEditor";
+import NotionEditor from "@/components/builder/NotionEditor";
 import BuilderPreview, {
   BuilderPreviewRef,
 } from "@/components/builder/BuilderPreview";
@@ -346,9 +346,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   </div>
                 </div>
 
-                {/* Block-based Editor */}
+                {/* Notion-style Editor */}
                 <div className="flex-1 overflow-hidden">
-                  <BlockEditor
+                  <NotionEditor
                     value={templateMarkdown}
                     onChange={handleMarkdownChange}
                     placeholder="Start writing your CV..."
