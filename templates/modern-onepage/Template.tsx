@@ -18,11 +18,12 @@ export default function Template({
     [markdown]
   );
 
+  // Note: pagePadding is NOT applied here - it's handled by the measuring container
+  // and BuilderPage to avoid double padding. Template only sets typography.
   return (
     <div
       className="bg-white text-slate-800"
       style={{
-        padding: `${theme.pagePadding}px`,
         fontSize: `${theme.fontSize}px`,
         lineHeight: theme.lineHeight,
       }}

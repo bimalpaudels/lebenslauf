@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, forwardRef, useImperativeHandle } from "react";
+import React, { useMemo, forwardRef, useImperativeHandle, useState, useRef, useCallback } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { useBuilderScaling } from "../../hooks/useBuilderScaling";
 import { usePageBreaking } from "../../hooks/usePageBreaking";
@@ -15,6 +15,8 @@ import { generateTypographyStyles, scopeTemplateCss } from "@/lib/cv-styles";
 interface BuilderPreviewProps {
   markdown: string;
   templateCss: string;
+  /** Optional template ID - when set, preview uses template-rendered HTML instead of generic markdown->HTML */
+  templateId?: string;
   pageFormat: "A4" | "Letter";
   fontSize: number;
   pagePadding: number;
@@ -32,6 +34,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     {
       markdown,
       templateCss,
+      templateId,
       pageFormat,
       fontSize,
       pagePadding,
@@ -41,10 +44,19 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     },
     ref
   ) {
-    const previewHtml = useMemo(
+    // State to hold HTML captured from template render (when templateId is set)
+    const [templateHtml, setTemplateHtml] = useState<string>("");
+    // Ref to the hidden container where TemplateHost renders
+    const templateContainerRef = useRef<HTMLDivElement>(null);
+
+    // Fallback: generic markdown->HTML (used when no templateId)
+    const genericHtml = useMemo(
       () => parseMarkdownToHtml(markdown),
       [markdown]
     );
+
+    // Use template HTML when templateId is set and we have captured HTML; otherwise fallback to generic
+    const previewHtml = templateId && templateHtml ? templateHtml : genericHtml;
 
     // Theme config for both TemplateHost and BuilderPage components
     const theme: ThemeTokens & ThemeConfig = useMemo(
@@ -61,6 +73,16 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     const { scale, pageDimensions, containerRef } = useBuilderScaling({
       pageFormat,
     });
+
+    // Callback when template has rendered - capture innerHTML for page-breaking
+    const handleTemplateRendered = useCallback(() => {
+      if (templateContainerRef.current) {
+        const html = templateContainerRef.current.innerHTML;
+        if (html) {
+          setTemplateHtml(html);
+        }
+      }
+    }, []);
 
     const { pages, measureRef } = usePageBreaking({
       previewHtml,
@@ -161,6 +183,20 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       
       /* Template-specific CSS for measuring container */
       ${scopedMeasuringCss}
+      
+      /* Hidden container for capturing template HTML */
+      .template-capture-container {
+        position: absolute;
+        top: -99999px;
+        left: -99999px;
+        width: ${pageDimensions.width - pagePadding * 2}px;
+        font-size: ${fontSize}px;
+        line-height: ${lineHeight};
+        visibility: hidden;
+        overflow: visible;
+        background: white;
+        color: #1f2937;
+      }
     `;
     }, [
       templateCss,
@@ -184,14 +220,6 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
 
       return (
         <>
-          {/* TSX template render for measurement (modern-onepage) */}
-          <div style={{ position: "absolute", left: -99999, top: -99999 }}>
-            <TemplateHost
-              templateId="modern-onepage"
-              markdown={markdown}
-              theme={theme}
-            />
-          </div>
           {pages.map((pageContent, index) => (
             <BuilderPage
               key={index}
@@ -219,6 +247,17 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
         customStyles={customStyles}
       >
         <div ref={measureRef} className="measuring-container" />
+        {/* Hidden container for capturing template HTML when templateId is set */}
+        {templateId && (
+          <div ref={templateContainerRef} className="template-capture-container">
+            <TemplateHost
+              templateId={templateId}
+              markdown={markdown}
+              theme={theme}
+              onRendered={handleTemplateRendered}
+            />
+          </div>
+        )}
         {renderContent()}
       </BuilderPageContainer>
     );

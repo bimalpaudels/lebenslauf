@@ -344,6 +344,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   ref={previewRef}
                   markdown={templateMarkdown}
                   templateCss={templateCss}
+                  templateId={cvData?.templateId}
                   pageFormat={pageFormat}
                   fontSize={fontSize}
                   pagePadding={pagePadding}
