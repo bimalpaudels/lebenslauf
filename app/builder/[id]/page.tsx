@@ -319,8 +319,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
           }
           rightPanel={
             <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900">
-              {/* Floating Preview Toolbar */}
-              <PreviewToolbar
+              {/* Floating Preview Toolbar - centered pill above preview */}
+              <div className="flex-shrink-0 pt-4 pb-2 flex justify-center">
+                <PreviewToolbar
                 pageFormat={pageFormat}
                 fontSize={fontSize}
                 pagePadding={pagePadding}
@@ -334,7 +335,8 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                 onParagraphSpacingChange={handleParagraphSpacingChange}
                 onThemeColorChange={handleThemeColorChange}
                 onExportPDF={handleExportPDF}
-              />
+                />
+              </div>
 
               {/* Preview Container */}
               <div className="flex-1 overflow-hidden">
