@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";
-import RichTextEditor from "@/components/RichTextEditor";
+import BlockEditor from "@/components/builder/BlockEditor";
 import BuilderPreview, {
   BuilderPreviewRef,
 } from "@/components/builder/BuilderPreview";
@@ -346,12 +346,12 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   </div>
                 </div>
 
-                {/* Rich Text Editor */}
+                {/* Block-based Editor */}
                 <div className="flex-1 overflow-hidden">
-                  <RichTextEditor
+                  <BlockEditor
                     value={templateMarkdown}
                     onChange={handleMarkdownChange}
-                    placeholder="Start writing your CV in markdown..."
+                    placeholder="Start writing your CV..."
                   />
                 </div>
               </div>
