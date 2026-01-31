@@ -11,6 +11,7 @@
   "dependencies": {
     "@babel/runtime": "^7.28.2",
     "@tiptap/core": "^3.18.0",
+    "@tiptap/extension-image": "^3.18.0",
     "@tiptap/extension-link": "^3.18.0",
     "@tiptap/extension-placeholder": "^3.18.0",
     "@tiptap/pm": "^3.18.0",

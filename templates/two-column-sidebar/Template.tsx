@@ -2,37 +2,161 @@
 
 import React, { useMemo } from "react";
 import { MarkdownRenderer, type ThemeConfig } from "@/components/MarkdownRenderer";
-import { parseFrontmatter } from "@/lib/markdown";
+import { marked } from "marked";
 
 export type Theme = ThemeConfig;
 
-/** Parse markdown into sections by ## Title, then entries by ### Subtitle (dates) */
-function parseSections(content: string): Map<string, { title: string; body: string }[]> {
+/** 
+ * Parse full markdown into structure:
+ * - name: first H1
+ * - photo: first image
+ * - contact: text in header area (content before first H2) excluding name/photo
+ * - sections: map of H2 -> content
+ */
+function parseCVContent(content: string) {
+  const tokens = marked.lexer(content);
+  
+  let name = "";
+  let photo = "";
+  let contact = "";
+  let about = "";
+  let skills: { name: string; level: number }[] = [];
+  
   const sections = new Map<string, { title: string; body: string }[]>();
-  const sectionRegex = /^##\s+(.+)$/gm;
-  const entryRegex = /^###\s+(.+)$/gm;
-
-  const parts = content.split(sectionRegex);
-  // parts: [intro, sectionTitle1, sectionContent1, sectionTitle2, sectionContent2, ...]
-  for (let i = 1; i < parts.length; i += 2) {
-    const sectionTitle = parts[i]?.trim() ?? "";
-    const sectionContent = (parts[i + 1] ?? "").trim();
-    if (!sectionTitle) continue;
-
-    const entries: { title: string; body: string }[] = [];
-    const entryParts = sectionContent.split(entryRegex);
-    for (let j = 1; j < entryParts.length; j += 2) {
-      const entryTitle = entryParts[j]?.trim() ?? "";
-      const entryBody = (entryParts[j + 1] ?? "").trim();
-      entries.push({ title: entryTitle, body: entryBody });
+  
+  // 1. Extract Name (first H1) & Photo (first Image)
+  // And identify where the "body" starts (first H2)
+  
+  let currentSectionTitle = "";
+  let currentEntryTitle = "";
+  let currentEntryBody = "";
+  
+  // Helper to commit current entry
+  const commitEntry = () => {
+    if (!currentSectionTitle) return;
+    
+    // Check if this section is About or Skills and we should handle differently?
+    // Actually, let's store everything in sections map first, then extract specific ones if needed.
+    
+    const entries = sections.get(currentSectionTitle) || [];
+    // If we have an entry title or body, push it
+    if (currentEntryTitle || currentEntryBody.trim()) {
+       entries.push({ title: currentEntryTitle, body: currentEntryBody.trim() });
+    } else if (entries.length === 0 && !currentEntryTitle && !currentEntryBody.trim()) {
+       // Just initialized section
     }
-    if (entries.length > 0) {
-      sections.set(sectionTitle, entries);
-    } else if (sectionContent) {
-      sections.set(sectionTitle, [{ title: "", body: sectionContent }]);
+    
+    if (entries.length > 0) sections.set(currentSectionTitle, entries);
+    
+    currentEntryTitle = "";
+    currentEntryBody = "";
+  };
+
+  // Header zone collection
+  let inHeader = true;
+  let headerTextParts: string[] = [];
+
+  for (const token of tokens) {
+    if (token.type === 'heading') {
+      if (token.depth === 1 && !name) {
+        name = token.text;
+        continue; // Don't add name to body
+      }
+      if (token.depth === 2) {
+        if (inHeader) {
+          inHeader = false;
+          // Process collected header text into contact info
+          contact = headerTextParts.join("\n").trim();
+        }
+        commitEntry();
+        currentSectionTitle = token.text;
+        continue;
+      }
+      if (token.depth === 3) {
+         commitEntry();
+         currentEntryTitle = token.text;
+         continue;
+      }
+    }
+    
+    // Extract photo from first image found anywhere (or just in header?) 
+    // User said "First Image".
+    if (token.type === 'paragraph') {
+       const imgMatch = token.text.match(/!\[.*?\]\((.*?)\)/);
+       if (imgMatch && !photo) {
+         photo = imgMatch[1];
+         // If the paragraph was JUST the image, don't add it to content?
+         // If it has other text, maybe keep text?
+         // For simplicity, let's assume image line is separate.
+         const textWithoutImg = token.text.replace(/!\[.*?\]\((.*?)\)/, "").trim();
+         if (!textWithoutImg) continue; 
+         // If text remains, treat as normal token
+         token.text = textWithoutImg; 
+       }
+    }
+    
+    if (inHeader) {
+      if (token.type === 'paragraph' || token.type === 'text') {
+        const text = (token as any).text || (token as any).raw;
+        if (text) headerTextParts.push(text);
+      }
+      // Lists in header?
+      if (token.type === 'list') {
+        const items = (token as any).items.map((i: any) => i.text).join(" • ");
+        headerTextParts.push(items);
+      }
+    } else {
+      // In a section
+      if (currentSectionTitle) {
+        // Accumulate raw markdown for body
+        currentEntryBody += (token as any).raw;
+      }
     }
   }
-  return sections;
+  
+  commitEntry(); // Commit last entry
+
+  // Extract special sections
+  
+  // About - case insensitive check
+  let aboutKey = "";
+  for(const k of sections.keys()) {
+     if (k.toLowerCase() === "about") { aboutKey = k; break; }
+  }
+  
+  if (aboutKey) {
+     const entries = sections.get(aboutKey);
+     if (entries) {
+        about = entries.map(e => e.body).join("\n\n");
+     }
+     sections.delete(aboutKey);
+  }
+  
+  // Skills - case insensitive check
+  let skillsKey = "";
+  for (const k of sections.keys()) {
+      if (k.toLowerCase() === "skills") { skillsKey = k; break; }
+  }
+  
+  if (skillsKey) {
+      const entries = sections.get(skillsKey);
+      if (entries) {
+        const rawSkills = entries.map(e => e.body).join("\n");
+        const skillMatches = rawSkills.matchAll(/^\s*[-*]\s+(.*)$/gm);
+        for (const match of skillMatches) {
+           const line = match[1];
+           const levelMatch = line.match(/(.*?)\s*\(Level\s*(\d+)\)/i);
+           if (levelMatch) {
+             skills.push({ name: levelMatch[1], level: parseInt(levelMatch[2]) });
+           } else {
+             skills.push({ name: line, level: 3 });
+           }
+        }
+      }
+      sections.delete(skillsKey);
+  }
+
+  return { name, photo, contact, about, skills, sections };
 }
 
 function SkillBar({ level }: { level: number }) {
@@ -59,22 +183,19 @@ export default function Template({
   markdown: string;
   theme: Theme;
 }) {
-  const { frontmatter, content } = useMemo(
-    () => parseFrontmatter(markdown || ""),
+  const { name, photo, contact, about, skills, sections } = useMemo(
+    () => parseCVContent(markdown || ""),
     [markdown]
   );
 
-  const sections = useMemo(() => parseSections(content), [content]);
-
-  const fm = frontmatter as Record<string, unknown> | null;
-  const name = fm?.name ? String(fm.name) : null;
-  const photo = fm?.photo ? String(fm.photo) : null;
-  const contact = (fm?.contact as Record<string, string> | undefined) ?? {};
-  const about = fm?.about ? String(fm.about) : null;
-  const skills = (Array.isArray(fm?.skills) ? fm.skills : []) as Array<{ name?: string; level?: number }>;
-
   const experienceEntries = sections.get("Experience") ?? sections.get("EXPERIENCE") ?? [];
   const educationEntries = sections.get("Education") ?? sections.get("EDUCATION") ?? [];
+
+  // Identify catch-all sections (everything else)
+  const otherSections = Array.from(sections.entries()).filter(
+    ([title]) =>
+      !["Experience", "EXPERIENCE", "Education", "EDUCATION"].includes(title)
+  );
 
   const baseStyle = {
     fontSize: `${theme.fontSize}px`,
@@ -123,11 +244,7 @@ export default function Template({
               className="text-white/90 whitespace-pre-line"
               style={{ fontSize: theme.fontSize * 0.9 }}
             >
-              {about.split("\n\n").map((p, i) => (
-                <p key={i} className="mb-2 last:mb-0">
-                  {p}
-                </p>
-              ))}
+              <MarkdownRenderer content={about} theme={{...theme, color: "white"}} />
             </div>
           </section>
         )}
@@ -183,14 +300,12 @@ export default function Template({
               className="mt-1 h-1.5 rounded-full max-w-[66%]"
               style={{ backgroundColor: accentColor }}
             />
-            {(contact.address || contact.phone || contact.email) && (
+            {contact && (
               <div
-                className="mt-2 text-slate-600 space-y-0.5"
+                className="mt-2 text-slate-600 space-y-0.5 whitespace-pre-line"
                 style={{ fontSize: theme.fontSize * 0.9 }}
               >
-                {contact.address && <div>{contact.address}</div>}
-                {contact.phone && <div>phone: {contact.phone}</div>}
-                {contact.email && <div>email: {contact.email}</div>}
+                  {contact}
               </div>
             )}
           </header>
@@ -273,17 +388,9 @@ export default function Template({
         )}
 
         {/* Catch-all: any other ## sections from markdown */}
-        {Array.from(sections.entries()).filter(
-          ([title]) =>
-            !["Experience", "EXPERIENCE", "Education", "EDUCATION"].includes(title)
-        ).length > 0 && (
+        {otherSections.length > 0 && (
           <section className="mt-4">
-            {Array.from(sections.entries())
-              .filter(
-                ([title]) =>
-                  !["Experience", "EXPERIENCE", "Education", "EDUCATION"].includes(title)
-              )
-              .map(([sectionTitle, entries]) => (
+            {otherSections.map(([sectionTitle, entries]) => (
                 <div key={sectionTitle} className="mb-4">
                   <h2
                     className="font-bold uppercase tracking-wide mb-2"
@@ -324,32 +431,28 @@ export default function Template({
 export const templateMeta = {
   id: "two-column-sidebar",
   name: "Two-Column Sidebar",
-  description: "Dark sidebar with photo, about, skills; main column for experience and education",
+  description: "Dark sidebar with photo, about, skills; main column for experience and education. Fully markdown driven.",
 };
 
-export const sampleMarkdown = `---
-name: Austin Bronson
-photo: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face
-contact:
-  address: "4710 Bus Boulevard, Flintstone, GA 30725"
-  phone: "+(0) 1 2345 555"
-  email: contact@yourdomain.com
-about: |
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+export const sampleMarkdown = `# Austin Bronson
 
-  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-skills:
-  - name: Graphic Design
-    level: 4
-  - name: Web Develop
-    level: 3
-  - name: Lorem Ipsum
-    level: 1
-  - name: Dolor sit amet
-    level: 3
-  - name: Consectetur elit
-    level: 5
----
+![Profile Photo](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face)
+
+4710 Bus Boulevard, Flintstone, GA 30725 • +(0) 1 2345 555 • contact@yourdomain.com
+
+## About
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+## Skills
+
+- Graphic Design (Level 4)
+- Web Develop (Level 3)
+- Lorem Ipsum (Level 1)
+- Dolor sit amet (Level 3)
+- Consectetur elit (Level 5)
 
 ## Experience
 
