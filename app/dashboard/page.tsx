@@ -1,6 +1,7 @@
 "use client";
 
 import SiteHeader from "@/components/SiteHeader";
+import BackgroundOrbs from "@/components/BackgroundOrbs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 // Templates are now chosen on a dedicated page
@@ -53,27 +54,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background selection:bg-emerald-500/30">
-      {/* Background Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]"></div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <BackgroundOrbs />
 
-      {/* Navigation */}
       <SiteHeader />
 
       {/* Main Content */}
-      <main className="relative z-10 px-6 py-12">
+      <main className="relative z-10 px-6 pt-24 pb-12">
         <div className="max-w-7xl mx-auto">
           {/* Header with CTA */}
           <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-slate-200/60 dark:border-slate-800/60">
             <div>
               <h2 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-                Personal Library
+                Dashboard
               </h2>
               <p className="mt-2 text-slate-600 dark:text-slate-400 font-medium">
-                Manage your professional documents and versions.
+                Manage different versions of your CV.
               </p>
             </div>
             <Link

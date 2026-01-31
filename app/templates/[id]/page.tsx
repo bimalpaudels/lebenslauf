@@ -3,6 +3,8 @@
 import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import DashboardPreview from "@/components/DashboardPreview";
+import SiteHeader from "@/components/SiteHeader";
+import BackgroundOrbs from "@/components/BackgroundOrbs";
 import { getTemplateById, getSampleMarkdown } from "@/templates/registry";
 import type { CVData } from "@/lib/storage";
 
@@ -71,26 +73,10 @@ export default function TemplatePreviewPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background selection:bg-rose-500/30">
-      {/* Background Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-rose-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-orange-500/5 rounded-full blur-[120px]"></div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <BackgroundOrbs />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 transition-all duration-300">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 rounded-[24px] bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/20 shadow-xl shadow-black/5">
-          <div className="flex items-center space-x-3">
-            <Link href="/dashboard" className="w-9 h-9 bg-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
-              <span className="text-white font-black text-xs uppercase">cv</span>
-            </Link>
-            <span className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">lebenslauf</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/templates" className="text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-rose-500 transition-colors px-4">Templates</Link>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader variant="floating" />
 
       <main className="relative z-10 px-6 pt-32 pb-20">
         <div className="max-w-7xl mx-auto">

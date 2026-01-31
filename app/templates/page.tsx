@@ -9,6 +9,8 @@ import {
 } from "@/templates/registry";
 import type { CVData } from "@/lib/storage";
 import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
+import BackgroundOrbs from "@/components/BackgroundOrbs";
 
 export default function TemplatesIndexPage() {
   const templates = React.useMemo(() => getTemplates(), []);
@@ -65,16 +67,14 @@ export default function TemplatesIndexPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background selection:bg-rose-500/30">
-      {/* Background Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-rose-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-[120px]"></div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <BackgroundOrbs />
 
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+      <SiteHeader />
+
+      <div className="max-w-7xl mx-auto px-6 pt-32 pb-12 relative z-10">
         <header className="mb-12">
-          <nav className="text-xs text-slate-500 dark:text-slate-400 mb-4 flex items-center space-x-2">
+          <nav className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
             <Link href="/dashboard" className="hover:text-rose-500 transition-colors">Dashboard</Link>
             <span className="opacity-30">/</span>
             <span className="font-bold text-slate-900 dark:text-white">Templates</span>

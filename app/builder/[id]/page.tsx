@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
+import BackgroundOrbs from "@/components/BackgroundOrbs";
 import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";
 import NotionEditor from "@/components/builder/NotionEditor";
 import BuilderPreview, {
@@ -273,30 +275,14 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   }
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden selection:bg-emerald-500/30">
-      {/* Background Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-emerald-500/5 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-blue-500/5 rounded-full blur-[100px]"></div>
-      </div>
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <BackgroundOrbs />
 
-      {/* Modern Top Bar */}
-      <header className="px-6 py-4 border-b border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl flex-shrink-0 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
-          <Link href="/dashboard" className="flex items-center space-x-3 group">
-            <div className="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-              <span className="text-white font-black text-xs uppercase">cv</span>
-            </div>
-            <span className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">lebenslauf</span>
-          </Link>
+      <SiteHeader variant="static">
+        <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">
+          {isSaving ? "Saving..." : isTyping ? "Unsaved Changes" : "Progress Saved"}
         </div>
-        
-        <div className="flex items-center space-x-4">
-          <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">
-            {isSaving ? "Saving..." : isTyping ? "Unsaved Changes" : "Progress Saved"}
-          </div>
-        </div>
-      </header>
+      </SiteHeader>
 
       {/* Main Content - Split Panes */}
       <div className="flex-1 overflow-hidden">
