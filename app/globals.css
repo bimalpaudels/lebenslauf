@@ -3,10 +3,10 @@
 :root {
   --background: #f8fafc;
   --foreground: #020617;
-  --primary: #10b981;
+  --primary: #f43f5e;
   --primary-foreground: #ffffff;
   --secondary: #64748b;
-  --accent: #3ecf8e;
+  --accent: #fb7185;
   --border: #e2e8f0;
   --card: #ffffff;
   --glass: rgba(255, 255, 255, 0.7);
@@ -29,8 +29,9 @@
   :root {
     --background: #020617;
     --foreground: #f8fafc;
-    --primary: #10b981;
+    --primary: #f43f5e;
     --secondary: #94a3b8;
+    --accent: #fb7185;
     --border: #1e293b;
     --card: #0f172a;
     --glass: rgba(15, 23, 42, 0.7);
