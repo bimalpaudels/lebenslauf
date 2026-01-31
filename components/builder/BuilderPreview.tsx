@@ -114,7 +114,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       return `
       .preview-container {
         height: 100%;
-        background: rgb(248 250 252);
+        background: transparent;
         overflow-x: hidden;
         overflow-y: auto;
         scrollbar-width: thin;
@@ -128,7 +128,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       
       @media (prefers-color-scheme: dark) {
         .preview-container {
-          background: rgb(15 23 42);
+          background: transparent;
           scrollbar-color: #3ECF8E rgb(51 65 85);
         }
       }
