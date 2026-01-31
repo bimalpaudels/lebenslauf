@@ -8,6 +8,9 @@ import {
   getTemplateById,
 } from "@/templates/registry";
 import type { CVData } from "@/lib/storage";
+import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
+import BackgroundOrbs from "@/components/BackgroundOrbs";
 
 export default function TemplatesIndexPage() {
   const templates = React.useMemo(() => getTemplates(), []);
@@ -51,7 +54,7 @@ export default function TemplatesIndexPage() {
           marginV: 20,
           pageSize: "A4",
           paragraphSpace: 1,
-          theme: "#3ECF8E",
+          theme: "#f43f5e",
         },
       };
       try {
@@ -64,75 +67,68 @@ export default function TemplatesIndexPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-100">
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="mb-8 flex items-center justify-between gap-4">
-          <div>
-            <nav className="text-xs text-slate-500 dark:text-slate-400">
-              <a href="/dashboard" className="hover:underline">
-                Dashboard
-              </a>
-              <span className="mx-2">/</span>
-              <span>Templates</span>
-            </nav>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
-              Choose a Template
-            </h1>
-            <p className="text-slate-600 dark:text-slate-300 mt-2">
-              Pick a starting point. You can customize everything in the
-              builder.
-            </p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      <BackgroundOrbs />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <SiteHeader />
+
+      <div className="max-w-7xl mx-auto px-6 pt-32 pb-12 relative z-10">
+        <header className="mb-12">
+          <nav className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
+            <Link href="/dashboard" className="hover:text-rose-500 transition-colors">Dashboard</Link>
+            <span className="opacity-30">/</span>
+            <span className="font-bold text-slate-900 dark:text-white">Templates</span>
+          </nav>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                Choose a Template
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-3 text-lg font-medium max-w-xl leading-relaxed">
+                Pick a starting point. You can customize every detail, from colors to fonts, in the builder later.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {templates.map((t) => (
-            <div key={t.id} className="flex flex-col">
-              <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/80 dark:bg-slate-800/70 shadow-sm backdrop-blur-sm hover:shadow-md hover:-translate-y-0.5 transition">
-                <div
-                  className="group relative overflow-hidden cursor-pointer w-full aspect-[794/1123]"
-                  onClick={() => (window.location.href = `/templates/${t.id}`)}
-                  title={`${t.name}`}
-                >
-                  <DashboardPreview
-                    markdown={samples[t.id] || "# Sample"}
-                    className="h-full"
-                    variant="template"
-                    templateId={t.id}
-                    contentOverlay={
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/templates/${t.id}`;
-                        }}
-                        className="w-7 h-7 rounded bg-black/50 text-white flex items-center justify-center"
-                        title="View Template"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="w-4 h-4"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                      </button>
-                    }
-                  />
-                </div>
-                <div className="px-4 py-3 border-t border-slate-200/70 dark:border-slate-700/70 flex items-center justify-between">
-                  <div className="text-sm font-medium text-slate-900 dark:text-white truncate pr-2">
-                    {t.name}
+            <div key={t.id} className="group relative">
+              <div className="relative aspect-[794/1123] rounded-[32px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-black/5 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-rose-500/10 group-hover:-translate-y-2">
+                <DashboardPreview
+                  markdown={samples[t.id] || "# Sample"}
+                  className="h-full"
+                  variant="template"
+                  templateId={t.id}
+                />
+                
+                {/* Overlay Links */}
+                <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-sm">
+                  <div className="flex flex-col space-y-3 px-8 w-full">
+                    <button
+                      onClick={() => handleUseTemplate(t.id)}
+                      className="group relative w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-black/20 hover:shadow-[0_10px_30px_rgba(244,63,94,0.4)] hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                    >
+                      <span className="relative z-10">Use Template</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                    <Link
+                      href={`/templates/${t.id}`}
+                      className="w-full py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-bold text-sm backdrop-blur-md border border-white/20 transition-all text-center"
+                    >
+                      View Preview
+                    </Link>
                   </div>
-                  <button
-                    onClick={() => handleUseTemplate(t.id)}
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-[#3ECF8E] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-offset-slate-900 transition"
-                  >
-                    Use
-                  </button>
+                </div>
+              </div>
+              <div className="mt-6 flex items-center justify-between px-2">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-rose-500 transition-colors">
+                    {t.name}
+                  </h3>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                    Minimalist • Modern
+                  </p>
                 </div>
               </div>
             </div>

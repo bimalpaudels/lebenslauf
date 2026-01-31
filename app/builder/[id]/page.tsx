@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
+import BackgroundOrbs from "@/components/BackgroundOrbs";
 import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";
 import NotionEditor from "@/components/builder/NotionEditor";
 import BuilderPreview, {
@@ -273,24 +274,20 @@ export default function BuilderPage({ params }: BuilderPageProps) {
   }
 
   return (
-    <div className="h-screen bg-slate-50 dark:bg-slate-900 flex flex-col overflow-hidden">
-      {/* Minimal Top Bar - Site Title Only */}
-      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
-        <Link href="/dashboard" className="flex items-center space-x-2 w-fit">
-          <div className="w-7 h-7 bg-[#3ECF8E] rounded-lg flex items-center justify-center shadow-sm">
-            <span className="text-slate-900 font-bold text-sm">CV</span>
-          </div>
-          <span className="text-slate-900 dark:text-white font-semibold text-lg">
-            lebenslauf
-          </span>
-        </Link>
-      </div>
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <BackgroundOrbs />
+
+      <SiteHeader variant="static">
+        <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">
+          {isSaving ? "Saving..." : isTyping ? "Unsaved Changes" : "Progress Saved"}
+        </div>
+      </SiteHeader>
 
       {/* Main Content - Split Panes */}
       <div className="flex-1 overflow-hidden">
         <SplitPane
           leftPanel={
-            <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900 print-hide relative">
+            <div className="h-full flex flex-col bg-transparent print-hide relative">
               {/* Notion-style Editor */}
               <div className="flex-1 overflow-hidden">
                 <NotionEditor
@@ -299,64 +296,50 @@ export default function BuilderPage({ params }: BuilderPageProps) {
                   placeholder="Start writing your CV..."
                 />
               </div>
-
-              {/* Auto-save indicator - positioned at bottom-right of editor */}
-              <div className="absolute bottom-3 right-3 flex items-center space-x-1.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    isSaving
-                      ? "bg-amber-400 animate-pulse"
-                      : isTyping
-                      ? "bg-gray-400 animate-pulse"
-                      : "bg-green-400"
-                  }`}
-                ></div>
-                <span className="text-xs text-slate-600 dark:text-slate-400">
-                  {isSaving ? "Saving..." : isTyping ? "Typing..." : "Saved"}
-                </span>
-              </div>
             </div>
           }
           rightPanel={
-            <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900">
+            <div className="h-full flex flex-col bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-sm">
               {/* Floating Preview Toolbar - centered pill above preview */}
-              <div className="flex-shrink-0 pt-4 pb-2 flex justify-center">
+              <div className="flex-shrink-0 pt-6 pb-4 flex justify-center">
                 <PreviewToolbar
-                pageFormat={pageFormat}
-                fontSize={fontSize}
-                pagePadding={pagePadding}
-                lineHeight={lineHeight}
-                paragraphSpacing={paragraphSpacing}
-                themeColor={themeColor}
-                onPageFormatChange={handlePageFormatChange}
-                onFontSizeChange={handleFontSizeChange}
-                onPagePaddingChange={handlePagePaddingChange}
-                onLineHeightChange={handleLineHeightChange}
-                onParagraphSpacingChange={handleParagraphSpacingChange}
-                onThemeColorChange={handleThemeColorChange}
-                onExportPDF={handleExportPDF}
-                />
-              </div>
-
-              {/* Preview Container */}
-              <div className="flex-1 overflow-hidden">
-                <BuilderPreview
-                  ref={previewRef}
-                  markdown={templateMarkdown}
-                  templateCss={templateCss}
-                  templateId={cvData?.templateId}
                   pageFormat={pageFormat}
                   fontSize={fontSize}
                   pagePadding={pagePadding}
                   lineHeight={lineHeight}
                   paragraphSpacing={paragraphSpacing}
                   themeColor={themeColor}
+                  onPageFormatChange={handlePageFormatChange}
+                  onFontSizeChange={handleFontSizeChange}
+                  onPagePaddingChange={handlePagePaddingChange}
+                  onLineHeightChange={handleLineHeightChange}
+                  onParagraphSpacingChange={handleParagraphSpacingChange}
+                  onThemeColorChange={handleThemeColorChange}
+                  onExportPDF={handleExportPDF}
                 />
+              </div>
+
+              {/* Preview Container */}
+              <div className="flex-1 overflow-hidden px-4 pb-4">
+                <div className="h-full rounded-[24px] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-900">
+                  <BuilderPreview
+                    ref={previewRef}
+                    markdown={templateMarkdown}
+                    templateCss={templateCss}
+                    templateId={cvData?.templateId}
+                    pageFormat={pageFormat}
+                    fontSize={fontSize}
+                    pagePadding={pagePadding}
+                    lineHeight={lineHeight}
+                    paragraphSpacing={paragraphSpacing}
+                    themeColor={themeColor}
+                  />
+                </div>
               </div>
             </div>
           }
           defaultSize={67}
-          minSize={35}
+          minSize={30}
           maxSize={80}
         />
       </div>

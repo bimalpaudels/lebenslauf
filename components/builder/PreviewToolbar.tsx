@@ -224,14 +224,17 @@ export const PreviewToolbar: React.FC<PreviewToolbarProps> = ({
       <button
         type="button"
         onClick={onExportPDF}
-        className="p-2 rounded-full bg-violet-500 hover:bg-violet-400 text-white transition-colors"
+        className="group relative p-2 rounded-full bg-slate-900 dark:bg-slate-700 text-white transition-all duration-300 hover:shadow-[0_10px_30px_rgba(244,63,94,0.4)] hover:-translate-y-1 overflow-hidden"
         title="Export PDF"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
+        <span className="relative z-10 block">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </span>
+        <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </button>
 
       {/* Dropdowns via portal so they are never clipped and always on top */}
