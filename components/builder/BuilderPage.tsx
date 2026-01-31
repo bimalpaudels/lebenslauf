@@ -48,7 +48,7 @@ export const BuilderPage: React.FC<BuilderPageProps> = ({
         }}
       >
         <div
-          className={pageContentClasses}
+          className={cn(pageContentClasses, "h-full")}
           style={{
             padding: `${theme.pagePadding}px`,
             fontSize: `${theme.fontSize}px`,
@@ -58,6 +58,7 @@ export const BuilderPage: React.FC<BuilderPageProps> = ({
           <MarkdownRendererFromHtml
             html={pageContent}
             theme={theme}
+            className="h-full"
           />
         </div>
       </div>

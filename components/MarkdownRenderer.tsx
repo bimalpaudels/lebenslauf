@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import { cn } from "@/lib/utils";
 import { createMarkdownComponents, type ThemeConfig } from "@/lib/markdown-components";
 
 export type { ThemeConfig };
@@ -33,7 +34,7 @@ export function MarkdownRenderer({
   );
 
   return (
-    <div className={className}>
+    <div className={cn("min-h-full", className)}>
       <ReactMarkdown
         rehypePlugins={[rehypeRaw]}
         components={components}
@@ -67,7 +68,7 @@ export function MarkdownRendererFromHtml({
 
   // Wrap HTML in a div so react-markdown can parse it via rehype-raw
   return (
-    <div className={className}>
+    <div className={cn("min-h-full", className)}>
       <ReactMarkdown
         rehypePlugins={[rehypeRaw]}
         components={components}

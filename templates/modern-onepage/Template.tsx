@@ -22,7 +22,7 @@ export default function Template({
   // and BuilderPage to avoid double padding. Template only sets typography.
   return (
     <div
-      className="bg-white text-slate-800"
+      className="bg-white text-slate-800 min-h-full"
       style={{
         fontSize: `${theme.fontSize}px`,
         lineHeight: theme.lineHeight,
