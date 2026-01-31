@@ -10,7 +10,7 @@ import {
 import type { CVData } from "@/lib/storage";
 
 export default function TemplatesIndexPage() {
-  const templates = getTemplates();
+  const templates = React.useMemo(() => getTemplates(), []);
   const [samples, setSamples] = useState<Record<string, string>>({});
 
   useEffect(() => {

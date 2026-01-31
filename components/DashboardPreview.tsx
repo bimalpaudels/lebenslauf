@@ -25,7 +25,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   css,
   pageFormat = "A4",
   fontSize = 12,
-  pagePadding = 20,
+  pagePadding = 16,
   lineHeight = 1.4,
   paragraphSpacing = 1,
   themeColor = "#3ECF8E",
