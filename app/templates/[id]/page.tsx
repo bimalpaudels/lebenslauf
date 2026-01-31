@@ -82,7 +82,7 @@ export default function TemplatePreviewPage({ params }: PageProps) {
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 rounded-[24px] bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/20 shadow-xl shadow-black/5">
           <div className="flex items-center space-x-3">
             <Link href="/dashboard" className="w-9 h-9 bg-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
-              <span className="text-white font-black text-sm">L</span>
+              <span className="text-white font-black text-xs uppercase">cv</span>
             </Link>
             <span className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">lebenslauf</span>
           </div>

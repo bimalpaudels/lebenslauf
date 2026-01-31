@@ -285,7 +285,7 @@ export default function BuilderPage({ params }: BuilderPageProps) {
         <div className="flex items-center space-x-8">
           <Link href="/dashboard" className="flex items-center space-x-3 group">
             <div className="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-              <span className="text-white font-black text-sm">L</span>
+              <span className="text-white font-black text-xs uppercase">cv</span>
             </div>
             <span className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">lebenslauf</span>
           </Link>

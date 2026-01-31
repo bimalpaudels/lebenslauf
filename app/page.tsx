@@ -68,8 +68,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 transition-all duration-300">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 rounded-[24px] bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/20 shadow-xl shadow-black/5">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
-              <span className="text-white font-black text-sm">L</span>
+            <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+              <span className="text-white font-black text-xs uppercase">cv</span>
             </div>
             <span className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">lebenslauf</span>
           </div>
@@ -218,16 +218,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-32 px-6">
-        <div className="max-w-5xl mx-auto text-center px-12 py-20 bg-slate-900 dark:bg-white rounded-[48px] relative overflow-hidden shadow-2xl">
+        <div className="max-w-5xl mx-auto text-center px-12 py-20 bg-white dark:bg-slate-900 rounded-[48px] relative overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black text-white dark:text-slate-900 mb-8 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
               Ready to land your <br />
-              <span className="text-rose-400 dark:text-orange-500">dream job?</span>
+              <span className="text-rose-500">dream job?</span>
             </h2>
-            <p className="text-xl text-slate-400 dark:text-slate-600 mb-12 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
               No sign-up, no hidden fees. Just professional CVs in minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -247,7 +246,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-slate-200 dark:bg-slate-800 rounded-lg flex items-center justify-center">
-              <span className="text-slate-900 dark:text-white font-bold">L</span>
+              <span className="text-slate-900 dark:text-white font-bold text-xs uppercase">cv</span>
             </div>
             <span className="text-slate-600 dark:text-slate-400 font-bold">lebenslauf</span>
           </div>
