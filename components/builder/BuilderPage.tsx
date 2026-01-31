@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { cn } from "@/lib/utils";
+import { MarkdownRendererFromHtml, type ThemeConfig } from "@/components/MarkdownRenderer";
 
 interface BuilderPageProps {
   pageContent: string;
@@ -7,6 +10,7 @@ interface BuilderPageProps {
   width: number;
   height: number;
   scale: number;
+  theme: ThemeConfig;
 }
 
 export const BuilderPage: React.FC<BuilderPageProps> = ({
@@ -14,35 +18,47 @@ export const BuilderPage: React.FC<BuilderPageProps> = ({
   width,
   height,
   scale,
+  theme,
 }) => {
   const pageWrapperClasses = "shrink-0";
-  
+
   const pageClasses = cn(
     "bg-white shadow-lg rounded-none relative overflow-hidden",
     "transition-shadow duration-300 ease-in-out shrink-0 origin-top-left",
     "hover:shadow-xl"
   );
 
-  const pageContentClasses = "h-full w-full box-border overflow-hidden relative page-content";
+  const pageContentClasses =
+    "h-full w-full box-border overflow-hidden relative page-content";
 
   return (
-    <div 
+    <div
       className={pageWrapperClasses}
       style={{
         width: `${width * scale}px`,
-        height: `${height * scale}px`
+        height: `${height * scale}px`,
       }}
     >
-      <div 
+      <div
         className={pageClasses}
         style={{
           width: `${width}px`,
           height: `${height}px`,
-          transform: `scale(${scale})`
+          transform: `scale(${scale})`,
         }}
       >
-        <div className={pageContentClasses}>
-          <div dangerouslySetInnerHTML={{ __html: pageContent }} />
+        <div
+          className={pageContentClasses}
+          style={{
+            padding: `${theme.pagePadding}px`,
+            fontSize: `${theme.fontSize}px`,
+            lineHeight: theme.lineHeight,
+          }}
+        >
+          <MarkdownRendererFromHtml
+            html={pageContent}
+            theme={theme}
+          />
         </div>
       </div>
     </div>

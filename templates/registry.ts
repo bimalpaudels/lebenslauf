@@ -11,11 +11,17 @@ const registry: TemplateMeta[] = [
     name: "Modern One-Page",
     description: "Clean one-page CV with styled header and sections",
   },
+  {
+    id: "two-column-sidebar",
+    name: "Two-Column Sidebar",
+    description: "Dark sidebar with photo, about, skills; main column for experience and education",
+  },
 ];
 
 // Map id -> dynamic import for the template module
 const loaders: Record<string, () => Promise<any>> = {
   "modern-onepage": () => import("@/templates/modern-onepage/Template"),
+  "two-column-sidebar": () => import("@/templates/two-column-sidebar/Template"),
 };
 
 export function getTemplates(): TemplateMeta[] {

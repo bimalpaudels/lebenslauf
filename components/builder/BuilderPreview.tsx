@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, forwardRef, useImperativeHandle } from "react";
+import React, { useMemo, forwardRef, useImperativeHandle, useState, useRef, useCallback } from "react";
 import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { useBuilderScaling } from "../../hooks/useBuilderScaling";
 import { usePageBreaking } from "../../hooks/usePageBreaking";
@@ -9,10 +9,14 @@ import { BuilderPageContainer } from "./BuilderPageContainer";
 import { BuilderPage } from "./BuilderPage";
 import { BuilderEmptyState } from "./BuilderEmptyState";
 import { TemplateHost, type ThemeTokens } from "./TemplateHost";
+import type { ThemeConfig } from "@/lib/markdown-components";
+import { generateTypographyStyles, scopeTemplateCss } from "@/lib/cv-styles";
 
 interface BuilderPreviewProps {
   markdown: string;
   templateCss: string;
+  /** Optional template ID - when set, preview uses template-rendered HTML instead of generic markdown->HTML */
+  templateId?: string;
   pageFormat: "A4" | "Letter";
   fontSize: number;
   pagePadding: number;
@@ -30,6 +34,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     {
       markdown,
       templateCss,
+      templateId,
       pageFormat,
       fontSize,
       pagePadding,
@@ -39,11 +44,22 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     },
     ref
   ) {
-    const previewHtml = useMemo(
+    // State to hold HTML captured from template render (when templateId is set)
+    const [templateHtml, setTemplateHtml] = useState<string>("");
+    // Ref to the hidden container where TemplateHost renders
+    const templateContainerRef = useRef<HTMLDivElement>(null);
+
+    // Fallback: generic markdown->HTML (used when no templateId)
+    const genericHtml = useMemo(
       () => parseMarkdownToHtml(markdown),
       [markdown]
     );
-    const theme: ThemeTokens = useMemo(
+
+    // Use template HTML when templateId is set and we have captured HTML; otherwise fallback to generic
+    const previewHtml = templateId && templateHtml ? templateHtml : genericHtml;
+
+    // Theme config for both TemplateHost and BuilderPage components
+    const theme: ThemeTokens & ThemeConfig = useMemo(
       () => ({
         color: themeColor,
         fontSize,
@@ -57,6 +73,16 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     const { scale, pageDimensions, containerRef } = useBuilderScaling({
       pageFormat,
     });
+
+    // Callback when template has rendered - capture innerHTML for page-breaking
+    const handleTemplateRendered = useCallback(() => {
+      if (templateContainerRef.current) {
+        const html = templateContainerRef.current.innerHTML;
+        if (html) {
+          setTemplateHtml(html);
+        }
+      }
+    }, []);
 
     const { pages, measureRef } = usePageBreaking({
       previewHtml,
@@ -85,7 +111,13 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       },
     }));
 
+    // Simplified styles - element styling is now handled by Tailwind components
+    // Only keeping container styles and measuring container styles for page breaking
     const customStyles = useMemo(() => {
+      // Generate typography styles for measuring container using shared utility
+      const measuringTypography = generateTypographyStyles(theme, ".measuring-container");
+      const scopedMeasuringCss = scopeTemplateCss(templateCss, ".measuring-container");
+
       return `
       .preview-container {
         height: 100%;
@@ -131,12 +163,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
         }
       }
       
-      .page-content {
-        padding: ${pagePadding}px !important;
-        font-size: ${fontSize}px !important;
-        line-height: ${lineHeight};
-      }
-      
+      /* Measuring container for page breaking - still uses HTML-based measurement */
       .measuring-container {
         position: absolute;
         top: -9999px;
@@ -148,115 +175,27 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
         visibility: hidden;
         overflow: visible;
         background: white;
-      }
-      
-      ${templateCss
-        .split("\n")
-        .map((line) => {
-          if (line.includes(".cv-container")) {
-            return line.replace(".cv-container", ".page-content");
-          }
-          return line.startsWith(".") ? `.page-content ${line}` : line;
-        })
-        .join("\n")}
-      
-      ${templateCss
-        .split("\n")
-        .map((line) => {
-          if (line.includes(".cv-container")) {
-            return line.replace(".cv-container", ".measuring-container");
-          }
-          return line.startsWith(".") ? `.measuring-container ${line}` : line;
-        })
-        .join("\n")}
-      
-      .page-content, .measuring-container {
         color: #1f2937;
       }
       
-      .page-content h1, .measuring-container h1 {
-        color: ${themeColor};
-        margin-top: 0;
-        margin-bottom: ${paragraphSpacing}rem;
-        line-height: ${lineHeight};
-        font-size: ${fontSize * 1.8}px !important;
-      }
+      /* Typography styles for measuring container (from shared utility) */
+      ${measuringTypography}
       
-      .page-content h2, .measuring-container h2 {
-        color: ${themeColor};
-        margin-top: ${paragraphSpacing * 1.5}rem;
-        margin-bottom: ${paragraphSpacing * 0.5}rem;
-        line-height: ${lineHeight};
-        font-size: ${fontSize * 1.4}px !important;
-      }
+      /* Template-specific CSS for measuring container */
+      ${scopedMeasuringCss}
       
-      .page-content h3, .measuring-container h3 {
-        color: #111827;
-        margin-top: ${paragraphSpacing * 1.2}rem;
-        margin-bottom: ${paragraphSpacing * 0.4}rem;
+      /* Hidden container for capturing template HTML */
+      .template-capture-container {
+        position: absolute;
+        top: -99999px;
+        left: -99999px;
+        width: ${pageDimensions.width - pagePadding * 2}px;
+        font-size: ${fontSize}px;
         line-height: ${lineHeight};
-        font-size: ${fontSize * 1.2}px !important;
-      }
-      
-      .page-content p, .measuring-container p {
-        color: #4b5563;
-        margin-bottom: ${paragraphSpacing * 0.8}rem;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content li, .measuring-container li {
-        color: #4b5563;
-        margin-bottom: ${paragraphSpacing * 0.3}rem;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content ul, .measuring-container ul,
-      .page-content ol, .measuring-container ol {
-        margin-bottom: ${paragraphSpacing}rem;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content dl, .measuring-container dl {
-        margin-bottom: ${paragraphSpacing}rem;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content dt, .measuring-container dt {
-        font-weight: 600;
-        color: #111827;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content dd, .measuring-container dd {
-        margin-left: 0;
-        margin-bottom: ${paragraphSpacing * 0.5}rem;
-        color: #6b7280;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content strong, .measuring-container strong {
-        color: #111827;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content em, .measuring-container em {
-        color: #6b7280;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
-      }
-      
-      .page-content a, .measuring-container a {
-        color: ${themeColor};
-        text-decoration: underline;
-        line-height: ${lineHeight};
-        font-size: ${fontSize}px !important;
+        visibility: hidden;
+        overflow: visible;
+        background: white;
+        color: #1f2937;
       }
     `;
     }, [
@@ -265,8 +204,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
       pagePadding,
       lineHeight,
       pageDimensions,
-      paragraphSpacing,
-      themeColor,
+      theme,
     ]);
 
     const renderContent = () => {
@@ -282,14 +220,6 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
 
       return (
         <>
-          {/* TSX template render for measurement (modern-onepage) */}
-          <div style={{ position: "absolute", left: -99999, top: -99999 }}>
-            <TemplateHost
-              templateId="modern-onepage"
-              markdown={markdown}
-              theme={theme}
-            />
-          </div>
           {pages.map((pageContent, index) => (
             <BuilderPage
               key={index}
@@ -298,6 +228,7 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
               width={pageDimensions.width}
               height={pageDimensions.height}
               scale={scale}
+              theme={theme}
             />
           ))}
         </>
@@ -316,6 +247,17 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
         customStyles={customStyles}
       >
         <div ref={measureRef} className="measuring-container" />
+        {/* Hidden container for capturing template HTML when templateId is set */}
+        {templateId && (
+          <div ref={templateContainerRef} className="template-capture-container">
+            <TemplateHost
+              templateId={templateId}
+              markdown={markdown}
+              theme={theme}
+              onRendered={handleTemplateRendered}
+            />
+          </div>
+        )}
         {renderContent()}
       </BuilderPageContainer>
     );
