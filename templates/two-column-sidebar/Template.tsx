@@ -2,54 +2,127 @@
 
 import React, { useMemo } from "react";
 import { MarkdownRenderer, type ThemeConfig } from "@/components/MarkdownRenderer";
-import { parseFrontmatter } from "@/lib/markdown";
+import { marked } from "marked";
 
 export type Theme = ThemeConfig;
 
-/** Parse markdown into sections by ## Title, then entries by ### Subtitle (dates) */
-function parseSections(content: string): Map<string, { title: string; body: string }[]> {
-  const sections = new Map<string, { title: string; body: string }[]>();
-  const sectionRegex = /^##\s+(.+)$/gm;
-  const entryRegex = /^###\s+(.+)$/gm;
+/** 
+ * Parse full markdown into structure:
+ * - name: first H1
+ * - photo: first image found
+ * - contact: text in header area (content before first H2 or H3)
+ * - leftSections: H2 sections (## Title) and their content
+ * - rightSections: H3 sections (### Title) and their content
+ */
+function parseCVContent(content: string) {
+  const tokens = marked.lexer(content);
+  
+  let name = "";
+  let photo = "";
+  let contact = "";
+  
+  const leftSections: { title: string; body: string }[] = [];
+  const rightSections: { title: string; body: string }[] = [];
+  
+  // Current section pointer
+  let currentSection: { title: string; body: string } | null = null;
+  
+  // Header zone collection
+  let inHeader = true;
+  let headerTextParts: string[] = [];
 
-  const parts = content.split(sectionRegex);
-  // parts: [intro, sectionTitle1, sectionContent1, sectionTitle2, sectionContent2, ...]
-  for (let i = 1; i < parts.length; i += 2) {
-    const sectionTitle = parts[i]?.trim() ?? "";
-    const sectionContent = (parts[i + 1] ?? "").trim();
-    if (!sectionTitle) continue;
-
-    const entries: { title: string; body: string }[] = [];
-    const entryParts = sectionContent.split(entryRegex);
-    for (let j = 1; j < entryParts.length; j += 2) {
-      const entryTitle = entryParts[j]?.trim() ?? "";
-      const entryBody = (entryParts[j + 1] ?? "").trim();
-      entries.push({ title: entryTitle, body: entryBody });
+  for (const token of tokens) {
+    if (token.type === 'heading') {
+      if (token.depth === 1 && !name) {
+        name = token.text;
+        continue; // Don't add name to body
+      }
+      
+      // H2 -> Left Column
+      if (token.depth === 2) {
+        if (inHeader) {
+          inHeader = false;
+          contact = headerTextParts.join("\n").trim();
+        }
+        currentSection = { title: token.text, body: "" };
+        leftSections.push(currentSection);
+        continue;
+      }
+      
+      // H3 -> Right Column
+      if (token.depth === 3) {
+         if (inHeader) {
+          inHeader = false;
+          contact = headerTextParts.join("\n").trim();
+        }
+        currentSection = { title: token.text, body: "" };
+        rightSections.push(currentSection);
+        continue;
+      }
+      
+      // H4+ -> Treated as content inside the current section
+      // Will be appended via default case relative to token.raw
     }
-    if (entries.length > 0) {
-      sections.set(sectionTitle, entries);
-    } else if (sectionContent) {
-      sections.set(sectionTitle, [{ title: "", body: sectionContent }]);
+    
+    // Extract photo from first image found
+    if (token.type === 'paragraph' || token.type === 'image') {
+       // Check for image syntax in text if it's a paragraph
+       const text = (token as any).text || "";
+       const imgMatch = text.match(/!\[.*?\]\((.*?)\)/);
+       
+       if (imgMatch && !photo) {
+         photo = imgMatch[1];
+         // Remove image from text to avoid duplicating it in the body/header
+         const textWithoutImg = text.replace(/!\[.*?\]\((.*?)\)/, "").trim();
+         
+         if (!textWithoutImg) continue; // If only image, skip adding this token to body
+         // Update token text to be the remainder
+         (token as any).text = textWithoutImg; 
+         // Note: token.raw usually contains the original. 
+         // If we rely on token.raw for body appending, we might duplicate the image if we aren't careful.
+         // But for simplicity, if we are in a section, we often append token.raw.
+         // Let's modify token.raw too if possible or handle appending carefully.
+         // This is a bit hacky, but 'marked' tokens are mutable.
+       }
+    }
+    
+    if (inHeader) {
+      if (token.type === 'paragraph' || token.type === 'text') {
+        const text = (token as any).text || (token as any).raw;
+        // Don't include the image mark we just extracted
+        const cleanText = text.replace(/!\[.*?\]\((.*?)\)/, "").trim();
+        if (cleanText) headerTextParts.push(cleanText);
+      }
+      if (token.type === 'list') {
+        const items = (token as any).items.map((i: any) => i.text).join(" • ");
+        headerTextParts.push(items);
+      }
+    } else {
+      // In a section (Left or Right)
+      if (currentSection) {
+        // Look out for the image we extracted so we don't re-render it
+        let rawContent = (token as any).raw;
+        // Simple heuristic: if raw content contains the exact photo URL and we found it, 
+        // we might NOT want to include it.
+        // But for consistency: user might want image in body too?
+        // Usually sidebar photo is removed from body.
+        if (photo && rawContent.includes(photo)) {
+            // strip it locally
+            // This regex covers standard image syntax
+            rawContent = rawContent.replace(/!\[.*?\]\(.*?\)/, "").trim();
+        }
+        
+        currentSection.body += rawContent;
+      }
     }
   }
-  return sections;
-}
+  
+  // If we ended still in header (no sections)
+  if (inHeader) {
+     contact = headerTextParts.join("\n").trim();
+  }
 
-function SkillBar({ level }: { level: number }) {
-  const filled = Math.min(5, Math.max(0, level));
-  return (
-    <span className="inline-flex gap-px align-middle" aria-hidden>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <span
-          key={i}
-          className="inline-block w-2 h-2 rounded-sm"
-          style={{
-            backgroundColor: i <= filled ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.25)",
-          }}
-        />
-      ))}
-    </span>
-  );
+  return { name, photo, contact, leftSections, rightSections };
 }
 
 export default function Template({
@@ -59,22 +132,10 @@ export default function Template({
   markdown: string;
   theme: Theme;
 }) {
-  const { frontmatter, content } = useMemo(
-    () => parseFrontmatter(markdown || ""),
+  const { name, photo, contact, leftSections, rightSections } = useMemo(
+    () => parseCVContent(markdown || ""),
     [markdown]
   );
-
-  const sections = useMemo(() => parseSections(content), [content]);
-
-  const fm = frontmatter as Record<string, unknown> | null;
-  const name = fm?.name ? String(fm.name) : null;
-  const photo = fm?.photo ? String(fm.photo) : null;
-  const contact = (fm?.contact as Record<string, string> | undefined) ?? {};
-  const about = fm?.about ? String(fm.about) : null;
-  const skills = (Array.isArray(fm?.skills) ? fm.skills : []) as Array<{ name?: string; level?: number }>;
-
-  const experienceEntries = sections.get("Experience") ?? sections.get("EXPERIENCE") ?? [];
-  const educationEntries = sections.get("Education") ?? sections.get("EDUCATION") ?? [];
 
   const baseStyle = {
     fontSize: `${theme.fontSize}px`,
@@ -88,6 +149,7 @@ export default function Template({
     <div
       className="flex w-full bg-white text-slate-800"
       style={baseStyle}
+      id="cv-template"
     >
       {/* Left column ~33% - dark */}
       <div
@@ -110,54 +172,25 @@ export default function Template({
           </div>
         )}
 
-        {/* About Me */}
-        {about && (
-          <section className="mb-5">
-            <h2
-              className="font-bold uppercase tracking-wide mb-2"
-              style={{ fontSize: theme.fontSize * 0.95 }}
-            >
-              About Me
-            </h2>
-            <div
-              className="text-white/90 whitespace-pre-line"
-              style={{ fontSize: theme.fontSize * 0.9 }}
-            >
-              {about.split("\n\n").map((p, i) => (
-                <p key={i} className="mb-2 last:mb-0">
-                  {p}
-                </p>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Skills */}
-        {skills.length > 0 && (
-          <section>
-            <h2
-              className="font-bold uppercase tracking-wide mb-2"
-              style={{ fontSize: theme.fontSize * 0.95 }}
-            >
-              Skills
-            </h2>
-            <ul className="space-y-1.5">
-              {skills.map((s, i) => (
-                <li
-                  key={i}
-                  className="flex items-center justify-between gap-2"
-                  style={{ fontSize: theme.fontSize * 0.9 }}
+        {/* Left Sections (##) */}
+        {leftSections.map((section, i) => (
+            <section key={i} className="mb-5">
+                <h2
+                className="font-bold uppercase tracking-wide mb-2"
+                style={{ fontSize: theme.fontSize * 0.95 }}
                 >
-                  <span className="flex-shrink-0 truncate">
-                    {s.name ?? ""}
-                    {String(s.name).trim() && !String(s.name).endsWith(":") ? ":" : ""}
-                  </span>
-                  <SkillBar level={typeof s.level === "number" ? s.level : 0} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+                {section.title}
+                </h2>
+                <div
+                className="text-white/90 whitespace-pre-line"
+                style={{ fontSize: theme.fontSize * 0.9 }}
+                >
+                {/* Force white text theme for left column */}
+                <MarkdownRenderer content={section.body} theme={{...theme, color: "white"}} />
+                </div>
+            </section>
+        ))}
+
       </div>
 
       {/* Right column ~66% - white */}
@@ -183,139 +216,34 @@ export default function Template({
               className="mt-1 h-1.5 rounded-full max-w-[66%]"
               style={{ backgroundColor: accentColor }}
             />
-            {(contact.address || contact.phone || contact.email) && (
+            {contact && (
               <div
-                className="mt-2 text-slate-600 space-y-0.5"
+                className="mt-2 text-slate-600 space-y-0.5 whitespace-pre-line"
                 style={{ fontSize: theme.fontSize * 0.9 }}
               >
-                {contact.address && <div>{contact.address}</div>}
-                {contact.phone && <div>phone: {contact.phone}</div>}
-                {contact.email && <div>email: {contact.email}</div>}
+                  {contact}
               </div>
             )}
           </header>
         )}
 
-        {/* Experience */}
-        {experienceEntries.length > 0 && (
-          <section className="mb-4">
-            <h2
-              className="font-bold uppercase tracking-wide mb-2"
-              style={{
-                fontSize: theme.fontSize * 1.1,
-                color: "#1e293b",
-              }}
-            >
-              Experience
-            </h2>
-            <div className="space-y-3">
-              {experienceEntries.map((entry, i) => (
-                <div key={i}>
-                  <h3
-                    className="font-bold uppercase text-slate-800"
-                    style={{
-                      fontSize: theme.fontSize * 1,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    {entry.title}
-                  </h3>
-                  {entry.body && (
-                    <div
-                      className="text-slate-600"
-                      style={{ fontSize: theme.fontSize * 0.95 }}
-                    >
-                      <MarkdownRenderer content={entry.body} theme={theme} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Education */}
-        {educationEntries.length > 0 && (
-          <section>
-            <h2
-              className="font-bold uppercase tracking-wide mb-2"
-              style={{
-                fontSize: theme.fontSize * 1.1,
-                color: "#1e293b",
-              }}
-            >
-              Education
-            </h2>
-            <div className="space-y-3">
-              {educationEntries.map((entry, i) => (
-                <div key={i}>
-                  <h3
-                    className="font-bold uppercase text-slate-800"
-                    style={{
-                      fontSize: theme.fontSize * 1,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    {entry.title}
-                  </h3>
-                  {entry.body && (
-                    <div
-                      className="text-slate-600"
-                      style={{ fontSize: theme.fontSize * 0.95 }}
-                    >
-                      <MarkdownRenderer content={entry.body} theme={theme} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Catch-all: any other ## sections from markdown */}
-        {Array.from(sections.entries()).filter(
-          ([title]) =>
-            !["Experience", "EXPERIENCE", "Education", "EDUCATION"].includes(title)
-        ).length > 0 && (
-          <section className="mt-4">
-            {Array.from(sections.entries())
-              .filter(
-                ([title]) =>
-                  !["Experience", "EXPERIENCE", "Education", "EDUCATION"].includes(title)
-              )
-              .map(([sectionTitle, entries]) => (
-                <div key={sectionTitle} className="mb-4">
-                  <h2
-                    className="font-bold uppercase tracking-wide mb-2"
-                    style={{
-                      fontSize: theme.fontSize * 1.1,
-                      color: "#1e293b",
-                    }}
-                  >
-                    {sectionTitle}
-                  </h2>
-                  {entries.map((entry, i) => (
-                    <div key={i}>
-                      {entry.title && (
-                        <h3
-                          className="font-bold uppercase text-slate-800"
-                          style={{
-                            fontSize: theme.fontSize * 1,
-                            marginBottom: "0.25rem",
-                          }}
-                        >
-                          {entry.title}
-                        </h3>
-                      )}
-                      {entry.body && (
-                        <MarkdownRenderer content={entry.body} theme={theme} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ))}
-          </section>
-        )}
+        {/* Right Sections (###) */}
+        {rightSections.map((section, i) => (
+             <section key={i} className="mb-4">
+             <h2
+               className="font-bold uppercase tracking-wide mb-2"
+               style={{
+                 fontSize: theme.fontSize * 1.1,
+                 color: "#1e293b",
+               }}
+             >
+               {section.title}
+             </h2>
+             <div className="text-slate-600" style={{ fontSize: theme.fontSize * 0.95 }}>
+               <MarkdownRenderer content={section.body} theme={theme} />
+             </div>
+           </section>
+        ))}
       </div>
     </div>
   );
@@ -324,54 +252,50 @@ export default function Template({
 export const templateMeta = {
   id: "two-column-sidebar",
   name: "Two-Column Sidebar",
-  description: "Dark sidebar with photo, about, skills; main column for experience and education",
+  description: "Dark sidebar (## headers) and main column (### headers). Fully flexible two-column layout.",
 };
 
-export const sampleMarkdown = `---
-name: Austin Bronson
-photo: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face
-contact:
-  address: "4710 Bus Boulevard, Flintstone, GA 30725"
-  phone: "+(0) 1 2345 555"
-  email: contact@yourdomain.com
-about: |
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+export const sampleMarkdown = `# Austin Bronson
 
-  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-skills:
-  - name: Graphic Design
-    level: 4
-  - name: Web Develop
-    level: 3
-  - name: Lorem Ipsum
-    level: 1
-  - name: Dolor sit amet
-    level: 3
-  - name: Consectetur elit
-    level: 5
----
+![Profile Photo](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face)
 
-## Experience
+4710 Bus Boulevard, Flintstone, GA 30725 • +(0) 1 2345 555 • contact@yourdomain.com
 
-### SALES FORCE TEAM LEADER (2006 - NOW)
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-
-### SENIOR CONSULTANT (2004 - 2006)
-
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
-
-### JUNIOR ANALYST (2000 - 2004)
-
-Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.
-
-## Education
-
-### HIGH SCHOOL OF DESIGN (1996 - 1999)
+## About
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
-### CERTIFICATION PROGRAM (1994 - 1996)
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+## Skills
+
+- Graphic Design (Level 4)
+- Web Develop (Level 3)
+- Lorem Ipsum (Level 1)
+- Dolor sit amet (Level 3)
+- Consectetur elit (Level 5)
+
+### Experience
+
+#### SALES FORCE TEAM LEADER (2006 - NOW)
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+#### SENIOR CONSULTANT (2004 - 2006)
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
+
+#### JUNIOR ANALYST (2000 - 2004)
+
+Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.
+
+### Education
+
+#### HIGH SCHOOL OF DESIGN (1996 - 1999)
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+#### CERTIFICATION PROGRAM (1994 - 1996)
 
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 `;

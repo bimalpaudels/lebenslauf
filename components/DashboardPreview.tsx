@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { cn } from "@/lib/utils";
 import { TemplateHost } from "@/components/builder/TemplateHost";
 
@@ -166,8 +165,6 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
     cssClassName,
   ]);
 
-  const previewHtml = useMemo(() => parseMarkdownToHtml(markdown), [markdown]);
-
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
     "flex flex-col items-start justify-start relative",
@@ -217,9 +214,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                 paragraphSpacing,
               }}
             />
-          ) : (
-            <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-          )}
+          ) : null}
         </div>
       </div>
     </div>

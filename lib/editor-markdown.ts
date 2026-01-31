@@ -29,47 +29,6 @@ turndownService.addRule("paragraph", {
   },
 });
 
-export interface CVFrontmatter {
-  name: string;
-  header: { text: string }[];
-}
-
-export interface ParsedCV {
-  frontmatter: CVFrontmatter;
-  body: string;
-}
-
-/**
- * Parse CV markdown into frontmatter and body
- */
-export function parseMarkdownContent(markdown: string): ParsedCV {
-  const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/;
-  const match = markdown.match(frontmatterRegex);
-
-  if (match) {
-    try {
-      const frontmatter = yaml.load(match[1]) as CVFrontmatter;
-      return {
-        frontmatter: {
-          name: frontmatter?.name || "",
-          header: Array.isArray(frontmatter?.header) ? frontmatter.header : [],
-        },
-        body: match[2].trim(),
-      };
-    } catch {
-      return {
-        frontmatter: { name: "", header: [] },
-        body: markdown,
-      };
-    }
-  }
-
-  return {
-    frontmatter: { name: "", header: [] },
-    body: markdown,
-  };
-}
-
 /**
  * Convert markdown body to HTML for TipTap
  */
@@ -98,45 +57,99 @@ export function htmlToMarkdown(html: string): string {
 }
 
 /**
- * Build full CV markdown from frontmatter and body
- */
-export function buildCVMarkdown(frontmatter: CVFrontmatter, body: string): string {
-  const frontmatterObj = {
-    name: frontmatter.name,
-    header: frontmatter.header.map((item) => ({
-      text: item.text || "",
-    })),
-  };
-
-  const yamlStr = yaml.dump(frontmatterObj, {
-    lineWidth: -1,
-    noRefs: true,
-  });
-
-  return `---\n${yamlStr.trim()}\n---\n\n${body.trim()}\n`;
-}
-
-/**
- * Convert full CV markdown to editor-ready HTML
- * Returns the frontmatter separately and HTML for the body
+ * Convert full CV markdown to editor-ready HTML.
+ * If frontmatter exists, it is converted to markdown content (headers, text) and appended to the body.
  */
 export function cvMarkdownToEditorContent(markdown: string): {
-  frontmatter: CVFrontmatter;
   bodyHtml: string;
 } {
-  const { frontmatter, body } = parseMarkdownContent(markdown);
-  const bodyHtml = markdownToHtml(body);
-  
-  return { frontmatter, bodyHtml };
+  const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/;
+  const match = markdown.match(frontmatterRegex);
+
+  if (match) {
+    try {
+      const frontmatter = yaml.load(match[1]) as Record<string, unknown>;
+      let body = match[2].trim();
+
+      // Migrate frontmatter to body
+      let migratedContent = "";
+
+      // Name -> H1
+      if (typeof frontmatter.name === 'string' && frontmatter.name) {
+        migratedContent += `# ${frontmatter.name}\n\n`;
+      }
+
+      // Contact info (Header items)
+      if (Array.isArray(frontmatter.header)) {
+        const contactLine = frontmatter.header
+          .map((item: any) => item.text)
+          .filter(Boolean)
+          .join(" • ");
+        if (contactLine) {
+          migratedContent += `${contactLine}\n\n`;
+        }
+      }
+
+      // About
+      if (typeof frontmatter.about === 'string' && frontmatter.about) {
+        migratedContent += `## About\n\n${frontmatter.about}\n\n`;
+      }
+
+      // Skills
+      if (Array.isArray(frontmatter.skills)) {
+        migratedContent += `## Skills\n\n`;
+        frontmatter.skills.forEach((skill: any) => {
+          const name = skill.name || skill;
+          const level = skill.level ? ` (Level ${skill.level})` : "";
+          migratedContent += `- ${name}${level}\n`;
+        });
+        migratedContent += `\n`;
+      }
+
+      // Photo - explicitly handled? 
+      // User said "Photo: First Image". If it was in frontmatter 'photo', we should convert it to an image markdown.
+      if (typeof frontmatter.photo === 'string' && frontmatter.photo) {
+        // Prepend photo before name? or after? 
+        // "Name: First H1". "Photo: First Image". 
+        // Let's put photo first or second.
+        // Let's put it after name for now, or before. 
+        // Standard markdown: Image can be anywhere.
+        migratedContent = `![](${frontmatter.photo})\n\n` + migratedContent;
+      }
+
+      const fullMarkdown = migratedContent + body;
+      
+      // Escape image syntax so it is treated as text in the editor
+      const escapedMarkdown = fullMarkdown.replace(/!\[(.*?)\]\((.*?)\)/g, '\\![$1]($2)');
+      
+      return { bodyHtml: markdownToHtml(escapedMarkdown) };
+
+    } catch (e) {
+      // If parsing fails, just return original markdown as body
+       // Escape image syntax here too
+      const escapedMarkdown = markdown.replace(/!\[(.*?)\]\((.*?)\)/g, '\\![$1]($2)');
+      return { bodyHtml: markdownToHtml(escapedMarkdown) };
+    }
+  }
+
+  // Escape image syntax for pure markdown too
+  const escaped = markdown.replace(/!\[(.*?)\]\((.*?)\)/g, '\\![$1]($2)');
+  return { bodyHtml: markdownToHtml(escaped) };
 }
 
 /**
  * Convert editor content back to CV markdown
  */
 export function editorContentToCVMarkdown(
-  frontmatter: CVFrontmatter,
   bodyHtml: string
 ): string {
-  const body = htmlToMarkdown(bodyHtml);
-  return buildCVMarkdown(frontmatter, body);
+  let markdown = htmlToMarkdown(bodyHtml);
+  // Unescape image syntax if it was double escaped or just ensure it's clean
+  // If Tiptap rendered `![...]` as text, Turndown outputs `![...]`.
+  // If we had `\!` it might be `\!`. we want to remove the backslash if present start of line or similar.
+  // Actually, Turndown might escape the `[` or `!`.
+  // Let's just strip the backslash escape if it precedes an image pattern
+  markdown = markdown.replace(/\\!\[/g, '![');
+  
+  return markdown;
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, forwardRef, useImperativeHandle, useState, useRef, useCallback } from "react";
-import { parseMarkdownToHtml } from "@/lib/template-loader";
 import { useBuilderScaling } from "../../hooks/useBuilderScaling";
 import { usePageBreaking } from "../../hooks/usePageBreaking";
 import { usePDFExport } from "../../hooks/usePDFExport";
@@ -49,14 +48,8 @@ const BuilderPreview = forwardRef<BuilderPreviewRef, BuilderPreviewProps>(
     // Ref to the hidden container where TemplateHost renders
     const templateContainerRef = useRef<HTMLDivElement>(null);
 
-    // Fallback: generic markdown->HTML (used when no templateId)
-    const genericHtml = useMemo(
-      () => parseMarkdownToHtml(markdown),
-      [markdown]
-    );
-
-    // Use template HTML when templateId is set and we have captured HTML; otherwise fallback to generic
-    const previewHtml = templateId && templateHtml ? templateHtml : genericHtml;
+    // Use template HTML when templateId is set and we have captured HTML
+    const previewHtml = templateId && templateHtml ? templateHtml : "";
 
     // Theme config for both TemplateHost and BuilderPage components
     const theme: ThemeTokens & ThemeConfig = useMemo(
