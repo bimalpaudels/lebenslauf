@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { TemplateHost } from "@/components/builder/TemplateHost";
 
 interface DashboardPreviewProps {
@@ -190,7 +191,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
           transformOrigin: "top left",
         }}
       >
-        <div className={contentClasses}>
+        <div className={cn(contentClasses, "h-full px-[var(--padding)]")}>
           {contentOverlay ? (
             <div
               className="absolute top-2 right-2 z-10 pointer-events-auto"
@@ -214,7 +215,18 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                 paragraphSpacing,
               }}
             />
-          ) : null}
+          ) : (
+            <MarkdownRenderer 
+              content={markdown} 
+              theme={{
+                color: themeColor,
+                fontSize,
+                lineHeight,
+                pagePadding,
+                paragraphSpacing,
+              }} 
+            />
+          )}
         </div>
       </div>
     </div>
