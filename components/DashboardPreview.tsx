@@ -25,7 +25,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
   css,
   pageFormat = "A4",
   fontSize = 12,
-  pagePadding = 16,
+  pagePadding = 20,
   lineHeight = 1.4,
   paragraphSpacing = 1,
   themeColor = "#3ECF8E",
@@ -168,7 +168,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
-    "flex flex-col items-start justify-start relative",
+    "flex flex-col items-center justify-center relative",
     className
   );
 
@@ -183,15 +183,21 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
     <div className={containerClasses} ref={setContainerRef}>
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
       <div
-        className={pageClasses}
         style={{
-          width: `${pageDimensions.width}px`,
-          height: `${pageDimensions.height}px`,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
+          width: `${pageDimensions.width * scale}px`,
+          height: `${pageDimensions.height * scale}px`,
         }}
       >
-        <div className={cn(contentClasses, "h-full px-[var(--padding)]")}>
+        <div
+          className={pageClasses}
+          style={{
+            width: `${pageDimensions.width}px`,
+            height: `${pageDimensions.height}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
+        >
+        <div className={cn(contentClasses, "h-full")}>
           {contentOverlay ? (
             <div
               className="absolute top-2 right-2 z-10 pointer-events-auto"
@@ -230,7 +236,8 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DashboardPreview;
