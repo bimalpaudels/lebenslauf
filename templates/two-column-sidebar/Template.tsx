@@ -206,7 +206,7 @@ export default function Template({
               style={{
                 fontSize: theme.fontSize * 2,
                 lineHeight: 1.1,
-                color: "#1e293b",
+                color: theme.color,
                 margin: 0,
               }}
             >
@@ -234,7 +234,7 @@ export default function Template({
                className="font-bold uppercase tracking-wide mb-2"
                style={{
                  fontSize: theme.fontSize * 1.1,
-                 color: "#1e293b",
+                 color: theme.color,
                }}
              >
                {section.title}
