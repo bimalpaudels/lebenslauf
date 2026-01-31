@@ -147,7 +147,7 @@ export default function Template({
 
   return (
     <div
-      className="flex w-full bg-white text-slate-800"
+      className="flex w-full bg-white text-slate-800 min-h-full"
       style={baseStyle}
       id="cv-template"
     >

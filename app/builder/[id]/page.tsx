@@ -355,9 +355,9 @@ export default function BuilderPage({ params }: BuilderPageProps) {
               </div>
             </div>
           }
-          defaultSize={60}
-          minSize={40}
-          maxSize={75}
+          defaultSize={67}
+          minSize={35}
+          maxSize={80}
         />
       </div>
     </div>
