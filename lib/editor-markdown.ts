@@ -29,10 +29,10 @@ turndownService.addRule("paragraph", {
   },
 });
 
-export interface CVFrontmatter {
+export type CVFrontmatter = Record<string, unknown> & {
   name: string;
   header: { text: string }[];
-}
+};
 
 export interface ParsedCV {
   frontmatter: CVFrontmatter;
@@ -46,26 +46,33 @@ export function parseMarkdownContent(markdown: string): ParsedCV {
   const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/;
   const match = markdown.match(frontmatterRegex);
 
+  const defaultFrontmatter: CVFrontmatter = {
+    name: "",
+    header: [],
+  };
+
   if (match) {
     try {
-      const frontmatter = yaml.load(match[1]) as CVFrontmatter;
+      const parsed = yaml.load(match[1]) as Record<string, unknown>;
       return {
         frontmatter: {
-          name: frontmatter?.name || "",
-          header: Array.isArray(frontmatter?.header) ? frontmatter.header : [],
+          ...defaultFrontmatter,
+          ...parsed,
+          name: typeof parsed?.name === 'string' ? parsed.name : defaultFrontmatter.name,
+          header: Array.isArray(parsed?.header) ? parsed.header : defaultFrontmatter.header,
         },
         body: match[2].trim(),
       };
     } catch {
       return {
-        frontmatter: { name: "", header: [] },
+        frontmatter: defaultFrontmatter,
         body: markdown,
       };
     }
   }
 
   return {
-    frontmatter: { name: "", header: [] },
+    frontmatter: defaultFrontmatter,
     body: markdown,
   };
 }
@@ -101,14 +108,7 @@ export function htmlToMarkdown(html: string): string {
  * Build full CV markdown from frontmatter and body
  */
 export function buildCVMarkdown(frontmatter: CVFrontmatter, body: string): string {
-  const frontmatterObj = {
-    name: frontmatter.name,
-    header: frontmatter.header.map((item) => ({
-      text: item.text || "",
-    })),
-  };
-
-  const yamlStr = yaml.dump(frontmatterObj, {
+  const yamlStr = yaml.dump(frontmatter, {
     lineWidth: -1,
     noRefs: true,
   });
