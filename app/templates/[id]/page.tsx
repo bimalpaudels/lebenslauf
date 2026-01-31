@@ -126,10 +126,13 @@ export default function TemplatePreviewPage({ params }: PageProps) {
 
                 <button
                   onClick={handleUseTemplate}
-                  className="mt-12 w-full py-5 bg-rose-500 text-white rounded-[24px] font-black text-xl shadow-2xl shadow-rose-500/20 hover:bg-rose-400 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-3 group"
+                  className="group relative mt-12 w-full py-5 bg-slate-900 text-white rounded-[24px] font-black text-xl shadow-2xl shadow-black/10 hover:shadow-[0_20px_50px_rgba(244,63,94,0.3)] hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                 >
-                  <span>Start with this Template</span>
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                  <span className="relative z-10 flex items-center justify-center space-x-3">
+                    <span>Start with this Template</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
                 
                 {error && (

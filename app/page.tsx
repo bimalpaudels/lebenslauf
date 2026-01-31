@@ -1,58 +1,70 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import BackgroundOrbs from "@/components/BackgroundOrbs";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "lebenslauf — Elevate Your Resume with Modern Markdown",
+  description: "Create professional, industry-standard CVs in minutes with our open-source, markdown-based builder. Privacy-focused and no sign-up required.",
+};
 
 const currentFeatures = [
   {
     title: "Markdown-Based",
-    description: "Simple and powerful content creation using familiar markdown syntax.",
+    description: "Simple and powerful content creation using markdown syntax.",
   },
   {
     title: "Live Preview",
-    description: "Real-time visualization of your CV as you type, with instant feedback.",
+    description: "Real-time visualization of your CV as you type.",
   },
   {
     title: "PDF Export",
-    description: "Generate high-quality, professional PDF files ready for job applications.",
+    description: "Generate high-quality PDF files ready for job applications.",
   },
   {
     title: "Privacy First",
     description: "No sign-up required. Your data is stored locally in your browser.",
   },
   {
-    title: "Modern Templates",
-    description: "Choose from a variety of professionally designed, industry-standard templates.",
+    title: "Templates Based",
+    description: "Choose from a variety of designed templates.",
   },
   {
     title: "Open Source",
-    description: "Transparent, community-driven, and fully free to use under MIT license.",
+    description: "Transparent and designed to be community-driven.",
   },
 ];
 
 const upcomingFeatures = [
   {
-    title: "AI Assistant",
-    description: "Smart content suggestions and optimization tailored for your target roles.",
+    title: "AI Support - BYOK",
+    description: "Bring your own API key to help you generate your CV.",
+    status: "Planned",
   },
   {
-    title: "LinkedIn Import",
-    description: "Quickly generate your CV by importing data directly from your profile.",
+    title: "More Templates",
+    description: "More templates to choose from.",
+    status: "WIP",
   },
   {
-    title: "Dark Mode Support",
-    description: "Specialized dark-themed templates for a modern, high-tech aesthetic.",
+    title: "Country Specific Templates",
+    description: "Templates specific to countries that follow their own standards.",
+    status: "WIP",
   },
   {
-    title: "Multi-CV Sync",
-    description: "Manage multiple versions of your CV and sync them across devices.",
+    title: "Granular Control to The Markdown Editor",
+    description: "Ability to edit each section of the CV independently.",
+    status: "Planned",
   },
   {
-    title: "Custom Branding",
-    description: "Add your personal touch with custom colors, fonts, and layouts.",
+    title: "Save on Your Phone",
+    description: "QR Code to save your CV on your phone.",
+    status: "Planned",
   },
   {
-    title: "Job Tracking",
-    description: "Keep track of your applications and manage target CVs for each role.",
+    title: "Request Features and Report Bug",
+    description: "Help us make lebenslauf better by reporting bugs or requesting new features.",
+    link: "https://github.com/bimalpaudels/lebenslauf/issues",
   },
 ];
 
@@ -66,9 +78,10 @@ export default function LandingPage() {
       {/* Hero Section */}
       <main className="pt-48 pb-20 px-6">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 mb-8 backdrop-blur-sm">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-            <span className="text-rose-600 dark:text-rose-400 text-xs font-bold tracking-widest uppercase">2026 Edition Now Live</span>
+          <div className="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 mb-8 backdrop-blur-sm">
+            <span className="text-rose-500 font-black text-xs uppercase tracking-widest">lebenslauf</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+            <span className="text-slate-500 dark:text-slate-400 text-[10px] font-bold tracking-tight lowercase italic">/le:bnslaʊf/ — life&apos;s course; CV</span>
           </div>
           <h1 className="text-7xl md:text-9xl font-black text-slate-900 dark:text-white mb-8 leading-[0.95] tracking-tighter">
             Elevate Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">Resume</span>
@@ -107,7 +120,7 @@ export default function LandingPage() {
               Powerful simplicity.
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
-              We focus on the perfect balance between professional aesthetics and
+              Built with focus on the perfect balance between professional aesthetics and
               intuitive markdown editing.
             </p>
           </div>
@@ -128,7 +141,7 @@ export default function LandingPage() {
                   </p>
                 </div>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {currentFeatures.map((f, i) => (
                   <div
                     key={i}
@@ -163,26 +176,35 @@ export default function LandingPage() {
                   </p>
                 </div>
               </div>
-              <div className="space-y-6">
-                {upcomingFeatures.map((f, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start space-x-4 p-4 rounded-2xl opacity-60 hover:opacity-100 transition-opacity"
-                  >
-                    <div className="w-1.5 h-1.5 mt-2 rounded-full bg-orange-500"></div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 dark:text-white flex items-center">
-                        {f.title}
-                        <span className="ml-2 text-[8px] uppercase tracking-tighter px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold">
-                          Planned
-                        </span>
-                      </h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-500 mt-0.5">
-                        {f.description}
-                      </p>
+              <div className="space-y-3">
+                {upcomingFeatures.map((f, i) => {
+                  const content = (
+                    <div className="flex items-start space-x-4 p-4 rounded-2xl opacity-60 hover:opacity-100 transition-all hover:bg-slate-100/50 dark:hover:bg-slate-800/50">
+                      <div className="w-1.5 h-1.5 mt-2 rounded-full bg-orange-500"></div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 dark:text-white flex items-center">
+                          {f.title}
+                          {f.status && (
+                            <span className="ml-2 text-[8px] uppercase tracking-tighter px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold">
+                              {f.status}
+                            </span>
+                          )}
+                        </h4>
+                        <p className="text-sm text-slate-500 dark:text-slate-500 mt-0.5">
+                          {f.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+
+                  return f.link ? (
+                    <a key={i} href={f.link} target="_blank" rel="noopener noreferrer">
+                      {content}
+                    </a>
+                  ) : (
+                    <div key={i}>{content}</div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -198,7 +220,7 @@ export default function LandingPage() {
               <span className="text-rose-500">dream job?</span>
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
-              No sign-up, no hidden fees. Just professional CVs in minutes.
+              No sign-up. Just professional CVs in minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link
@@ -224,10 +246,6 @@ export default function LandingPage() {
           <p className="text-slate-500 dark:text-slate-500 text-sm">
             © {new Date().getFullYear()} lebenslauf. Built with Markdown and Passion.
           </p>
-          <div className="flex items-center space-x-6">
-            <a href="https://github.com/bimalpaudels/lebenslauf" className="text-slate-400 hover:text-rose-500 transition-colors">GitHub</a>
-            <a href="#" className="text-slate-400 hover:text-rose-500 transition-colors">Privacy</a>
-          </div>
         </div>
       </footer>
     </div>

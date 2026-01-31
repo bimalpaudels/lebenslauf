@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import BackgroundOrbs from "@/components/BackgroundOrbs";
 import { loadCV, updateCV, saveCV, type CVData } from "@/lib/storage";

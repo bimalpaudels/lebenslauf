@@ -88,12 +88,6 @@ export default function TemplatesIndexPage() {
                 Pick a starting point. You can customize every detail, from colors to fonts, in the builder later.
               </p>
             </div>
-            <div className="flex items-center space-x-2 px-4 py-2 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-              <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
-                {templates.length} Pro Designs
-              </span>
-            </div>
           </div>
         </header>
 
@@ -113,9 +107,10 @@ export default function TemplatesIndexPage() {
                   <div className="flex flex-col space-y-3 px-8 w-full">
                     <button
                       onClick={() => handleUseTemplate(t.id)}
-                      className="w-full py-4 bg-rose-500 text-white rounded-2xl font-black text-sm shadow-xl shadow-rose-500/20 hover:bg-rose-400 transition-all"
+                      className="group relative w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-black/20 hover:shadow-[0_10px_30px_rgba(244,63,94,0.4)] hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                     >
-                      Use Template
+                      <span className="relative z-10">Use Template</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
                     <Link
                       href={`/templates/${t.id}`}

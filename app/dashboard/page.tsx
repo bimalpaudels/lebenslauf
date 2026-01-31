@@ -65,29 +65,32 @@ export default function Dashboard() {
           {/* Header with CTA */}
           <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-slate-200/60 dark:border-slate-800/60">
             <div>
-              <h2 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+              <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
                 Dashboard
-              </h2>
+              </h1>
               <p className="mt-2 text-slate-600 dark:text-slate-400 font-medium">
                 Manage different versions of your CV.
               </p>
             </div>
             <Link
               href="/templates"
-              className="group inline-flex items-center gap-2 rounded-2xl bg-slate-900 dark:bg-white px-6 py-3 text-sm font-bold text-white dark:text-slate-900 shadow-xl shadow-slate-900/10 dark:shadow-white/5 hover:-translate-y-1 transition-all duration-300"
+              className="group relative inline-flex items-center gap-2 rounded-2xl bg-slate-900 dark:bg-white px-6 py-3 text-sm font-bold text-white dark:text-slate-900 shadow-xl shadow-slate-900/10 dark:shadow-white/5 hover:shadow-[0_20px_50px_rgba(244,63,94,0.3)] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
-              <span>Create New CV</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-              >
-                <path d="M5 12h14" />
-                <path d="M12 5l7 7-7 7" />
-              </svg>
+              <span className="relative z-10 flex items-center gap-2">
+                <span>Create New CV</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5l7 7-7 7" />
+                </svg>
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </Link>
           </div>
 
