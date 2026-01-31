@@ -49,8 +49,9 @@ export function createMarkdownComponents(theme: ThemeConfig): Components {
 
     h3: ({ children }) => (
       <h3
-        className="font-semibold text-gray-900"
+        className="font-semibold"
         style={{
+          color: theme.color,
           fontSize: `${theme.fontSize * 1.2}px`,
           lineHeight: theme.lineHeight,
           marginTop: `${theme.paragraphSpacing * 1.2}rem`,

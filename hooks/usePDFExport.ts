@@ -141,7 +141,6 @@ export const usePDFExport = () => {
               font-size: ${fontSize}px !important;
               line-height: ${lineHeight} !important;
               font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-              color: #1f2937 !important;
               background: white !important;
           }
           

@@ -30,7 +30,7 @@ export function generateTypographyStyles(
     }
     
     ${selector} h3 {
-      color: #111827;
+      color: ${color};
       margin-top: ${paragraphSpacing * 1.2}rem;
       margin-bottom: ${paragraphSpacing * 0.4}rem;
       line-height: ${lineHeight};
@@ -131,6 +131,22 @@ export function generateTypographyStyles(
       border: none;
       border-top: 1px solid #d1d5db;
       margin: ${paragraphSpacing}rem 0;
+    }
+
+    ${selector} .company {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    ${selector} .job-date, ${selector} .location-date {
+      color: #6b7280;
+    }
+
+    ${selector} .highlight {
+      background-color: ${color}26;
+      color: ${color};
+      padding: 0 0.25rem;
+      border-radius: 0.125rem;
     }
   `;
 }

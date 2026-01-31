@@ -69,7 +69,7 @@ export function cvMarkdownToEditorContent(markdown: string): {
   if (match) {
     try {
       const frontmatter = yaml.load(match[1]) as Record<string, unknown>;
-      let body = match[2].trim();
+      const body = match[2].trim();
 
       // Migrate frontmatter to body
       let migratedContent = "";
@@ -81,8 +81,8 @@ export function cvMarkdownToEditorContent(markdown: string): {
 
       // Contact info (Header items)
       if (Array.isArray(frontmatter.header)) {
-        const contactLine = frontmatter.header
-          .map((item: any) => item.text)
+        const contactLine = (frontmatter.header as { text: string }[])
+          .map((item) => item.text)
           .filter(Boolean)
           .join(" • ");
         if (contactLine) {
@@ -98,9 +98,9 @@ export function cvMarkdownToEditorContent(markdown: string): {
       // Skills
       if (Array.isArray(frontmatter.skills)) {
         migratedContent += `## Skills\n\n`;
-        frontmatter.skills.forEach((skill: any) => {
-          const name = skill.name || skill;
-          const level = skill.level ? ` (Level ${skill.level})` : "";
+        (frontmatter.skills as (string | { name: string; level?: string | number })[]).forEach((skill) => {
+          const name = typeof skill === 'string' ? skill : skill.name;
+          const level = (typeof skill !== 'string' && skill.level) ? ` (Level ${skill.level})` : "";
           migratedContent += `- ${name}${level}\n`;
         });
         migratedContent += `\n`;
@@ -124,7 +124,7 @@ export function cvMarkdownToEditorContent(markdown: string): {
       
       return { bodyHtml: markdownToHtml(escapedMarkdown) };
 
-    } catch (e) {
+    } catch {
       // If parsing fails, just return original markdown as body
        // Escape image syntax here too
       const escapedMarkdown = markdown.replace(/!\[(.*?)\]\((.*?)\)/g, '\\![$1]($2)');

@@ -1,12 +1,9 @@
 "use client";
 
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
-import {
-  TemplateHost,
-  type ThemeTokens,
-} from "@/components/builder/TemplateHost";
+import DashboardPreview from "@/components/DashboardPreview";
 import { getTemplateById, getSampleMarkdown } from "@/templates/registry";
 import type { CVData } from "@/lib/storage";
 
@@ -21,16 +18,6 @@ export default function TemplatePreviewPage({ params }: PageProps) {
   const [markdown, setMarkdown] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
-  const theme: ThemeTokens = useMemo(
-    () => ({
-      color: "#3ECF8E",
-      fontSize: 12,
-      lineHeight: 1.4,
-      pagePadding: 20,
-      paragraphSpacing: 1,
-    }),
-    []
-  );
 
   useEffect(() => {
     let isActive = true;
@@ -145,15 +132,20 @@ export default function TemplatePreviewPage({ params }: PageProps) {
           {/* Right: preview */}
           <div className="lg:col-span-3 order-1 lg:order-2">
             <div className="sticky top-16">
-              <article className="rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700">
-                <div className="p-6">
-                  <TemplateHost
-                    templateId={templateId}
-                    markdown={markdown}
-                    theme={theme}
-                  />
-                </div>
-              </article>
+              <div className="aspect-[794/1123] w-full rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white dark:bg-slate-800 shadow-xl overflow-hidden">
+                <DashboardPreview
+                  markdown={markdown}
+                  templateId={templateId}
+                  pageFormat="A4"
+                  fontSize={12}
+                  pagePadding={20}
+                  lineHeight={1.4}
+                  paragraphSpacing={1}
+                  themeColor="#3ECF8E"
+                  className="h-full"
+                  variant="template"
+                />
+              </div>
             </div>
           </div>
         </div>

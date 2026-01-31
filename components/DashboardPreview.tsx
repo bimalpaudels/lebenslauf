@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { TemplateHost } from "@/components/builder/TemplateHost";
 
 interface DashboardPreviewProps {
@@ -167,7 +168,7 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
 
   const containerClasses = cn(
     "h-full w-full bg-transparent overflow-hidden",
-    "flex flex-col items-start justify-start relative",
+    "flex flex-col items-center justify-center relative",
     className
   );
 
@@ -182,15 +183,21 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
     <div className={containerClasses} ref={setContainerRef}>
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
       <div
-        className={pageClasses}
         style={{
-          width: `${pageDimensions.width}px`,
-          height: `${pageDimensions.height}px`,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
+          width: `${pageDimensions.width * scale}px`,
+          height: `${pageDimensions.height * scale}px`,
         }}
       >
-        <div className={contentClasses}>
+        <div
+          className={pageClasses}
+          style={{
+            width: `${pageDimensions.width}px`,
+            height: `${pageDimensions.height}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
+        >
+        <div className={cn(contentClasses, "h-full")}>
           {contentOverlay ? (
             <div
               className="absolute top-2 right-2 z-10 pointer-events-auto"
@@ -214,11 +221,23 @@ const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                 paragraphSpacing,
               }}
             />
-          ) : null}
+          ) : (
+            <MarkdownRenderer 
+              content={markdown} 
+              theme={{
+                color: themeColor,
+                fontSize,
+                lineHeight,
+                pagePadding,
+                paragraphSpacing,
+              }} 
+            />
+          )}
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DashboardPreview;

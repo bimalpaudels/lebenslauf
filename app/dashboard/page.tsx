@@ -139,6 +139,7 @@ export default function Dashboard() {
                           key={`${cvId}-${cvData.updated_at}`}
                           markdown={cvData.content}
                           css={cvData.design}
+                          templateId={cvData.templateId}
                           pageFormat={cvData.style.pageSize as "A4" | "Letter"}
                           fontSize={cvData.style.fontSize}
                           pagePadding={cvData.style.marginV}
